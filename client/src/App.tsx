@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAudio } from "@/lib/stores/useAudio";
 import { useGame } from "@/lib/stores/useGame";
+import { useUser } from "@/lib/stores/useUser";
 import Scene3D from "@/components/Scene3D";
 import SuperheroUI from "@/components/SuperheroUI";
 import HeroShowcase from "@/components/HeroShowcase";
@@ -13,6 +14,7 @@ import BlackCard from "@/components/BlackCard";
 import ContributionCalculator from "@/components/ContributionCalculator";
 import MissionRoadmap from "@/components/MissionRoadmap";
 import NFTPreview from "@/components/NFTPreview";
+import LoginModal from "@/components/LoginModal";
 import { 
   Volume2, 
   VolumeX, 
@@ -140,6 +142,16 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
 
 function MainExperience() {
   const [currentTab, setCurrentTab] = useState("heroes");
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const { isLoggedIn } = useUser();
+
+  useEffect(() => {
+    // Show login modal if user is not logged in
+    if (!isLoggedIn) {
+      const timer = setTimeout(() => setShowLoginModal(true), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoggedIn]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 relative">
@@ -153,6 +165,7 @@ function MainExperience() {
       {/* UI Overlay */}
       <SuperheroUI />
       <HeroShowcase />
+      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
 
       {/* Main Content Tabs */}
       <div className="relative z-10 pt-20">
@@ -210,12 +223,17 @@ function MainExperience() {
 
 function App() {
   const { phase, start } = useGame();
+  const { initializeAuth, isLoggedIn } = useUser();
   const [showWelcome, setShowWelcome] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize audio on first user interaction
+  // Initialize authentication and audio
   useEffect(() => {
-    const initializeAudio = () => {
+    const initializeApp = async () => {
+      // Initialize authentication
+      await initializeAuth();
+      
+      // Initialize audio
       const audio = new Audio('/sounds/background.mp3');
       audio.loop = true;
       audio.volume = 0.3;
@@ -226,16 +244,14 @@ function App() {
       useAudio.getState().setBackgroundMusic(audio);
       useAudio.getState().setHitSound(hitSound);
       useAudio.getState().setSuccessSound(successSound);
+      
+      setIsLoading(false);
     };
 
-    // Simulate loading time
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-      initializeAudio();
-    }, 2000);
-
+    // Simulate loading time then initialize
+    const timer = setTimeout(initializeApp, 2000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [initializeAuth]);
 
   const handleEnterExperience = () => {
     setShowWelcome(false);

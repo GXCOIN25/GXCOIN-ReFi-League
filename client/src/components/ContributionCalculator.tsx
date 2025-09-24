@@ -15,8 +15,8 @@ export default function ContributionCalculator() {
   const { playSuccess } = useAudio();
   
   const simulatedImpact = calculateImpact(simulatedAmount[0]);
-  const simulatedRank = [...useContribution.getState().currentRank, ...useContribution.getState().getCurrentRank()].reverse()
-    .find(rank => simulatedAmount[0] >= rank.minContribution) || useContribution.getState().currentRank;
+  const allRanks = useContribution.getState().getCurrentRank();
+  const simulatedRank = allRanks;
 
   const handleContribute = () => {
     addContribution(simulatedAmount[0]);
@@ -147,7 +147,7 @@ export default function ContributionCalculator() {
           <div className="p-4 rounded-lg bg-gradient-to-r from-gray-900 to-gray-800 border border-gray-700">
             <h4 className="text-white font-medium mb-2">Unlocked Benefits:</h4>
             <div className="space-y-1 text-sm">
-              {simulatedRank.benefits.slice(0, 3).map((benefit, index) => (
+              {simulatedRank.benefits.slice(0, 3).map((benefit: string, index: number) => (
                 <div key={index} className="flex items-center gap-2 text-gray-300">
                   <div 
                     className="w-2 h-2 rounded-full"
