@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { ranks } from "@/data/ranks";
 import { Rank } from "@/types/heroes";
+import { GXCoinAPI } from "@/lib/api";
+import { useUser } from "./useUser";
 
 interface ContributionState {
   totalContribution: number;
@@ -13,10 +15,12 @@ interface ContributionState {
     treesPlanted: number;
     waterPurified: number;
   };
+  isLoading: boolean;
   
   // Actions
-  addContribution: (amount: number) => void;
-  calculateImpact: (contribution: number) => typeof ContributionState.prototype.impactMetrics;
+  addContribution: (amount: number) => Promise<void>;
+  loadUserData: () => Promise<void>;
+  calculateImpact: (contribution: number) => { plasticRemoved: number; carbonOffset: number; renewableEnergy: number; treesPlanted: number; waterPurified: number; };
   getCurrentRank: () => Rank;
   getNextRank: () => Rank | null;
   getProgressToNext: () => number;
@@ -33,17 +37,60 @@ export const useContribution = create<ContributionState>()(
       treesPlanted: 0,
       waterPurified: 0
     },
+    isLoading: false,
     
-    addContribution: (amount: number) => {
-      const newTotal = get().totalContribution + amount;
-      const newRank = get().getCurrentRank();
-      const impact = get().calculateImpact(newTotal);
+    addContribution: async (amount: number) => {
+      const user = useUser.getState().currentUser;
+      if (!user) return;
       
-      set({
-        totalContribution: newTotal,
-        currentRank: newRank,
-        impactMetrics: impact
-      });
+      set({ isLoading: true });
+      
+      try {
+        // Calculate new total and rank AFTER adding the contribution
+        const newTotal = get().totalContribution + amount;
+        const newRank = [...ranks].reverse().find(rank => newTotal >= rank.minContribution) || ranks[0];
+        const impact = get().calculateImpact(newTotal);
+        
+        // Save to backend with correct rank based on new total
+        await GXCoinAPI.addContribution({
+          amount,
+          currentRankId: newRank.id,
+          impactMetrics: impact
+        });
+        
+        set({
+          totalContribution: newTotal,
+          currentRank: newRank,
+          impactMetrics: impact,
+          isLoading: false
+        });
+      } catch (error) {
+        console.error('Failed to add contribution:', error);
+        set({ isLoading: false });
+      }
+    },
+    
+    loadUserData: async () => {
+      const user = useUser.getState().currentUser;
+      if (!user) return;
+      
+      set({ isLoading: true });
+      
+      try {
+        const total = await GXCoinAPI.getTotalContribution();
+        const newRank = [...ranks].reverse().find(rank => total >= rank.minContribution) || ranks[0];
+        const impact = get().calculateImpact(total);
+        
+        set({
+          totalContribution: total,
+          currentRank: newRank,
+          impactMetrics: impact,
+          isLoading: false
+        });
+      } catch (error) {
+        console.error('Failed to load user data:', error);
+        set({ isLoading: false });
+      }
     },
     
     calculateImpact: (contribution: number) => {

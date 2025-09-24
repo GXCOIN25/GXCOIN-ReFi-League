@@ -35,7 +35,7 @@ export default function NFTPreview() {
 
   const nftPreviews = heroes.map(hero => 
     generateNFTPreview(hero.id, Math.min(Math.floor(currentRank.impactMultiplier), 5))
-  ).filter(Boolean);
+  ).filter((nft): nft is NonNullable<typeof nft> => nft !== null);
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {

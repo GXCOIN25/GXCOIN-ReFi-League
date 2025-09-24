@@ -5,10 +5,12 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useHeroes } from "@/lib/stores/useHeroes";
 import { useContribution } from "@/lib/stores/useContribution";
-import { Zap, Shield, Crown, Star, Award } from "lucide-react";
+import { useUser } from "@/lib/stores/useUser";
+import { Zap, Shield, Crown, Star, Award, User, LogOut } from "lucide-react";
 
 export default function SuperheroUI() {
   const { currentRank, totalContribution, getProgressToNext, getNextRank } = useContribution();
+  const { currentUser, isLoggedIn, logout } = useUser();
   const nextRank = getNextRank();
   const progress = getProgressToNext();
 
@@ -23,8 +25,46 @@ export default function SuperheroUI() {
     }
   };
 
+  if (!isLoggedIn) {
+    return (
+      <div className="fixed top-4 left-4 z-50">
+        <Card className="bg-black/60 border-gray-500/30 backdrop-blur-sm">
+          <CardContent className="p-4 text-center">
+            <User className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+            <p className="text-sm text-gray-300">Welcome to GXCOIN</p>
+            <p className="text-xs text-gray-500">Login to start your eco-warrior journey</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed top-4 left-4 z-50 space-y-4 max-w-sm">
+      {/* User Info */}
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Card className="bg-black/60 border-purple-500/30 backdrop-blur-sm">
+          <CardContent className="p-3 flex items-center gap-3">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-white">{currentUser?.username}</p>
+              <p className="text-xs text-gray-400">Eco-Warrior #{currentUser?.id}</p>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={logout}
+              className="text-gray-400 hover:text-white h-8 w-8 p-0"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
+      
       {/* Current Rank Display */}
       <motion.div
         initial={{ opacity: 0, x: -50 }}
