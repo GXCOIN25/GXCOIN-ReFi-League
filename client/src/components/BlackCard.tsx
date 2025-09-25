@@ -33,15 +33,15 @@ export default function BlackCard() {
           className="absolute inset-0 backface-hidden"
           style={{ backfaceVisibility: "hidden" }}
         >
-          <Card className="h-64 bg-gradient-to-br from-gray-900 via-black to-gray-800 border-gold-500/50 overflow-hidden">
+          <Card className="h-64 bg-gradient-to-br from-gray-900 via-black to-gray-800 border-yellow-500/50 overflow-hidden">
             <CardContent className="h-full flex flex-col justify-center items-center text-center p-6 relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-gold-500/10 via-transparent to-purple-500/10" />
+              <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 via-transparent to-purple-500/10" />
               
               <motion.div
                 whileHover={{ scale: 1.1 }}
                 className="relative z-10"
               >
-                <CreditCard className="h-12 w-12 text-gold-400 mb-4" />
+                <CreditCard className="h-12 w-12 text-yellow-400 mb-4" />
               </motion.div>
               
               <h3 className="text-xl font-bold text-white mb-2">
@@ -53,7 +53,7 @@ export default function BlackCard() {
               
               <Button 
                 onClick={() => setIsRevealed(true)}
-                className="bg-gradient-to-r from-gold-600 to-gold-400 hover:from-gold-500 hover:to-gold-300"
+                className="bg-gradient-to-r from-yellow-600 to-yellow-400 hover:from-yellow-500 hover:to-yellow-300"
               >
                 Reveal Card Features
               </Button>
@@ -69,8 +69,8 @@ export default function BlackCard() {
             transform: "rotateY(180deg)" 
           }}
         >
-          <Card className="h-64 bg-black border-gold-500 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-gold-500/5 via-purple-500/5 to-blue-500/5" />
+          <Card className="h-64 bg-black border-yellow-500 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 via-purple-500/5 to-blue-500/5" />
             
             <CardContent className="h-full p-4 relative z-10">
               <div className="flex justify-between items-start mb-4">
