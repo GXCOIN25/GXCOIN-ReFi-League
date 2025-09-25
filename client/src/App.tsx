@@ -163,7 +163,7 @@ function MainExperience() {
   // }, [isLoggedIn]);
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-br from-gray-900 via-black to-blue-900 relative overflow-y-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 relative overflow-y-auto">
       {/* Background with Hero Visualization */}
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-gray-900 via-black to-blue-900 pointer-events-none">
         <div className="w-full h-full flex items-center justify-center">
@@ -255,7 +255,7 @@ function MainExperience() {
               </TabsList>
             </div>
 
-            <div className="space-y-8 min-h-[100dvh] overflow-y-auto">
+            <div className="space-y-8 min-h-screen overflow-y-auto px-2">
               <TabsContent value="heroes" className="space-y-8 mt-0">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}

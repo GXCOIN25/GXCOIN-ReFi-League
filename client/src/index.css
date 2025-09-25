@@ -12,7 +12,7 @@
     margin: 0;
     padding: 0;
     width: 100vw;
-    min-height: 100dvh;
+    min-height: 100vh;
     overflow-x: hidden;
     overflow-y: auto;
     /* Add safe area padding for mobile devices */
@@ -28,7 +28,7 @@
 
 #root {
   width: 100%;
-  min-height: 100dvh;
+  min-height: 100vh;
   position: relative;
   overflow-y: auto;
   /* Improve mobile performance */
