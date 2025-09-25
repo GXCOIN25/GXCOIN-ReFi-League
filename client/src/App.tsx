@@ -222,7 +222,7 @@ function MainExperience() {
                   <Zap className="w-3 h-3" />
                   <span className="hidden sm:inline">Calculate</span>
                 </TabsTrigger>
-                <TabsTrigger value="nfts" className="text-xs flex items-center gap-1">
+                <TabsTrigger value="nfts" className="text-xs flex items-center gap-1 cursor-pointer hover:bg-white/10 p-2 rounded">
                   <Sparkles className="w-3 h-3" />
                   <span className="hidden sm:inline">NFTs</span>
                 </TabsTrigger>
@@ -271,6 +271,18 @@ function MainExperience() {
               </TabsContent>
 
               <TabsContent value="nfts" className="mt-0">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center space-y-4 mb-8"
+                >
+                  <h1 className="text-4xl font-bold text-white">
+                    <span className="text-purple-400">Dynamic</span> NFT Collection
+                  </h1>
+                  <p className="text-gray-300 max-w-2xl mx-auto">
+                    Explore and mint your evolving NFT badges that grow with your environmental impact.
+                  </p>
+                </motion.div>
                 <NFTPreview onMintNFT={(heroId: string, level: number) => setShowNFTMinting({ heroId, level })} />
               </TabsContent>
               
