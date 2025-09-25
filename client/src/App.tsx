@@ -165,11 +165,13 @@ function MainExperience() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 relative">
-      {/* 3D Scene Background */}
-      <div className="absolute inset-0 z-0">
-        <Suspense fallback={<div className="w-full h-full bg-black" />}>
-          <Scene3D />
-        </Suspense>
+      {/* Simplified Background */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-gray-900 via-black to-blue-900" />
+
+      {/* Test Content */}
+      <div className="relative z-10 p-8">
+        <h1 className="text-4xl font-bold text-white mb-4">GXCOIN Platform Loading...</h1>
+        <p className="text-gray-300">Testing basic functionality</p>
       </div>
 
       {/* UI Overlay */}
