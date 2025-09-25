@@ -35,7 +35,7 @@ import "@fontsource/inter";
 
 function LoadingScreen() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 flex items-center justify-center">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-gray-900 via-black to-blue-900 flex items-center justify-center overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.5 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -44,7 +44,7 @@ function LoadingScreen() {
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          className="w-16 h-16 mx-auto"
+          className="w-16 h-16 mx-auto motion-reduce:animate-none"
         >
           <Zap className="w-full h-full text-green-400" />
         </motion.div>
@@ -71,7 +71,7 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 flex items-center justify-center px-4"
+      className="min-h-[100dvh] bg-gradient-to-br from-gray-900 via-black to-blue-900 flex items-center justify-center px-4 overflow-y-auto"
     >
       <Card className="w-full max-w-lg bg-black/60 backdrop-blur-sm border-green-500/30">
         <CardContent className="p-8 text-center space-y-6">
@@ -163,17 +163,17 @@ function MainExperience() {
   // }, [isLoggedIn]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 relative">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-gray-900 via-black to-blue-900 relative overflow-y-auto">
       {/* Background with Hero Visualization */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-gray-900 via-black to-blue-900">
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-gray-900 via-black to-blue-900 pointer-events-none">
         <div className="w-full h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-6 max-w-4xl">
               {heroes.map((hero) => (
                 <div key={hero.id} className="text-center space-y-2">
                   <div 
-                    className="w-16 h-16 mx-auto rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform"
-                    style={{ backgroundColor: hero.color + '30', border: `2px solid ${hero.color}` }}
+                    className="w-16 h-16 mx-auto rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform pointer-events-auto"
+                    style={{ backgroundColor: hero.color + '30', border: `2px solid ${hero.color}`, minWidth: '44px', minHeight: '44px' }}
                     onClick={() => selectHero && selectHero(hero.id)}
                   >
                     <span className="text-2xl font-bold text-white">{hero.symbol.charAt(1)}</span>
@@ -219,43 +219,43 @@ function MainExperience() {
         <div className="max-w-7xl mx-auto px-4">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
             <div className="flex justify-center mb-8">
-              <TabsList className="grid w-full max-w-4xl grid-cols-4 md:grid-cols-8 gap-1 bg-black/60 backdrop-blur-sm p-2">
-                <TabsTrigger value="heroes" className="text-xs flex items-center gap-1 cursor-pointer hover:bg-white/10 p-2 rounded">
+              <TabsList className="mobile-tabs-list w-full max-w-4xl bg-black/60 backdrop-blur-sm p-2 flex overflow-x-auto scroll-smooth gap-1 md:grid md:grid-cols-8">
+                <TabsTrigger value="heroes" className="mobile-tab-trigger text-xs flex items-center gap-1 cursor-pointer hover:bg-white/10 rounded flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
                   <Shield className="w-3 h-3" />
                   <span className="hidden sm:inline">Heroes</span>
                 </TabsTrigger>
-                <TabsTrigger value="ranks" className="text-xs flex items-center gap-1">
+                <TabsTrigger value="ranks" className="mobile-tab-trigger text-xs flex items-center gap-1 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
                   <Trophy className="w-3 h-3" />
                   <span className="hidden sm:inline">Ranks</span>
                 </TabsTrigger>
-                <TabsTrigger value="calculate" className="text-xs flex items-center gap-1">
+                <TabsTrigger value="calculate" className="mobile-tab-trigger text-xs flex items-center gap-1 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
                   <Zap className="w-3 h-3" />
                   <span className="hidden sm:inline">Calculate</span>
                 </TabsTrigger>
-                <TabsTrigger value="nfts" className="text-xs flex items-center gap-1 cursor-pointer hover:bg-white/10 p-2 rounded">
+                <TabsTrigger value="nfts" className="mobile-tab-trigger text-xs flex items-center gap-1 cursor-pointer hover:bg-white/10 rounded flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
                   <Sparkles className="w-3 h-3" />
                   <span className="hidden sm:inline">NFTs</span>
                 </TabsTrigger>
-                <TabsTrigger value="impact" className="text-xs flex items-center gap-1">
+                <TabsTrigger value="impact" className="mobile-tab-trigger text-xs flex items-center gap-1 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
                   <Globe className="w-3 h-3" />
                   <span className="hidden sm:inline">Impact</span>
                 </TabsTrigger>
-                <TabsTrigger value="community" className="text-xs flex items-center gap-1">
+                <TabsTrigger value="community" className="mobile-tab-trigger text-xs flex items-center gap-1 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
                   <Users className="w-3 h-3" />
                   <span className="hidden sm:inline">Community</span>
                 </TabsTrigger>
-                <TabsTrigger value="tokens" className="text-xs flex items-center gap-1">
+                <TabsTrigger value="tokens" className="mobile-tab-trigger text-xs flex items-center gap-1 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
                   <Coins className="w-3 h-3" />
                   <span className="hidden sm:inline">Tokens</span>
                 </TabsTrigger>
-                <TabsTrigger value="wallet" className="text-xs flex items-center gap-1">
+                <TabsTrigger value="wallet" className="mobile-tab-trigger text-xs flex items-center gap-1 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
                   <Wallet className="w-3 h-3" />
                   <span className="hidden sm:inline">Wallet</span>
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            <div className="space-y-8 min-h-screen">
+            <div className="space-y-8 min-h-[100dvh] overflow-y-auto">
               <TabsContent value="heroes" className="space-y-8 mt-0">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}

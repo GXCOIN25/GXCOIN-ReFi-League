@@ -12,15 +12,19 @@
     margin: 0;
     padding: 0;
     width: 100vw;
-    min-height: 100vh;
+    min-height: 100dvh;
     overflow-x: hidden;
     overflow-y: auto;
+    /* Add safe area padding for mobile devices */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
 #root {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100dvh;
   position: relative;
   overflow-y: auto;
 }
@@ -30,4 +34,37 @@ canvas {
   height: 100% !important;
   touch-action: auto;
   pointer-events: auto;
+}
+
+/* Mobile-specific styles */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Horizontal scrolling tabs for mobile */
+.mobile-tabs-list {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-tabs-list::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-tab-trigger {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
 }

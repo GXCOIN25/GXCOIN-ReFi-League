@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useHeroes } from "@/lib/stores/useHeroes";
 import { useContribution } from "@/lib/stores/useContribution";
 import { Sparkles, Star, Zap, Award, Crown } from "lucide-react";
+import TokenBadge, { TokenSymbol } from "./TokenBadge";
 
 interface NFTPreviewProps {
   onMintNFT?: (heroId: string, level: number) => void;
@@ -16,23 +17,56 @@ export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
   const { heroes, nftBadges, unlockNFTBadge } = useHeroes();
   const { currentRank, impactMetrics } = useContribution();
 
+  // Helper function to map hero symbols to token symbols for the TokenBadge
+  const getTokenSymbol = (heroSymbol: string): TokenSymbol => {
+    switch (heroSymbol) {
+      case "$GCCT": return "GCCT";
+      case "$WTR": return "WTR";
+      case "$GPWR": return "GPWR";
+      case "$BATT": return "BATT";
+      case "$HEMP": return "HEMP";
+      default: return "GCCT"; // fallback
+    }
+  };
+
   // Generate dynamic NFT previews based on rank and impact
   const generateNFTPreview = (heroId: string, level: number) => {
     const hero = heroes.find(h => h.id === heroId);
     if (!hero) return null;
 
     const rarity = level > 3 ? 'Legendary' : level > 1 ? 'Rare' : 'Common';
-    const attributes = {
-      power: Math.min(level * 10 + Math.floor(impactMetrics.carbonOffset / 10), 100),
-      impact: Math.min(level * 15 + Math.floor(impactMetrics.plasticRemoved / 100), 100),
-      rarity: level * 20
+    
+    // Enhanced attribute calculation based on currentRank and impactMetrics
+    const rankMultiplier = currentRank.impactMultiplier;
+    const baseAttributes = {
+      power: Math.min(
+        level * 8 + 
+        Math.floor(impactMetrics.carbonOffset / 100) + 
+        Math.floor(impactMetrics.renewableEnergy / 200) +
+        (rankMultiplier * 10), 
+        100
+      ),
+      impact: Math.min(
+        level * 12 + 
+        Math.floor(impactMetrics.plasticRemoved / 1000) + 
+        Math.floor(impactMetrics.waterPurified / 5000) + 
+        Math.floor(impactMetrics.treesPlanted * 5) +
+        (rankMultiplier * 8), 
+        100
+      ),
+      rarity: Math.min(
+        level * 15 + 
+        Math.floor((impactMetrics.carbonOffset + impactMetrics.plasticRemoved) / 10000) +
+        (rankMultiplier * 12),
+        100
+      )
     };
 
     return {
       hero,
       level,
-      rarity,
-      attributes,
+      rarity: rarity as 'Common' | 'Rare' | 'Legendary',
+      attributes: baseAttributes,
       evolution: level > 3 ? 'Legendary' : level > 1 ? 'Evolved' : 'Base'
     };
   };
@@ -130,24 +164,27 @@ export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
                       <span className="text-xs text-gray-400">Level {nft.level}</span>
                     </div>
 
-                    {/* NFT Visual Representation */}
-                    <div 
-                      className={`w-full h-32 rounded-lg mb-3 bg-gradient-to-br ${nft.hero.gradient} flex items-center justify-center relative overflow-hidden`}
-                    >
-                      <div className="absolute inset-0 bg-black/20" />
-                      <div className="relative z-10 text-center">
-                        <div className="text-3xl font-bold text-white mb-1">
-                          {nft.hero.name}
-                        </div>
-                        <div className="text-sm text-white/80">
-                          {nft.hero.nftBadge}
+                    {/* NFT Visual Representation - TokenBadge */}
+                    <div className="w-full h-44 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden bg-gray-900/50">
+                      <div className="flex flex-col items-center gap-2">
+                        <TokenBadge
+                          tokenSymbol={getTokenSymbol(nft.hero.symbol)}
+                          attributes={nft.attributes}
+                          rarity={nft.rarity}
+                          level={nft.level}
+                          size="lg"
+                          className="drop-shadow-lg"
+                          animated={true}
+                        />
+                        <div className="text-center">
+                          <div className="text-sm font-bold text-white">
+                            {nft.hero.name}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            {nft.hero.nftBadge}
+                          </div>
                         </div>
                       </div>
-                      
-                      {/* Evolution Effects */}
-                      {nft.evolution === 'Legendary' && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-400/20 to-transparent animate-pulse" />
-                      )}
                     </div>
 
                     {/* NFT Info */}
@@ -157,20 +194,9 @@ export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
                         Evolution: <span className="text-white">{nft.evolution}</span>
                       </div>
                       
-                      {/* Attributes */}
-                      <div className="grid grid-cols-3 gap-2 text-xs">
-                        <div className="text-center">
-                          <div className="text-red-400 font-bold">{nft.attributes.power}</div>
-                          <div className="text-gray-400">Power</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-blue-400 font-bold">{nft.attributes.impact}</div>
-                          <div className="text-gray-400">Impact</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-purple-400 font-bold">{nft.attributes.rarity}</div>
-                          <div className="text-gray-400">Rarity</div>
-                        </div>
+                      {/* Attribute Summary - Now integrated into TokenBadge */}
+                      <div className="text-xs text-center text-gray-400">
+                        Attributes dynamically displayed in badge progress arcs
                       </div>
                     </div>
                   </CardContent>
