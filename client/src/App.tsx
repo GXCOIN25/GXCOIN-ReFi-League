@@ -154,12 +154,13 @@ function MainExperience() {
   const { isLoggedIn } = useUser();
   const { heroes, selectHero } = useHeroes();
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      const timer = setTimeout(() => setShowLoginModal(true), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [isLoggedIn]);
+  // Remove automatic login modal - let users explore freely
+  // useEffect(() => {
+  //   if (!isLoggedIn) {
+  //     const timer = setTimeout(() => setShowLoginModal(true), 2000);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [isLoggedIn]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 relative">
@@ -182,9 +183,18 @@ function MainExperience() {
                 </div>
               ))}
             </div>
-            <div className="text-center">
+            <div className="text-center space-y-4">
               <h3 className="text-2xl font-bold text-white mb-2">GXCOIN Eco-Warriors</h3>
               <p className="text-gray-400">Click heroes above to explore their powers</p>
+              {!isLoggedIn && (
+                <Button
+                  onClick={() => setShowLoginModal(true)}
+                  size="sm"
+                  className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-500 hover:to-blue-500 text-white font-semibold"
+                >
+                  Login to Save Progress
+                </Button>
+              )}
             </div>
           </div>
         </div>
