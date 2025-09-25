@@ -15,11 +15,18 @@ export const WalletConnect: React.FC = () => {
     setError
   } = useWallet();
   
+  console.log('WalletConnect render:', { isConnected, address, balance, isConnecting, error });
+  
   const [copySuccess, setCopySuccess] = useState(false);
 
   const handleConnect = async () => {
     setError(null);
-    await connectWallet();
+    try {
+      await connectWallet();
+    } catch (err) {
+      console.error('Wallet connection error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to connect wallet');
+    }
   };
   
   const copyAddress = async () => {
