@@ -1,36 +1,40 @@
 import React, { useMemo } from "react";
 import { motion } from "framer-motion";
 
-// Token-specific color themes as specified in the task
+// Token-specific image mappings to the uploaded NFT card images
+const TOKEN_IMAGES = {
+  GCCT: "/gcct-badge.jpg", // Carbon Credits shield badge
+  WTR: "/wtr-badge.jpg", // Water warrior badge
+  GPWR: "/heroes-group.jpg", // Use group image for GPWR until we have individual one
+  BATT: "/batt-badge.jpg", // Battery/tech warrior badge
+  HEMP: "/hemp-badge.jpg" // Hemp nature warrior badge
+} as const;
+
+// Token-specific color themes for progress rings and accents
 const TOKEN_THEMES = {
   GCCT: {
     primary: "#22c55e", // emerald
     gradient: ["#22c55e", "#16a34a", "#15803d"],
-    glyph: "₵",
     name: "Carbon Credits"
   },
   WTR: {
     primary: "#3b82f6", // blue
     gradient: ["#3b82f6", "#2563eb", "#1d4ed8"],
-    glyph: "≋",
     name: "Water"
   },
   GPWR: {
     primary: "#f59e0b", // amber
     gradient: ["#f59e0b", "#d97706", "#b45309"],
-    glyph: "⚡",
     name: "Green Power"
   },
   BATT: {
     primary: "#fb923c", // orange
     gradient: ["#fb923c", "#f97316", "#ea580c"],
-    glyph: "🔋",
     name: "Battery"
   },
   HEMP: {
     primary: "#84cc16", // lime
     gradient: ["#84cc16", "#65a30d", "#4d7c0f"],
-    glyph: "🌿",
     name: "Hemp"
   }
 } as const;
@@ -62,7 +66,7 @@ interface CircularProgressProps {
   label: string;
 }
 
-// Circular progress arc component
+// Circular progress arc component for attributes overlay
 const CircularProgress: React.FC<CircularProgressProps> = ({
   value,
   max,
@@ -73,94 +77,66 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   className = "",
   label
 }) => {
+  const normalizedValue = Math.min(Math.max(value, 0), max);
+  const percentage = (normalizedValue / max) * 100;
   const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const progress = Math.min(value / max, 1);
+  const circumference = radius * 2 * Math.PI;
   const strokeDasharray = circumference;
-  const strokeDashoffset = circumference * (1 - progress);
-  
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
   return (
     <div className={`relative ${className}`} style={{ width: size, height: size }}>
       <svg
+        className="absolute inset-0 -rotate-90"
         width={size}
         height={size}
-        className="rotate-[-90deg]"
-        aria-label={`${label}: ${value}/${max}`}
+        viewBox={`0 0 ${size} ${size}`}
+        aria-label={`${label}: ${normalizedValue}/${max}`}
         role="img"
       >
-        {/* Track */}
+        {/* Background track */}
         <circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          fill="none"
+          fill="transparent"
           stroke={trackColor}
           strokeWidth={strokeWidth}
         />
-        {/* Progress */}
+        {/* Progress arc */}
         <motion.circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          fill="none"
+          fill="transparent"
           stroke={color}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
-          style={{
-            strokeDasharray,
-            strokeDashoffset
-          }}
+          strokeDasharray={strokeDasharray}
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset }}
-          transition={{ duration: 1, ease: "easeOut" }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
         />
       </svg>
-      {/* Value text */}
+      {/* Center label */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-xs font-bold text-white" aria-hidden="true">
-          {value}
+        <span className="text-xs font-bold text-white drop-shadow-lg">
+          {normalizedValue}
         </span>
       </div>
     </div>
   );
 };
 
-// Token glyph component
-const TokenGlyph: React.FC<{ symbol: TokenSymbol; size: number; color: string }> = ({
-  symbol,
-  size,
-  color
-}) => {
-  const theme = TOKEN_THEMES[symbol];
-  
-  return (
-    <div 
-      className="flex items-center justify-center font-bold"
-      style={{ 
-        fontSize: size * 0.6,
-        color,
-        textShadow: '0 0 8px rgba(0,0,0,0.5)'
-      }}
-      aria-label={`${theme.name} token`}
-    >
-      {theme.glyph}
-    </div>
-  );
-};
-
 // Shimmer effect for legendary badges
-const ShimmerEffect: React.FC<{ children: React.ReactNode; enabled: boolean }> = ({
-  children,
-  enabled
+const ShimmerEffect: React.FC<{ children: React.ReactNode; enabled: boolean }> = ({ 
+  children, 
+  enabled 
 }) => {
   if (!enabled) return <>{children}</>;
-  
+
   return (
-    <motion.div
-      className="relative overflow-hidden"
-      initial={{ opacity: 1 }}
-      animate={{ opacity: 1 }}
-    >
+    <motion.div className="relative overflow-hidden rounded-lg">
       {children}
       <motion.div
         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full"
@@ -190,6 +166,7 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
   animated = true
 }) => {
   const theme = TOKEN_THEMES[tokenSymbol];
+  const imageSrc = TOKEN_IMAGES[tokenSymbol];
   const isLegendary = rarity === 'Legendary';
   
   // Size configurations
@@ -200,7 +177,7 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
           container: 120,
           progress: 24,
           progressStroke: 2,
-          glyph: 32,
+          image: 100,
           padding: 8
         };
       case 'lg':
@@ -208,7 +185,7 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
           container: 200,
           progress: 40,
           progressStroke: 3,
-          glyph: 80,
+          image: 180,
           padding: 16
         };
       default: // 'md'
@@ -216,7 +193,7 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
           container: 160,
           progress: 32,
           progressStroke: 2.5,
-          glyph: 60,
+          image: 140,
           padding: 12
         };
     }
@@ -227,166 +204,139 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const shouldAnimate = animated && !prefersReducedMotion;
 
+  // Rarity border styles
+  const rarityStyles = useMemo(() => {
+    switch (rarity) {
+      case 'Legendary':
+        return {
+          border: `3px solid ${theme.primary}`,
+          boxShadow: `0 0 20px ${theme.primary}50, inset 0 0 20px ${theme.primary}20`,
+          background: `linear-gradient(135deg, ${theme.gradient[0]}10, ${theme.gradient[1]}20, ${theme.gradient[2]}10)`
+        };
+      case 'Rare':
+        return {
+          border: `2px solid ${theme.primary}80`,
+          boxShadow: `0 0 10px ${theme.primary}30`,
+          background: `linear-gradient(135deg, ${theme.gradient[0]}05, ${theme.gradient[1]}10)`
+        };
+      default: // Common
+        return {
+          border: `1px solid ${theme.primary}40`,
+          boxShadow: `0 0 5px ${theme.primary}20`,
+          background: `linear-gradient(135deg, ${theme.gradient[0]}02, ${theme.gradient[1]}05)`
+        };
+    }
+  }, [rarity, theme]);
+
   return (
     <ShimmerEffect enabled={isLegendary && shouldAnimate}>
       <motion.div
-        className={`relative ${className}`}
-        style={{ width: sizeConfig.container, height: sizeConfig.container }}
+        className={`relative rounded-xl overflow-hidden ${className}`}
+        style={{ 
+          width: sizeConfig.container, 
+          height: sizeConfig.container,
+          ...rarityStyles
+        }}
         initial={shouldAnimate ? { scale: 0.8, opacity: 0 } : undefined}
         animate={shouldAnimate ? { scale: 1, opacity: 1 } : undefined}
         transition={{ duration: 0.5, ease: "easeOut" }}
         whileHover={shouldAnimate ? { scale: 1.05 } : undefined}
       >
-        {/* Main badge background */}
-        <div className="absolute inset-0 rounded-full overflow-hidden">
-          <svg
-            width={sizeConfig.container}
-            height={sizeConfig.container}
-            className="absolute inset-0"
-            aria-hidden="true"
-          >
-            <defs>
-              <radialGradient
-                id={`badge-gradient-${tokenSymbol}-${level}`}
-                cx="50%"
-                cy="30%"
-                r="70%"
-              >
-                <stop offset="0%" stopColor={theme.gradient[0]} stopOpacity="0.9" />
-                <stop offset="50%" stopColor={theme.gradient[1]} stopOpacity="0.8" />
-                <stop offset="100%" stopColor={theme.gradient[2]} stopOpacity="0.9" />
-              </radialGradient>
-              <radialGradient
-                id={`badge-overlay-${tokenSymbol}-${level}`}
-                cx="50%"
-                cy="50%"
-                r="50%"
-              >
-                <stop offset="0%" stopColor="rgba(255,255,255,0.3)" />
-                <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-              </radialGradient>
-            </defs>
-            
-            {/* Main circle */}
-            <circle
-              cx={sizeConfig.container / 2}
-              cy={sizeConfig.container / 2}
-              r={sizeConfig.container / 2 - 2}
-              fill={`url(#badge-gradient-${tokenSymbol}-${level})`}
-              stroke={theme.primary}
-              strokeWidth="2"
-            />
-            
-            {/* Highlight overlay */}
-            <circle
-              cx={sizeConfig.container / 2}
-              cy={sizeConfig.container / 2}
-              r={sizeConfig.container / 4}
-              fill={`url(#badge-overlay-${tokenSymbol}-${level})`}
-            />
-            
-            {/* Ring details for higher levels */}
-            {level > 2 && (
-              <circle
-                cx={sizeConfig.container / 2}
-                cy={sizeConfig.container / 2}
-                r={sizeConfig.container / 2 - 8}
-                fill="none"
-                stroke={theme.primary}
-                strokeWidth="1"
-                strokeOpacity="0.6"
-              />
-            )}
-          </svg>
-        </div>
-
-        {/* Token glyph/monogram */}
-        <div 
-          className="absolute inset-0 flex items-center justify-center z-10"
-          style={{ marginTop: -sizeConfig.padding }}
-        >
-          <TokenGlyph
-            symbol={tokenSymbol}
-            size={sizeConfig.glyph}
-            color="#ffffff"
+        {/* Main NFT card image */}
+        <div className="absolute inset-0">
+          <img
+            src={imageSrc}
+            alt={`${theme.name} NFT Badge`}
+            className="w-full h-full object-cover"
+            style={{
+              filter: `brightness(1.1) contrast(1.1) saturate(1.2)`
+            }}
+            onError={(e) => {
+              // Fallback to group image if individual image fails to load
+              const target = e.target as HTMLImageElement;
+              if (target.src !== '/heroes-group.jpg') {
+                target.src = '/heroes-group.jpg';
+              }
+            }}
           />
         </div>
 
-        {/* Progress arcs for attributes */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          {/* Power arc (top-right) */}
-          <div 
-            className="absolute"
-            style={{ 
-              top: sizeConfig.padding,
-              right: sizeConfig.padding
-            }}
-          >
-            <CircularProgress
-              value={attributes.power}
-              max={100}
-              size={sizeConfig.progress}
-              strokeWidth={sizeConfig.progressStroke}
-              color="#ef4444"
-              label="Power"
-            />
-          </div>
+        {/* Overlay gradient for better text visibility */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: `linear-gradient(45deg, ${theme.primary}20 0%, transparent 50%, ${theme.primary}10 100%)`
+          }}
+        />
 
-          {/* Impact arc (bottom-right) */}
+        {/* Token symbol overlay */}
+        <div className="absolute top-2 left-2">
           <div 
-            className="absolute"
+            className="px-2 py-1 rounded text-xs font-bold text-white shadow-lg"
             style={{ 
-              bottom: sizeConfig.padding,
-              right: sizeConfig.padding
+              background: `linear-gradient(135deg, ${theme.gradient[0]}, ${theme.gradient[1]})`,
+              border: `1px solid ${theme.primary}`
             }}
           >
-            <CircularProgress
-              value={attributes.impact}
-              max={100}
-              size={sizeConfig.progress}
-              strokeWidth={sizeConfig.progressStroke}
-              color="#3b82f6"
-              label="Impact"
-            />
-          </div>
-
-          {/* Rarity arc (bottom-left) */}
-          <div 
-            className="absolute"
-            style={{ 
-              bottom: sizeConfig.padding,
-              left: sizeConfig.padding
-            }}
-          >
-            <CircularProgress
-              value={attributes.rarity}
-              max={100}
-              size={sizeConfig.progress}
-              strokeWidth={sizeConfig.progressStroke}
-              color="#8b5cf6"
-              label="Rarity"
-            />
+            ${tokenSymbol}
           </div>
         </div>
 
         {/* Level indicator */}
-        <div 
-          className="absolute top-1 left-1 bg-black/60 text-white text-xs font-bold px-1.5 py-0.5 rounded-full"
-          aria-label={`Level ${level}`}
-        >
-          L{level}
+        <div className="absolute top-2 right-2">
+          <div 
+            className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-lg"
+            style={{ 
+              background: `linear-gradient(135deg, ${theme.gradient[1]}, ${theme.gradient[2]})`,
+              border: `1px solid ${theme.primary}`
+            }}
+          >
+            {level}
+          </div>
         </div>
 
         {/* Rarity indicator */}
-        <div 
-          className={`absolute top-1 right-1 text-xs font-bold px-1.5 py-0.5 rounded-full ${
-            rarity === 'Legendary' ? 'bg-yellow-500/80 text-yellow-900' :
-            rarity === 'Rare' ? 'bg-purple-500/80 text-white' :
-            'bg-gray-500/80 text-white'
-          }`}
-          aria-label={`${rarity} rarity`}
-        >
-          {rarity === 'Legendary' ? '★' : rarity === 'Rare' ? '◆' : '○'}
+        <div className="absolute bottom-2 left-2">
+          <div 
+            className="px-2 py-1 rounded text-xs font-semibold text-white shadow-lg backdrop-blur-sm"
+            style={{ 
+              background: `${theme.primary}80`,
+              border: `1px solid ${theme.primary}`
+            }}
+          >
+            {rarity}
+          </div>
+        </div>
+
+        {/* Attributes progress rings in bottom-right corner */}
+        <div className="absolute bottom-2 right-2 flex gap-1">
+          <CircularProgress
+            value={attributes.power}
+            max={100}
+            size={sizeConfig.progress}
+            strokeWidth={sizeConfig.progressStroke}
+            color={theme.gradient[0]}
+            label="Power"
+            className="opacity-90"
+          />
+          <CircularProgress
+            value={attributes.impact}
+            max={100}
+            size={sizeConfig.progress}
+            strokeWidth={sizeConfig.progressStroke}
+            color={theme.gradient[1]}
+            label="Impact"
+            className="opacity-90"
+          />
+          <CircularProgress
+            value={attributes.rarity}
+            max={100}
+            size={sizeConfig.progress}
+            strokeWidth={sizeConfig.progressStroke}
+            color={theme.gradient[2]}
+            label="Rarity Score"
+            className="opacity-90"
+          />
         </div>
       </motion.div>
     </ShimmerEffect>
