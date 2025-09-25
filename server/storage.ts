@@ -9,7 +9,7 @@ import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 
 const sql = neon(process.env.DATABASE_URL!);
-const db = drizzle(sql);
+const db = drizzle(sql, { logger: false });
 
 export interface IStorage {
   // User methods
