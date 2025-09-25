@@ -222,8 +222,9 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
     }
   }, [size]);
 
-  // Check for reduced motion preference
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Check for reduced motion preference with runtime guard
+  const prefersReducedMotion = typeof window !== 'undefined' && 
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const shouldAnimate = animated && !prefersReducedMotion;
 
   return (
