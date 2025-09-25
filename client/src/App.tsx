@@ -259,7 +259,7 @@ function MainExperience() {
                     Meet Your <span className="text-green-400">Eco-Warriors</span>
                   </h1>
                   <p className="text-gray-300 max-w-2xl mx-auto">
-                    Click on the floating heroes in the 3D scene to discover their unique powers and impact on regenerative finance.
+                    Click on the hero symbols above to discover their unique powers and impact on regenerative finance.
                   </p>
                 </motion.div>
                 <BlackCard />
