@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/neon-serverless";
-import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import { users, contributions, nftBadges, missions, 
          type User, type InsertUser, 
          type Contribution, type InsertContribution,
@@ -8,8 +8,13 @@ import { eq, desc, sum } from "drizzle-orm";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 
-const sql = neon(process.env.DATABASE_URL!);
-const db = drizzle(sql, { logger: false });
+// Initialize PostgreSQL client and Drizzle
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL environment variable is not set');
+}
+
+const client = postgres(process.env.DATABASE_URL, { ssl: 'require' });
+const db = drizzle(client);
 
 export interface IStorage {
   // User methods
