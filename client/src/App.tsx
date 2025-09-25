@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAudio } from "@/lib/stores/useAudio";
 import { useGame } from "@/lib/stores/useGame";
 import { useUser } from "@/lib/stores/useUser";
-import Scene3D from "@/components/Scene3D";
+import { useHeroes } from "@/lib/stores/useHeroes";
 import SuperheroUI from "@/components/SuperheroUI";
 import HeroShowcase from "@/components/HeroShowcase";
 import RankProgression from "@/components/RankProgression";
@@ -154,6 +154,7 @@ function MainExperience() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showNFTMinting, setShowNFTMinting] = useState<{ heroId: string; level: number } | null>(null);
   const { isLoggedIn } = useUser();
+  const { heroes, selectHero } = useHeroes();
 
   useEffect(() => {
     // Show login modal if user is not logged in
@@ -165,11 +166,31 @@ function MainExperience() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 relative">
-      {/* 3D Scene Background */}
-      <div className="absolute inset-0 z-0">
-        <Suspense fallback={<div className="w-full h-full bg-black" />}>
-          <Scene3D />
-        </Suspense>
+      {/* Background with Hero Visualization */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-gray-900 via-black to-blue-900">
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="text-center space-y-8">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-6 max-w-4xl">
+              {heroes.map((hero, index) => (
+                <div key={hero.id} className="text-center space-y-2">
+                  <div 
+                    className="w-16 h-16 mx-auto rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform"
+                    style={{ backgroundColor: hero.color + '30', border: `2px solid ${hero.color}` }}
+                    onClick={() => selectHero && selectHero(hero.id)}
+                  >
+                    <span className="text-2xl font-bold text-white">{hero.symbol.charAt(1)}</span>
+                  </div>
+                  <div className="text-xs text-white font-medium">{hero.name}</div>
+                  <div className="text-xs" style={{ color: hero.color }}>{hero.symbol}</div>
+                </div>
+              ))}
+            </div>
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-white mb-2">GXCOIN Eco-Warriors</h3>
+              <p className="text-gray-400">Click heroes above to explore their powers</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* UI Overlay */}
@@ -333,8 +354,8 @@ function MainExperience() {
 function App() {
   const { phase, start } = useGame();
   const { initializeAuth, isLoggedIn } = useUser();
-  const [showWelcome, setShowWelcome] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Initialize authentication and audio
   useEffect(() => {
@@ -372,7 +393,7 @@ function App() {
   }
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ width: '100vw', minHeight: '100vh', position: 'relative', overflowX: 'hidden', overflowY: 'auto' }}>
       <AnimatePresence mode="wait">
         {showWelcome ? (
           <WelcomeScreen key="welcome" onEnter={handleEnterExperience} />

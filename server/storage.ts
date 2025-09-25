@@ -6,7 +6,7 @@ import { users, contributions, nftBadges, missions,
          type NftBadge, type InsertNftBadge } from "@shared/schema";
 import { eq, desc, sum } from "drizzle-orm";
 import * as bcrypt from "bcrypt";
-import * as jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
 // Initialize PostgreSQL client and Drizzle
 if (!process.env.DATABASE_URL) {
