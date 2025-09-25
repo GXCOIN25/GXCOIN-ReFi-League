@@ -36,17 +36,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post("/api/auth/register", async (req, res) => {
     try {
-      const userData = insertUserSchema.parse(req.body);
+      // Clean the request body to handle undefined walletAddress
+      const cleanedBody = {
+        username: req.body.username,
+        password: req.body.password,
+        walletAddress: req.body.walletAddress || null
+      };
+      
+      const userData = insertUserSchema.parse(cleanedBody);
       const user = await storage.createUser(userData);
       const token = storage.generateToken(user);
       
       const { password, ...safeUser } = user;
       res.json({ user: safeUser, token });
     } catch (error: any) {
+      console.error('Registration error:', error);
       if (error.code === '23505') { // Unique constraint violation
         res.status(409).json({ error: "Username already exists" });
       } else {
-        res.status(400).json({ error: "Invalid user data" });
+        res.status(400).json({ error: "Invalid user data", details: error.message });
       }
     }
   });
