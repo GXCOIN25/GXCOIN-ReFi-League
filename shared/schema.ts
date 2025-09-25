@@ -47,6 +47,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   walletAddress: true,
+}).extend({
+  walletAddress: z.string().optional().nullable(),
 });
 
 export const insertContributionSchema = createInsertSchema(contributions).pick({
