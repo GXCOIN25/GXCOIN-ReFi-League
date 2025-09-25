@@ -1,9 +1,8 @@
-import { Suspense, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAudio } from "@/lib/stores/useAudio";
 import { useGame } from "@/lib/stores/useGame";
 import { useUser } from "@/lib/stores/useUser";
 import { useHeroes } from "@/lib/stores/useHeroes";
@@ -12,7 +11,6 @@ import HeroShowcase from "@/components/HeroShowcase";
 import RankProgression from "@/components/RankProgression";
 import BlackCard from "@/components/BlackCard";
 import ContributionCalculator from "@/components/ContributionCalculator";
-import MissionRoadmap from "@/components/MissionRoadmap";
 import NFTPreview from "@/components/NFTPreview";
 import LoginModal from "@/components/LoginModal";
 import { WalletConnect } from "@/components/WalletConnect";
@@ -64,32 +62,32 @@ function LoadingScreen() {
 }
 
 function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
-  const { toggleMute, isMuted } = useAudio();
+  const [isMuted, setIsMuted] = useState(true);
+
+  const toggleMute = () => setIsMuted(!isMuted);
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-green-900 flex items-center justify-center p-4"
+      className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 flex items-center justify-center px-4"
     >
-      <Card className="max-w-2xl w-full bg-black/80 backdrop-blur-sm border-green-500/50">
+      <Card className="w-full max-w-lg bg-black/60 backdrop-blur-sm border-green-500/30">
         <CardContent className="p-8 text-center space-y-6">
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", duration: 0.8 }}
-            className="space-y-4"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
           >
-            <div className="text-6xl font-bold bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
-              GXCOIN
+            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
+              <Zap className="w-10 h-10 text-green-400" />
             </div>
-            <div className="text-xl text-white font-semibold">
-              Eco-Warrior Superheroes
-            </div>
-            <p className="text-gray-300 max-w-md mx-auto">
-              Join the ReFi League and become a hero in the fight for regenerative finance. 
-              Discover your powers, unlock legendary NFTs, and make real-world impact.
+            <h1 className="text-3xl font-bold text-white mb-2">
+              Welcome to <span className="text-green-400">GXCOIN</span>
+            </h1>
+            <p className="text-gray-400 mb-6">
+              The Interactive ReFi League Experience
             </p>
           </motion.div>
 
@@ -157,7 +155,6 @@ function MainExperience() {
   const { heroes, selectHero } = useHeroes();
 
   useEffect(() => {
-    // Show login modal if user is not logged in
     if (!isLoggedIn) {
       const timer = setTimeout(() => setShowLoginModal(true), 2000);
       return () => clearTimeout(timer);
@@ -171,7 +168,7 @@ function MainExperience() {
         <div className="w-full h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-6 max-w-4xl">
-              {heroes.map((hero, index) => (
+              {heroes.map((hero) => (
                 <div key={hero.id} className="text-center space-y-2">
                   <div 
                     className="w-16 h-16 mx-auto rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform"
@@ -352,35 +349,23 @@ function MainExperience() {
 }
 
 function App() {
-  const { phase, start } = useGame();
-  const { initializeAuth, isLoggedIn } = useUser();
-  const [showWelcome, setShowWelcome] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { start } = useGame();
+  const { initializeAuth } = useUser();
+  const [showWelcome, setShowWelcome] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize authentication and audio
   useEffect(() => {
     const initializeApp = async () => {
-      // Initialize authentication
-      await initializeAuth();
-      
-      // Initialize audio
-      const audio = new Audio('/sounds/background.mp3');
-      audio.loop = true;
-      audio.volume = 0.3;
-      
-      const hitSound = new Audio('/sounds/hit.mp3');
-      const successSound = new Audio('/sounds/success.mp3');
-      
-      useAudio.getState().setBackgroundMusic(audio);
-      useAudio.getState().setHitSound(hitSound);
-      useAudio.getState().setSuccessSound(successSound);
-      
-      setIsLoading(false);
+      try {
+        await initializeAuth();
+        setIsLoading(false);
+      } catch (error) {
+        console.error('App initialization failed:', error);
+        setIsLoading(false);
+      }
     };
 
-    // Simulate loading time then initialize
-    const timer = setTimeout(initializeApp, 2000);
-    return () => clearTimeout(timer);
+    initializeApp();
   }, [initializeAuth]);
 
   const handleEnterExperience = () => {
