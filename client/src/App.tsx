@@ -209,8 +209,8 @@ function MainExperience() {
         <div className="max-w-7xl mx-auto px-4">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
             <div className="flex justify-center mb-8">
-              <TabsList className="grid w-full max-w-4xl grid-cols-4 md:grid-cols-8 gap-1 bg-black/60 backdrop-blur-sm">
-                <TabsTrigger value="heroes" className="text-xs flex items-center gap-1">
+              <TabsList className="grid w-full max-w-4xl grid-cols-4 md:grid-cols-8 gap-1 bg-black/60 backdrop-blur-sm p-2">
+                <TabsTrigger value="heroes" className="text-xs flex items-center gap-1 cursor-pointer hover:bg-white/10 p-2 rounded">
                   <Shield className="w-3 h-3" />
                   <span className="hidden sm:inline">Heroes</span>
                 </TabsTrigger>
@@ -245,7 +245,7 @@ function MainExperience() {
               </TabsList>
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-8 min-h-screen">
               <TabsContent value="heroes" className="space-y-8 mt-0">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
