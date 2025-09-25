@@ -7,7 +7,11 @@ import { useHeroes } from "@/lib/stores/useHeroes";
 import { useContribution } from "@/lib/stores/useContribution";
 import { Sparkles, Star, Zap, Award, Crown } from "lucide-react";
 
-export default function NFTPreview() {
+interface NFTPreviewProps {
+  onMintNFT?: (heroId: string, level: number) => void;
+}
+
+export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
   const [selectedNFT, setSelectedNFT] = useState<string | null>(null);
   const { heroes, nftBadges, unlockNFTBadge } = useHeroes();
   const { currentRank, impactMetrics } = useContribution();
@@ -203,20 +207,38 @@ export default function NFTPreview() {
 
           {/* Mint Action */}
           <div className="text-center space-y-4">
-            <Button 
-              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500"
-              size="lg"
-              onClick={() => {
-                heroes.forEach(hero => {
-                  unlockNFTBadge(hero.id, Math.min(Math.floor(currentRank.impactMultiplier), 5));
-                });
-              }}
-            >
-              <Award className="h-4 w-4 mr-2" />
-              Mint Current Collection
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button 
+                className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-500 hover:to-blue-500"
+                size="lg"
+                onClick={() => {
+                  heroes.forEach(hero => {
+                    unlockNFTBadge(hero.id, Math.min(Math.floor(currentRank.impactMultiplier), 5));
+                  });
+                }}
+              >
+                <Award className="h-4 w-4 mr-2" />
+                Unlock Collection
+              </Button>
+              
+              {onMintNFT && (
+                <Button 
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500"
+                  size="lg"
+                  onClick={() => {
+                    const heroToMint = heroes[0];
+                    if (heroToMint) {
+                      onMintNFT(heroToMint.id, Math.min(Math.floor(currentRank.impactMultiplier), 5));
+                    }
+                  }}
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Mint NFT on Blockchain
+                </Button>
+              )}
+            </div>
             <p className="text-xs text-gray-400">
-              Your NFTs will evolve as you make more impact
+              {onMintNFT ? 'Unlock badges in-app or mint real NFTs on blockchain' : 'Your NFTs will evolve as you make more impact'}
             </p>
           </div>
         </CardContent>

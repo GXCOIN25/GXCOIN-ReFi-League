@@ -15,6 +15,11 @@ import ContributionCalculator from "@/components/ContributionCalculator";
 import MissionRoadmap from "@/components/MissionRoadmap";
 import NFTPreview from "@/components/NFTPreview";
 import LoginModal from "@/components/LoginModal";
+import { WalletConnect } from "@/components/WalletConnect";
+import { RealImpactDashboard } from "@/components/RealImpactDashboard";
+import { CommunityFeatures } from "@/components/CommunityFeatures";
+import { TokenIntegration } from "@/components/TokenIntegration";
+import { NFTMinting } from "@/components/NFTMinting";
 import { 
   Volume2, 
   VolumeX, 
@@ -22,7 +27,10 @@ import {
   Shield, 
   Users, 
   Trophy,
-  Sparkles
+  Sparkles,
+  Wallet,
+  Globe,
+  Coins
 } from "lucide-react";
 import "@fontsource/inter";
 
@@ -143,6 +151,7 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
 function MainExperience() {
   const [currentTab, setCurrentTab] = useState("heroes");
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showNFTMinting, setShowNFTMinting] = useState<{ heroId: string; level: number } | null>(null);
   const { isLoggedIn } = useUser();
 
   useEffect(() => {
@@ -166,18 +175,54 @@ function MainExperience() {
       <SuperheroUI />
       <HeroShowcase />
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      
+      {/* NFT Minting Modal */}
+      {showNFTMinting && (
+        <NFTMinting
+          heroId={showNFTMinting.heroId}
+          level={showNFTMinting.level}
+          onClose={() => setShowNFTMinting(null)}
+        />
+      )}
 
       {/* Main Content Tabs */}
       <div className="relative z-10 pt-20">
         <div className="max-w-7xl mx-auto px-4">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
             <div className="flex justify-center mb-8">
-              <TabsList className="grid w-full max-w-2xl grid-cols-5 bg-black/60 backdrop-blur-sm">
-                <TabsTrigger value="heroes" className="text-xs">Heroes</TabsTrigger>
-                <TabsTrigger value="ranks" className="text-xs">Ranks</TabsTrigger>
-                <TabsTrigger value="calculate" className="text-xs">Calculate</TabsTrigger>
-                <TabsTrigger value="roadmap" className="text-xs">Roadmap</TabsTrigger>
-                <TabsTrigger value="nfts" className="text-xs">NFTs</TabsTrigger>
+              <TabsList className="grid w-full max-w-4xl grid-cols-4 md:grid-cols-8 gap-1 bg-black/60 backdrop-blur-sm">
+                <TabsTrigger value="heroes" className="text-xs flex items-center gap-1">
+                  <Shield className="w-3 h-3" />
+                  <span className="hidden sm:inline">Heroes</span>
+                </TabsTrigger>
+                <TabsTrigger value="ranks" className="text-xs flex items-center gap-1">
+                  <Trophy className="w-3 h-3" />
+                  <span className="hidden sm:inline">Ranks</span>
+                </TabsTrigger>
+                <TabsTrigger value="calculate" className="text-xs flex items-center gap-1">
+                  <Zap className="w-3 h-3" />
+                  <span className="hidden sm:inline">Calculate</span>
+                </TabsTrigger>
+                <TabsTrigger value="nfts" className="text-xs flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  <span className="hidden sm:inline">NFTs</span>
+                </TabsTrigger>
+                <TabsTrigger value="impact" className="text-xs flex items-center gap-1">
+                  <Globe className="w-3 h-3" />
+                  <span className="hidden sm:inline">Impact</span>
+                </TabsTrigger>
+                <TabsTrigger value="community" className="text-xs flex items-center gap-1">
+                  <Users className="w-3 h-3" />
+                  <span className="hidden sm:inline">Community</span>
+                </TabsTrigger>
+                <TabsTrigger value="tokens" className="text-xs flex items-center gap-1">
+                  <Coins className="w-3 h-3" />
+                  <span className="hidden sm:inline">Tokens</span>
+                </TabsTrigger>
+                <TabsTrigger value="wallet" className="text-xs flex items-center gap-1">
+                  <Wallet className="w-3 h-3" />
+                  <span className="hidden sm:inline">Wallet</span>
+                </TabsTrigger>
               </TabsList>
             </div>
 
@@ -206,12 +251,74 @@ function MainExperience() {
                 <ContributionCalculator />
               </TabsContent>
 
-              <TabsContent value="roadmap" className="mt-0">
-                <MissionRoadmap />
-              </TabsContent>
-
               <TabsContent value="nfts" className="mt-0">
-                <NFTPreview />
+                <NFTPreview onMintNFT={(heroId: string, level: number) => setShowNFTMinting({ heroId, level })} />
+              </TabsContent>
+              
+              <TabsContent value="impact" className="mt-0">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center space-y-4 mb-8"
+                >
+                  <h1 className="text-4xl font-bold text-white">
+                    <span className="text-green-400">Real-Time</span> Environmental Impact
+                  </h1>
+                  <p className="text-gray-300 max-w-2xl mx-auto">
+                    Track your actual environmental impact with live data feeds and verified metrics.
+                  </p>
+                </motion.div>
+                <RealImpactDashboard />
+              </TabsContent>
+              
+              <TabsContent value="community" className="mt-0">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center space-y-4 mb-8"
+                >
+                  <h1 className="text-4xl font-bold text-white">
+                    <span className="text-blue-400">Community</span> Missions
+                  </h1>
+                  <p className="text-gray-300 max-w-2xl mx-auto">
+                    Join forces with other Eco-Warriors in team missions and global challenges.
+                  </p>
+                </motion.div>
+                <CommunityFeatures />
+              </TabsContent>
+              
+              <TabsContent value="tokens" className="mt-0">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center space-y-4 mb-8"
+                >
+                  <h1 className="text-4xl font-bold text-white">
+                    <span className="text-yellow-400">Token</span> Ecosystem
+                  </h1>
+                  <p className="text-gray-300 max-w-2xl mx-auto">
+                    Track and trade AQUA, HEMP, VOLTRA, GRAPHENE, and TRADER tokens with real market data.
+                  </p>
+                </motion.div>
+                <TokenIntegration />
+              </TabsContent>
+              
+              <TabsContent value="wallet" className="mt-0">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center space-y-4 mb-8"
+                >
+                  <h1 className="text-4xl font-bold text-white">
+                    <span className="text-purple-400">Crypto</span> Wallet
+                  </h1>
+                  <p className="text-gray-300 max-w-2xl mx-auto">
+                    Connect your wallet to make real contributions and mint NFTs on the blockchain.
+                  </p>
+                </motion.div>
+                <div className="flex justify-center">
+                  <WalletConnect />
+                </div>
               </TabsContent>
             </div>
           </Tabs>
