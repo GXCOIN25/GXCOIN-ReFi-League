@@ -19,19 +19,25 @@ export default function BlackCard() {
     "Impact dashboard"
   ];
 
+  // Check if user prefers reduced motion
+  const prefersReducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   return (
     <div className="w-full max-w-md mx-auto">
       <motion.div
         className="relative perspective-1000"
         initial={{ rotateY: 0 }}
         animate={{ rotateY: isRevealed ? 180 : 0 }}
-        transition={{ duration: 0.8, ease: "easeInOut" }}
+        transition={{ duration: prefersReducedMotion ? 0.2 : 0.8, ease: "easeInOut" }}
         style={{ transformStyle: "preserve-3d" }}
       >
         {/* Front of Card */}
         <motion.div
           className="absolute inset-0 backface-hidden"
-          style={{ backfaceVisibility: "hidden" }}
+          style={{ 
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden"
+          }}
         >
           <Card className="h-64 bg-gradient-to-br from-gray-900 via-black to-gray-800 border-yellow-500/50 overflow-hidden">
             <CardContent className="h-full flex flex-col justify-center items-center text-center p-6 relative">
@@ -53,7 +59,7 @@ export default function BlackCard() {
               
               <Button 
                 onClick={() => setIsRevealed(true)}
-                className="bg-gradient-to-r from-yellow-600 to-yellow-400 hover:from-yellow-500 hover:to-yellow-300"
+                className="bg-gradient-to-r from-yellow-600 to-yellow-400 hover:from-yellow-500 hover:to-yellow-300 min-h-[44px] min-w-[160px] touch-manipulation"
               >
                 Reveal Card Features
               </Button>
@@ -65,8 +71,9 @@ export default function BlackCard() {
         <motion.div
           className="absolute inset-0 backface-hidden"
           style={{ 
-            backfaceVisibility: "hidden", 
-            transform: "rotateY(180deg)" 
+            backfaceVisibility: "hidden",
+            WebkitBackfaceVisibility: "hidden",
+            transform: "rotateY(180deg)"
           }}
         >
           <Card className="h-64 bg-black border-yellow-500 relative overflow-hidden">
@@ -88,7 +95,7 @@ export default function BlackCard() {
                   variant="ghost" 
                   size="sm"
                   onClick={() => setIsRevealed(false)}
-                  className="text-gold-400 hover:text-gold-300"
+                  className="text-yellow-400 hover:text-yellow-300 min-h-[44px] min-w-[44px] touch-manipulation"
                 >
                   ↻
                 </Button>
@@ -104,7 +111,7 @@ export default function BlackCard() {
                     transition={{ delay: 0.1 * index }}
                     className="flex items-center gap-2 text-xs"
                   >
-                    <Star className="h-3 w-3 text-gold-400 flex-shrink-0" />
+                    <Star className="h-3 w-3 text-yellow-400 flex-shrink-0" />
                     <span className="text-gray-300">{feature}</span>
                   </motion.div>
                 ))}
@@ -112,9 +119,9 @@ export default function BlackCard() {
 
               <div className="absolute bottom-4 right-4">
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gold-400 rounded-full" />
-                  <div className="w-2 h-2 bg-gold-300 rounded-full" />
-                  <div className="w-2 h-2 bg-gold-200 rounded-full" />
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full" />
+                  <div className="w-2 h-2 bg-yellow-300 rounded-full" />
+                  <div className="w-2 h-2 bg-yellow-200 rounded-full" />
                 </div>
               </div>
             </CardContent>
@@ -129,7 +136,7 @@ export default function BlackCard() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
       >
-        <Button className="w-full bg-gold-600 hover:bg-gold-500 text-white">
+        <Button className="w-full bg-yellow-600 hover:bg-yellow-500 text-white min-h-[44px] touch-manipulation">
           Apply for BLACK CARD
         </Button>
         <p className="text-center text-xs text-gray-400">
