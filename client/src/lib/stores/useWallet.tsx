@@ -26,18 +26,30 @@ export const useWallet = create<WalletState>((set, get) => ({
   error: null,
 
   connectWallet: async () => {
+    console.log('Attempting to connect wallet...');
+    
     if (!window.ethereum) {
-      set({ error: 'Please install MetaMask or another Web3 wallet' });
+      const errorMsg = 'Please install MetaMask or another Web3 wallet';
+      console.error('No ethereum provider found:', errorMsg);
+      set({ error: errorMsg });
       return;
     }
 
+    console.log('Ethereum provider found:', window.ethereum);
     set({ isConnecting: true, error: null });
 
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
+      console.log('Provider created:', provider);
+      
       await provider.send('eth_requestAccounts', []);
+      console.log('Accounts requested');
+      
       const signer = await provider.getSigner();
+      console.log('Signer obtained:', signer);
+      
       const address = await signer.getAddress();
+      console.log('Address obtained:', address);
       
       set({
         isConnected: true,
@@ -46,11 +58,14 @@ export const useWallet = create<WalletState>((set, get) => ({
         isConnecting: false
       });
       
+      console.log('Wallet connected successfully');
       // Get initial balance
       await get().getBalance();
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Failed to connect wallet';
+      console.error('Wallet connection error:', error);
       set({
-        error: error instanceof Error ? error.message : 'Failed to connect wallet',
+        error: errorMsg,
         isConnecting: false
       });
     }
@@ -97,9 +112,3 @@ export const useWallet = create<WalletState>((set, get) => ({
   }
 }));
 
-// Add global type for ethereum
-declare global {
-  interface Window {
-    ethereum?: any;
-  }
-}
