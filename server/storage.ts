@@ -101,7 +101,7 @@ export class PostgresStorage implements IStorage {
       .select({ total: sum(contributions.amount) })
       .from(contributions)
       .where(eq(contributions.userId, userId));
-    return result[0]?.total || 0;
+    return Number(result[0]?.total) || 0;
   }
 
   // NFT Badge methods
