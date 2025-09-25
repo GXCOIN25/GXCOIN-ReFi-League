@@ -16,6 +16,7 @@ import MissionRoadmap from "@/components/MissionRoadmap";
 import NFTPreview from "@/components/NFTPreview";
 import LoginModal from "@/components/LoginModal";
 import { WalletConnect } from "@/components/WalletConnect";
+import { WalletFeatures } from "@/components/WalletFeatures";
 import { RealImpactDashboard } from "@/components/RealImpactDashboard";
 import { CommunityFeatures } from "@/components/CommunityFeatures";
 import { TokenIntegration } from "@/components/TokenIntegration";
@@ -316,8 +317,9 @@ function MainExperience() {
                     Connect your wallet to make real contributions and mint NFTs on the blockchain.
                   </p>
                 </motion.div>
-                <div className="flex justify-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
                   <WalletConnect />
+                  <WalletFeatures />
                 </div>
               </TabsContent>
             </div>
