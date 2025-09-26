@@ -170,4 +170,94 @@ export class GXCoinAPI {
     });
     if (!response.ok) throw new Error('Failed to update mission progress');
   }
+
+  // Patent Registry API methods
+  static async getAllPatents(): Promise<any[]> {
+    const response = await fetch(`${API_BASE}/patents`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to get patents');
+    return response.json();
+  }
+
+  static async getPatentById(patentId: number): Promise<any> {
+    const response = await fetch(`${API_BASE}/patents/${patentId}`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to get patent');
+    return response.json();
+  }
+
+  static async getUserPatentAccess(): Promise<any[]> {
+    const response = await fetch(`${API_BASE}/patents/user-access`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to get patent access');
+    return response.json();
+  }
+
+  static async unlockPatent(patentId: number): Promise<any> {
+    const response = await fetch(`${API_BASE}/patents/${patentId}/unlock`, {
+      method: 'POST',
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to unlock patent');
+    return response.json();
+  }
+
+  static async usePatent(patentId: number, heroId: string, usageType: string, quantity = 1): Promise<any> {
+    const response = await fetch(`${API_BASE}/patents/${patentId}/use`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ heroId, usageType, quantity })
+    });
+    if (!response.ok) throw new Error('Failed to use patent');
+    return response.json();
+  }
+
+  // Environmental Battle API methods
+  static async recordBattle(battleData: any): Promise<any> {
+    const response = await fetch(`${API_BASE}/battles`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(battleData)
+    });
+    if (!response.ok) throw new Error('Failed to record battle');
+    return response.json();
+  }
+
+  static async getBattleHistory(): Promise<any[]> {
+    const response = await fetch(`${API_BASE}/battles/history`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to get battle history');
+    return response.json();
+  }
+
+  // Economic Rewards API methods
+  static async getEconomicRewards(): Promise<any[]> {
+    const response = await fetch(`${API_BASE}/rewards`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to get economic rewards');
+    return response.json();
+  }
+
+  static async addEconomicReward(rewardData: any): Promise<any> {
+    const response = await fetch(`${API_BASE}/rewards`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify(rewardData)
+    });
+    if (!response.ok) throw new Error('Failed to add economic reward');
+    return response.json();
+  }
+
+  static async getUserEconomicStats(): Promise<any> {
+    const response = await fetch(`${API_BASE}/stats/economic`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to get economic stats');
+    return response.json();
+  }
 }

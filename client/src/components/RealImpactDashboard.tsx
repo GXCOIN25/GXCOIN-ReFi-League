@@ -34,47 +34,55 @@ export const RealImpactDashboard: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(true);
 
-  // Simulate real-time data updates
+  // Load real economic data from API
   useEffect(() => {
-    const updateMetrics = () => {
-      setImpactData(prev => ({
-        carbonOffset: prev.carbonOffset + Math.random() * 0.5,
-        plasticRemoved: prev.plasticRemoved + Math.random() * 0.2,
-        renewableEnergy: prev.renewableEnergy + Math.random() * 1.0,
-        treesPlanted: prev.treesPlanted + Math.random() * 0.1,
-        lastUpdated: new Date().toISOString()
-      }));
+    const loadRealImpactData = async () => {
+      try {
+        const { GXCoinAPI } = await import('@/lib/api');
+        const economicStats = await GXCoinAPI.getUserEconomicStats();
+        
+        if (economicStats) {
+          setImpactData({
+            carbonOffset: economicStats.carbonTonsSequestered || 0,
+            plasticRemoved: economicStats.totalPlasticConverted || 0,
+            renewableEnergy: economicStats.totalEnergyGenerated || 0,
+            treesPlanted: (economicStats.carbonTonsSequestered || 0) * 40, // 40 trees per ton CO2
+            lastUpdated: economicStats.updatedAt || new Date().toISOString()
+          });
 
-      setLiveMetrics(prev => ({
-        globalCO2Reduction: prev.globalCO2Reduction + Math.random() * 10,
-        activeProjects: Math.floor(Math.random() * 5) + 45,
-        totalFunding: prev.totalFunding + Math.random() * 1000,
-        energyGenerated: prev.energyGenerated + Math.random() * 50
-      }));
+          setLiveMetrics({
+            globalCO2Reduction: economicStats.carbonTonsSequestered || 0,
+            activeProjects: economicStats.environmentalThreatsDefeated || 0,
+            totalFunding: economicStats.totalEconomicValue || 0,
+            energyGenerated: economicStats.totalEnergyGenerated || 0
+          });
+        }
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Failed to load real impact data:', error);
+        // Fallback to initial values
+        setImpactData({
+          carbonOffset: 0,
+          plasticRemoved: 0,
+          renewableEnergy: 0,
+          treesPlanted: 0,
+          lastUpdated: new Date().toISOString()
+        });
+        setLiveMetrics({
+          globalCO2Reduction: 0,
+          activeProjects: 0,
+          totalFunding: 0,
+          energyGenerated: 0
+        });
+        setIsLoading(false);
+      }
     };
 
-    // Initial load
-    setTimeout(() => {
-      setImpactData({
-        carbonOffset: 1247.5,
-        plasticRemoved: 892.3,
-        renewableEnergy: 3456.7,
-        treesPlanted: 156.8,
-        lastUpdated: new Date().toISOString()
-      });
+    loadRealImpactData();
 
-      setLiveMetrics({
-        globalCO2Reduction: 12750,
-        activeProjects: 48,
-        totalFunding: 2456789,
-        energyGenerated: 45632
-      });
-
-      setIsLoading(false);
-    }, 1000);
-
-    // Update every 3 seconds
-    const interval = setInterval(updateMetrics, 3000);
+    // Update every 10 seconds with fresh data
+    const interval = setInterval(loadRealImpactData, 10000);
     return () => clearInterval(interval);
   }, []);
 

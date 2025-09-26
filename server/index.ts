@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { initializePatents, storage } from "./storage";
 
 const app = express();
 app.use(express.json());
@@ -37,6 +38,64 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  console.log('🚀 Starting GXCOIN Patent-Powered Gaming Platform...');
+  
+  // 🔒 Production-ready configuration validation
+  function validateProductionConfig() {
+    const requiredEnvVars = ['DATABASE_URL'];
+    const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+    
+    if (missingVars.length > 0) {
+      console.error('❌ CRITICAL CONFIGURATION ERROR: Missing required environment variables:');
+      missingVars.forEach(varName => {
+        console.error(`   - ${varName}`);
+      });
+      console.error('🚨 Application cannot start safely without these variables.');
+      process.exit(1);
+    }
+    
+    // JWT_SECRET validation with development fallback but production warning
+    if (!process.env.JWT_SECRET) {
+      if (process.env.NODE_ENV === 'production') {
+        console.error('❌ CRITICAL SECURITY ERROR: JWT_SECRET is required in production');
+        process.exit(1);
+      } else {
+        console.warn('⚠️  WARNING: JWT_SECRET not set - using development fallback');
+        console.warn('🚨 NEVER deploy to production without setting JWT_SECRET!');
+        process.env.JWT_SECRET = 'dev-gxcoin-jwt-secret-' + Date.now();
+      }
+    }
+    
+    console.log('✅ Production configuration validated successfully');
+  }
+  
+  // 🗄️ Database startup verification
+  async function verifyDatabaseConnection() {
+    try {
+      console.log('🔍 Verifying database connection and schema...');
+      
+      // Test basic database connectivity
+      await storage.getUserByUsername('__health_check_user__');
+      
+      console.log('✅ Database connection verified');
+    } catch (error) {
+      console.error('❌ Database verification failed:', error);
+      console.error('🚨 Ensure DATABASE_URL is correct and database is accessible');
+      process.exit(1);
+    }
+  }
+  
+  // Step 1: Validate configuration
+  validateProductionConfig();
+  
+  // Step 2: Verify database connectivity  
+  await verifyDatabaseConnection();
+  
+  // Step 3: Initialize patents data
+  console.log('🔬 Initializing patent registry...');
+  await initializePatents();
+  console.log('✅ Patent registry initialized');
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -64,6 +123,7 @@ app.use((req, res, next) => {
     host: "0.0.0.0",
     reusePort: true,
   }, () => {
-    log(`serving on port ${port}`);
+    log(`✅ Server running on port ${port}`);
+    log('🌟 Patent-powered gaming platform ready for revolutionary experiences!');
   });
 })();
