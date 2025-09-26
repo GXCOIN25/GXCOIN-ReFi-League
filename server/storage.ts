@@ -1,10 +1,15 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { users, contributions, nftBadges, missions, 
+import { users, contributions, nftBadges, missions, patents, economicRewards, userPatentAccess, environmentalBattles, userEconomicStats,
          type User, type InsertUser, 
          type Contribution, type InsertContribution,
-         type NftBadge, type InsertNftBadge } from "@shared/schema";
-import { eq, desc, sum } from "drizzle-orm";
+         type NftBadge, type InsertNftBadge,
+         type Patent, type InsertPatent,
+         type EconomicReward, type InsertEconomicReward,
+         type UserPatentAccess, type InsertUserPatentAccess,
+         type EnvironmentalBattle, type InsertEnvironmentalBattle,
+         type UserEconomicStats, type InsertUserEconomicStats } from "@shared/schema";
+import { eq, desc, sum, and } from "drizzle-orm";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -37,6 +42,29 @@ export interface IStorage {
   // Mission methods
   getUserMissionProgress(userId: number): Promise<any[]>;
   updateMissionProgress(userId: number, missionId: string, progress: number): Promise<void>;
+  
+  // Patent Registry methods
+  getAllPatents(): Promise<Patent[]>;
+  getPatentById(patentId: number): Promise<Patent | undefined>;
+  createPatent(patent: InsertPatent): Promise<Patent>;
+  getUserPatentAccess(userId: number): Promise<UserPatentAccess[]>;
+  unlockPatentForUser(userId: number, patentId: number): Promise<UserPatentAccess>;
+  updatePatentUsage(userId: number, patentId: number, newUsageCount: number): Promise<void>;
+  
+  // Economic Rewards methods
+  getUserEconomicRewards(userId: number): Promise<EconomicReward[]>;
+  addEconomicReward(reward: InsertEconomicReward): Promise<EconomicReward>;
+  getUserEconomicStats(userId: number): Promise<UserEconomicStats | undefined>;
+  updateUserEconomicStats(userId: number, stats: Partial<InsertUserEconomicStats>): Promise<UserEconomicStats>;
+  
+  // Environmental Battle methods
+  getUserBattleHistory(userId: number): Promise<EnvironmentalBattle[]>;
+  recordEnvironmentalBattle(battle: InsertEnvironmentalBattle): Promise<EnvironmentalBattle>;
+  
+  // Economic Calculations
+  calculateCarbonCreditValue(carbonTons: number): number;
+  calculatePlasticConversionValue(bottleCount: number): number;
+  calculatePatentLicensingValue(patentId: number, usageCount: number): Promise<number>;
 }
 
 export class PostgresStorage implements IStorage {
@@ -67,7 +95,10 @@ export class PostgresStorage implements IStorage {
   }
 
   generateToken(user: User): string {
-    const secret = process.env.JWT_SECRET || 'gxcoin-demo-jwt-secret-2025-superhero-platform-temp-key-for-testing';
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error('❌ CRITICAL SECURITY ERROR: JWT_SECRET environment variable is required');
+    }
     return jwt.sign(
       { userId: user.id, username: user.username },
       secret,
@@ -76,7 +107,10 @@ export class PostgresStorage implements IStorage {
   }
 
   verifyToken(token: string): { userId: number } | null {
-    const secret = process.env.JWT_SECRET || 'gxcoin-demo-jwt-secret-2025-superhero-platform-temp-key-for-testing';
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error('❌ CRITICAL SECURITY ERROR: JWT_SECRET environment variable is required');
+    }
     try {
       const payload = jwt.verify(token, secret) as any;
       return { userId: payload.userId };
@@ -133,6 +167,241 @@ export class PostgresStorage implements IStorage {
       }
     });
   }
+  
+  // Patent Registry methods
+  async getAllPatents(): Promise<Patent[]> {
+    return await db.select().from(patents).orderBy(patents.patentNumber);
+  }
+  
+  async getPatentById(patentId: number): Promise<Patent | undefined> {
+    const result = await db.select().from(patents).where(eq(patents.id, patentId)).limit(1);
+    return result[0];
+  }
+  
+  async createPatent(patent: InsertPatent): Promise<Patent> {
+    const result = await db.insert(patents).values(patent).returning();
+    return result[0];
+  }
+  
+  async getUserPatentAccess(userId: number): Promise<UserPatentAccess[]> {
+    return await db.select().from(userPatentAccess).where(eq(userPatentAccess.userId, userId));
+  }
+  
+  async unlockPatentForUser(userId: number, patentId: number): Promise<UserPatentAccess> {
+    const result = await db.insert(userPatentAccess).values({
+      userId,
+      patentId,
+      usageCount: 0,
+      totalValueGenerated: 0
+    }).returning();
+    
+    // Update user's economic stats
+    await this.updateUserEconomicStats(userId, { patentsUnlocked: 1 });
+    
+    return result[0];
+  }
+  
+  async updatePatentUsage(userId: number, patentId: number, newUsageCount: number): Promise<void> {
+    await db.update(userPatentAccess)
+      .set({ 
+        usageCount: newUsageCount,
+        totalValueGenerated: newUsageCount * 10 // Simple calculation, can be enhanced
+      })
+      .where(and(eq(userPatentAccess.userId, userId), eq(userPatentAccess.patentId, patentId)));
+  }
+  
+  // Economic Rewards methods
+  async getUserEconomicRewards(userId: number): Promise<EconomicReward[]> {
+    return await db.select().from(economicRewards).where(eq(economicRewards.userId, userId)).orderBy(desc(economicRewards.createdAt));
+  }
+  
+  async addEconomicReward(reward: InsertEconomicReward): Promise<EconomicReward> {
+    const result = await db.insert(economicRewards).values(reward).returning();
+    
+    // Update user's economic stats
+    const stats: Partial<InsertUserEconomicStats> = {
+      totalEconomicValue: reward.amount
+    };
+    
+    switch (reward.rewardType) {
+      case 'carbon_credits':
+        stats.totalCarbonCredits = reward.quantity;
+        stats.carbonTonsSequestered = reward.quantity;
+        break;
+      case 'plastic_conversion':
+        stats.totalPlasticConverted = reward.quantity;
+        break;
+      case 'energy_generation':
+        stats.totalEnergyGenerated = reward.quantity;
+        break;
+      case 'patent_licensing':
+        stats.totalPatentLicensing = reward.amount;
+        break;
+    }
+    
+    await this.updateUserEconomicStats(reward.userId, stats);
+    
+    return result[0];
+  }
+  
+  async getUserEconomicStats(userId: number): Promise<UserEconomicStats | undefined> {
+    const result = await db.select().from(userEconomicStats).where(eq(userEconomicStats.userId, userId)).limit(1);
+    return result[0];
+  }
+  
+  async updateUserEconomicStats(userId: number, stats: Partial<InsertUserEconomicStats>): Promise<UserEconomicStats> {
+    // First try to update existing record
+    const existing = await this.getUserEconomicStats(userId);
+    
+    if (existing) {
+      // Update existing record by adding to existing values
+      const updateData: Partial<UserEconomicStats> = {
+        totalCarbonCredits: (existing.totalCarbonCredits || 0) + (stats.totalCarbonCredits || 0),
+        totalPlasticConverted: (existing.totalPlasticConverted || 0) + (stats.totalPlasticConverted || 0),
+        totalEnergyGenerated: (existing.totalEnergyGenerated || 0) + (stats.totalEnergyGenerated || 0),
+        totalPatentLicensing: (existing.totalPatentLicensing || 0) + (stats.totalPatentLicensing || 0),
+        totalEconomicValue: (existing.totalEconomicValue || 0) + (stats.totalEconomicValue || 0),
+        carbonTonsSequestered: (existing.carbonTonsSequestered || 0) + (stats.carbonTonsSequestered || 0),
+        environmentalThreatsDefeated: (existing.environmentalThreatsDefeated || 0) + (stats.environmentalThreatsDefeated || 0),
+        patentsUnlocked: (existing.patentsUnlocked || 0) + (stats.patentsUnlocked || 0),
+        updatedAt: new Date()
+      };
+      
+      const result = await db.update(userEconomicStats)
+        .set(updateData)
+        .where(eq(userEconomicStats.userId, userId))
+        .returning();
+      return result[0];
+    } else {
+      // Create new record
+      const result = await db.insert(userEconomicStats).values({
+        userId,
+        ...stats,
+        updatedAt: new Date()
+      }).returning();
+      return result[0];
+    }
+  }
+  
+  // Environmental Battle methods
+  async getUserBattleHistory(userId: number): Promise<EnvironmentalBattle[]> {
+    return await db.select().from(environmentalBattles).where(eq(environmentalBattles.userId, userId)).orderBy(desc(environmentalBattles.createdAt));
+  }
+  
+  async recordEnvironmentalBattle(battle: InsertEnvironmentalBattle): Promise<EnvironmentalBattle> {
+    const result = await db.insert(environmentalBattles).values(battle).returning();
+    
+    // Update environmental threats defeated if victory
+    if (battle.outcome === 'victory') {
+      await this.updateUserEconomicStats(battle.userId, { 
+        environmentalThreatsDefeated: 1,
+        totalEconomicValue: battle.economicValue
+      });
+    }
+    
+    return result[0];
+  }
+  
+  // Economic Calculations
+  calculateCarbonCreditValue(carbonTons: number): number {
+    // Base value of $175 per ton of CO2 sequestered
+    const basePrice = 175;
+    return carbonTons * basePrice;
+  }
+  
+  calculatePlasticConversionValue(bottleCount: number): number {
+    // $1.25 per plastic bottle converted to hemp
+    const bottleValue = 1.25;
+    return bottleCount * bottleValue;
+  }
+  
+  async calculatePatentLicensingValue(patentId: number, usageCount: number): Promise<number> {
+    const patent = await this.getPatentById(patentId);
+    if (!patent) return 0;
+    
+    // Base economic value multiplied by usage count with diminishing returns
+    const baseValue = patent.economicValue;
+    const diminishingFactor = Math.log(usageCount + 1) / Math.log(10); // Logarithmic scaling
+    return baseValue * usageCount * (0.5 + diminishingFactor * 0.5);
+  }
 }
 
 export const storage = new PostgresStorage();
+
+// Initialize comprehensive patents database - Industry-First Patent-Powered Gaming
+export async function initializePatents() {
+  console.log('🔬 Initializing patent registry with comprehensive industry-first database...');
+  
+  try {
+    const patents = await storage.getAllPatents();
+    console.log(`📋 Found ${patents.length} existing patents in database`);
+    
+    if (patents.length === 0) {
+      console.log('🌱 Seeding comprehensive patent database (18 revolutionary patents)...');
+      
+      // Import the comprehensive patent database from client data
+      const { PATENTS_DATABASE } = await import('../client/src/data/patents');
+      
+      // Transform patents for database insertion
+      const patentsToInsert: InsertPatent[] = PATENTS_DATABASE.map(patent => ({
+        patentNumber: patent.patentNumber,
+        title: patent.title,
+        description: patent.description,
+        category: patent.category,
+        economicValue: patent.economicValue,
+        environmentalImpact: patent.environmentalImpact,
+        accessLevel: patent.accessLevel,
+        heroAssociation: patent.heroAssociation
+      }));
+      
+      console.log(`📄 Inserting ${patentsToInsert.length} industry-first patents...`);
+      
+      let insertedCount = 0;
+      for (const patent of patentsToInsert) {
+        try {
+          await storage.createPatent(patent);
+          insertedCount++;
+          console.log(`  ✅ ${insertedCount}/${patentsToInsert.length}: ${patent.patentNumber} - ${patent.title}`);
+        } catch (error) {
+          console.error(`  ❌ Failed to insert patent ${patent.patentNumber}:`, error);
+        }
+      }
+      
+      console.log(`🎉 Successfully seeded ${insertedCount} revolutionary patents!`);
+      
+      // Log comprehensive breakdown for verification
+      const finalPatents = await storage.getAllPatents();
+      const categoryBreakdown = finalPatents.reduce((acc, patent) => {
+        acc[patent.category] = (acc[patent.category] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      console.log('📊 Patent categories seeded:', categoryBreakdown);
+      console.log('💡 Economic value range:', {
+        min: Math.min(...finalPatents.map(p => p.economicValue)),
+        max: Math.max(...finalPatents.map(p => p.economicValue)),
+        avg: Math.round(finalPatents.reduce((sum, p) => sum + p.economicValue, 0) / finalPatents.length)
+      });
+      console.log('🌍 Total environmental impact potential:', {
+        maxCO2Sequestration: Math.max(...finalPatents.map(p => p.environmentalImpact.co2Sequestered || 0)),
+        maxPlasticConversion: Math.max(...finalPatents.map(p => p.environmentalImpact.plasticConverted || 0)),
+        maxEnergyGeneration: Math.max(...finalPatents.map(p => p.environmentalImpact.energyGenerated || 0))
+      });
+      
+    } else {
+      console.log(`✅ Patent database already initialized with ${patents.length} patents`);
+      
+      // Verify we have the expected 18 patents
+      if (patents.length < 18) {
+        console.warn(`⚠️  Expected 18 patents but found only ${patents.length}. Consider re-seeding.`);
+      } else if (patents.length >= 18) {
+        console.log('🏆 Complete patent registry loaded: Revolutionary patent-powered gaming ready!');
+      }
+    }
+    
+    return patents;
+  } catch (error) {
+    console.error('❌ CRITICAL ERROR during patent initialization:', error);
+    throw new Error(`Patent initialization failed: ${error.message}`);
+  }
+}

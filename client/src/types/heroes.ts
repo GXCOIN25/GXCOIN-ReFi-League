@@ -44,14 +44,14 @@ export interface NFTBadge {
   attributes: Record<string, number>;
 }
 
-// Game Arena specific types
+// Enhanced Game Arena specific types with Patent Integration
 export interface GameHero {
   id: string;
   name: string;
   title: string;
   description: string;
-  element: 'Fire' | 'Ice' | 'Electric' | 'Dark' | 'Earth' | 'Air' | 'Light';
-  rarity: 'Rare' | 'Epic' | 'Legendary';
+  element: 'Fire' | 'Ice' | 'Electric' | 'Dark' | 'Earth' | 'Air' | 'Light' | 'Universal' | 'BioChar' | 'Water' | 'Carbon' | 'Energy' | 'Construction' | 'DeFi';
+  rarity: 'Rare' | 'Epic' | 'Legendary' | 'Mythic';
   color: string;
   gradient: string;
   
@@ -62,13 +62,19 @@ export interface GameHero {
     speed: number;
   };
   
-  // Special Abilities
+  // Special Abilities with Economic Effects
   abilities: {
     name: string;
     description: string;
     cooldown: number;
     damage?: number;
     effect?: string;
+    economicEffect?: {
+      type: 'carbon_credits' | 'plastic_conversion' | 'patent_licensing' | 'energy_generation';
+      baseValue: number;
+      quantity: number;
+    };
+    requiredPatents?: number[]; // Patent IDs required to unlock this ability
   }[];
   
   // Ownership and progression
@@ -100,4 +106,81 @@ export interface BattleTurn {
   damage: number;
   effect?: string;
   targetHealth: number;
+}
+
+// Patent System Types
+export interface Patent {
+  id: number;
+  patentNumber: string;
+  title: string;
+  description: string;
+  category: 'biochar' | 'water' | 'carbon' | 'energy' | 'construction';
+  economicValue: number;
+  environmentalImpact: Record<string, number>;
+  accessLevel: number;
+  heroAssociation?: string;
+  createdAt?: Date;
+}
+
+// Environmental Battle System Types
+export interface EnvironmentalThreat {
+  id: string;
+  name: string;
+  type: 'big_tech_ai' | 'toxic_mining' | 'fast_fashion' | 'fossil_fuel' | 'industrial_pollution' | 'deforestation';
+  icon: string;
+  description: string;
+  threatLevel: number; // 1-10 difficulty
+  economicRewards: {
+    carbonCredits?: number; // tons of CO2
+    plasticConversion?: number; // bottles converted
+    energyGeneration?: number; // kWh generated
+    patentLicensing?: number; // direct licensing value
+  };
+  environmentalImpact: Record<string, number>;
+  requiredHeroLevel: number;
+  weaknesses: string[]; // Hero elements that are effective
+  resistances: string[]; // Hero elements that are less effective
+}
+
+// Economic Reward Types
+export interface EconomicReward {
+  id: number;
+  userId: number;
+  heroId: string;
+  rewardType: 'carbon_credits' | 'plastic_conversion' | 'patent_licensing' | 'energy_generation';
+  amount: number; // Dollar value
+  quantity: number; // Resource quantity (tons, bottles, kWh, etc.)
+  patentId?: number;
+  battleId?: string;
+  transactionData: Record<string, any>;
+  createdAt: Date;
+}
+
+// User Economic Statistics
+export interface UserEconomicStats {
+  id: number;
+  userId: number;
+  totalCarbonCredits: number;
+  totalPlasticConverted: number;
+  totalEnergyGenerated: number;
+  totalPatentLicensing: number;
+  totalEconomicValue: number;
+  carbonTonsSequestered: number;
+  environmentalThreatsDefeated: number;
+  patentsUnlocked: number;
+  updatedAt: Date;
+}
+
+// Enhanced Battle Result with Economic Data
+export interface EnvironmentalBattleResult extends Omit<BattleResult, 'opponentHero'> {
+  environmentalThreat: EnvironmentalThreat;
+  economicRewards: {
+    carbonCreditsEarned: number;
+    plasticConverted: number;
+    energyGenerated: number;
+    patentLicensing: number;
+    totalDollarValue: number;
+  };
+  environmentalImpact: Record<string, number>;
+  patentsUnlocked?: Patent[];
 }
