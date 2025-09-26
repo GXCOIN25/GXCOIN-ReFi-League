@@ -19,6 +19,7 @@ import { RealImpactDashboard } from "@/components/RealImpactDashboard";
 import { CommunityFeatures } from "@/components/CommunityFeatures";
 import { TokenIntegration } from "@/components/TokenIntegration";
 import { NFTMinting } from "@/components/NFTMinting";
+import GameArena from "@/components/GameArena";
 import { 
   Volume2, 
   VolumeX, 
@@ -29,7 +30,8 @@ import {
   Sparkles,
   Wallet,
   Globe,
-  Coins
+  Coins,
+  Gamepad2
 } from "lucide-react";
 import "@fontsource/inter";
 
@@ -219,7 +221,7 @@ function MainExperience() {
         <div className="max-w-7xl mx-auto px-4">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
             <div className="flex justify-center mb-8">
-              <TabsList className="mobile-tabs-list w-full max-w-4xl bg-black/60 backdrop-blur-sm p-2 flex overflow-x-auto scroll-smooth gap-1 md:grid md:grid-cols-8">
+              <TabsList className="mobile-tabs-list w-full max-w-5xl bg-black/60 backdrop-blur-sm p-2 flex overflow-x-auto scroll-smooth gap-1 md:grid md:grid-cols-9">
                 <TabsTrigger value="heroes" className="mobile-tab-trigger text-xs flex items-center gap-1 cursor-pointer hover:bg-white/10 rounded flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
                   <Shield className="w-3 h-3" />
                   <span className="hidden sm:inline">Heroes</span>
@@ -251,6 +253,10 @@ function MainExperience() {
                 <TabsTrigger value="wallet" className="mobile-tab-trigger text-xs flex items-center gap-1 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
                   <Wallet className="w-3 h-3" />
                   <span className="hidden sm:inline">Wallet</span>
+                </TabsTrigger>
+                <TabsTrigger value="game" className="mobile-tab-trigger text-xs flex items-center gap-1 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
+                  <Gamepad2 className="w-3 h-3" />
+                  <span className="hidden sm:inline">Arena</span>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -361,6 +367,22 @@ function MainExperience() {
                   <WalletConnect />
                   <WalletFeatures />
                 </div>
+              </TabsContent>
+
+              <TabsContent value="game" className="mt-0">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center space-y-4 mb-8"
+                >
+                  <h1 className="text-4xl font-bold text-white">
+                    <span className="text-red-400">Game</span> Arena
+                  </h1>
+                  <p className="text-gray-300 max-w-2xl mx-auto">
+                    Battle with your heroes, climb the ranks, and earn Arena Coins in the ultimate gaming experience.
+                  </p>
+                </motion.div>
+                <GameArena />
               </TabsContent>
             </div>
           </Tabs>
