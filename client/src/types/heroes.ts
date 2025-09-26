@@ -43,3 +43,61 @@ export interface NFTBadge {
   rarity: string;
   attributes: Record<string, number>;
 }
+
+// Game Arena specific types
+export interface GameHero {
+  id: string;
+  name: string;
+  title: string;
+  description: string;
+  element: 'Fire' | 'Ice' | 'Electric' | 'Dark' | 'Earth' | 'Air' | 'Light';
+  rarity: 'Rare' | 'Epic' | 'Legendary';
+  color: string;
+  gradient: string;
+  
+  // Battle Stats
+  stats: {
+    power: number;
+    health: number;
+    speed: number;
+  };
+  
+  // Special Abilities
+  abilities: {
+    name: string;
+    description: string;
+    cooldown: number;
+    damage?: number;
+    effect?: string;
+  }[];
+  
+  // Ownership and progression
+  owned: boolean;
+  level: number;
+  experience: number;
+  maxExperience: number;
+  
+  // Visual
+  avatar: string;
+  battleSprite: string;
+}
+
+export interface BattleResult {
+  winner: 'player' | 'opponent' | 'draw';
+  playerHero: GameHero;
+  opponentHero: GameHero;
+  turns: BattleTurn[];
+  rewards: {
+    experience: number;
+    coins?: number;
+    items?: string[];
+  };
+}
+
+export interface BattleTurn {
+  attacker: string;
+  ability: string;
+  damage: number;
+  effect?: string;
+  targetHealth: number;
+}
