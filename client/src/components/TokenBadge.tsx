@@ -172,7 +172,7 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
   // Image loading state management
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const [currentImageSrc, setCurrentImageSrc] = useState(imageSrc);
+  const [currentImageSrc, setCurrentImageSrc] = useState<string>(imageSrc);
   const [allImagesFailed, setAllImagesFailed] = useState(false);
   
   // Reset image state when tokenSymbol changes
@@ -180,9 +180,11 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
     setImageLoaded(false);
     setImageError(false);
     setAllImagesFailed(false);
-    setCurrentImageSrc(TOKEN_IMAGES[tokenSymbol]);
+    // Force fresh image load with aggressive cache-busting
+    const cacheBustingUrl = `${TOKEN_IMAGES[tokenSymbol]}?bust=${Date.now()}&rnd=${Math.random()}&token=${tokenSymbol}`;
+    setCurrentImageSrc(cacheBustingUrl);
     if (process.env.NODE_ENV !== 'production') {
-      console.log(`Loading image for token ${tokenSymbol}:`, TOKEN_IMAGES[tokenSymbol]);
+      console.log(`🎯 TokenBadge ${tokenSymbol} loading image:`, cacheBustingUrl);
     }
   }, [tokenSymbol]);
   
@@ -302,21 +304,41 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
           )}
         </div>
 
-        {/* Overlay gradient for better text visibility */}
+        {/* Overlay gradient for better text visibility - Token-specific */}
         <div 
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(45deg, ${theme.primary}20 0%, transparent 50%, ${theme.primary}10 100%)`
+            background: `linear-gradient(45deg, ${theme.primary}30 0%, transparent 50%, ${theme.primary}15 100%)`,
+            border: `3px solid ${theme.primary}60`
           }}
         />
+        
+        {/* Token-specific corner indicator */}
+        <div className="absolute bottom-2 right-2">
+          <div 
+            className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold shadow-xl"
+            style={{ 
+              background: `radial-gradient(circle, ${theme.primary}, ${theme.gradient[2]})`,
+              border: `2px solid white`,
+              color: 'white'
+            }}
+          >
+            {tokenSymbol === 'WTR' && '💧'}
+            {tokenSymbol === 'HEMP' && '🌿'}
+            {tokenSymbol === 'GPWR' && '⚡'}
+            {tokenSymbol === 'BATT' && '🔋'}
+            {tokenSymbol === 'GCCT' && '📈'}
+          </div>
+        </div>
 
-        {/* Token symbol overlay */}
+        {/* Token symbol overlay with enhanced visibility */}
         <div className="absolute top-2 left-2">
           <div 
-            className="px-2 py-1 rounded text-xs font-bold text-white shadow-lg"
+            className="px-3 py-2 rounded-lg text-sm font-bold text-white shadow-xl"
             style={{ 
               background: `linear-gradient(135deg, ${theme.gradient[0]}, ${theme.gradient[1]})`,
-              border: `1px solid ${theme.primary}`
+              border: `2px solid ${theme.primary}`,
+              backdropFilter: 'blur(4px)'
             }}
           >
             ${tokenSymbol}

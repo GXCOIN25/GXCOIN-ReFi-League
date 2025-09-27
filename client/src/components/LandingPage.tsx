@@ -215,7 +215,11 @@ export default function LandingPage() {
                           {/* NFT Badge Display */}
                           <div className="flex justify-center">
                             <TokenBadge
-                              tokenSymbol={getValidTokenSymbol(hero.symbol)}
+                              tokenSymbol={(() => {
+                                const symbol = getValidTokenSymbol(hero.symbol);
+                                console.log(`🎭 LandingPage rendering ${hero.name} with symbol: ${symbol}`);
+                                return symbol;
+                              })()}
                               attributes={{
                                 power: hero.stats.power,
                                 impact: hero.stats.health,
