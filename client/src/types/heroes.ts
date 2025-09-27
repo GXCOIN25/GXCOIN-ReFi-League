@@ -50,11 +50,18 @@ export interface GameHero {
   name: string;
   symbol: string;
   title: string;
+  subtitle?: string; // For "Powered by GXCOIN Anchor" or "Powers All Eco-Warriors"
   description: string;
   element: 'Fire' | 'Ice' | 'Electric' | 'Dark' | 'Earth' | 'Air' | 'Light' | 'Universal' | 'BioChar' | 'Water' | 'Carbon' | 'Energy' | 'Construction' | 'DeFi';
   rarity: 'Rare' | 'Epic' | 'Legendary' | 'Mythic';
   color: string;
   gradient: string;
+  
+  // GXCOIN Anchor hierarchy fields
+  isAnchor?: boolean; // True only for GXCOIN (GCCT)
+  poweredBy?: string; // Token symbol that powers this hero (e.g., "GCCT")
+  requireAnchor?: boolean; // Whether this hero requires GXCOIN anchor to unlock
+  powersHeroes?: string[]; // For anchor only - list of heroes it powers
   
   // Battle Stats
   stats: {

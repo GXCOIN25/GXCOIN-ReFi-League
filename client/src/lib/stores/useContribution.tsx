@@ -17,6 +17,10 @@ interface ContributionState {
   };
   isLoading: boolean;
   
+  // GXCOIN Anchor Power fields
+  gxcoinStake: number;
+  anchorPower: number;
+  
   // Actions
   addContribution: (amount: number) => Promise<void>;
   loadUserData: () => Promise<void>;
@@ -24,6 +28,12 @@ interface ContributionState {
   getCurrentRank: () => Rank;
   getNextRank: () => Rank | null;
   getProgressToNext: () => number;
+  
+  // GXCOIN Anchor Power actions
+  getAnchorMultiplier: () => number;
+  setGXCoinStake: (stake: number) => void;
+  setAnchorPower: (power: number) => void;
+  computeAnchorPowerFromStake: (stake: number) => number;
 }
 
 export const useContribution = create<ContributionState>()(
@@ -38,6 +48,10 @@ export const useContribution = create<ContributionState>()(
       waterPurified: 0
     },
     isLoading: false,
+    
+    // GXCOIN Anchor Power state (defaults maintain current behavior)
+    gxcoinStake: 0,
+    anchorPower: 0,
     
     addContribution: async (amount: number) => {
       const user = useUser.getState().currentUser;
@@ -94,14 +108,40 @@ export const useContribution = create<ContributionState>()(
     },
     
     calculateImpact: (contribution: number) => {
-      const multiplier = get().currentRank.impactMultiplier;
+      const effectiveMultiplier = get().currentRank.impactMultiplier * get().getAnchorMultiplier();
       return {
-        plasticRemoved: Math.floor(contribution * 5.7 * multiplier), // gallons
-        carbonOffset: Math.floor(contribution * 0.1 * multiplier), // tons
-        renewableEnergy: Math.floor(contribution * 2.3 * multiplier), // kWh
-        treesPlanted: Math.floor(contribution * 0.05 * multiplier),
-        waterPurified: Math.floor(contribution * 10 * multiplier) // gallons
+        plasticRemoved: Math.floor(contribution * 5.7 * effectiveMultiplier), // gallons
+        carbonOffset: Math.floor(contribution * 0.1 * effectiveMultiplier), // tons
+        renewableEnergy: Math.floor(contribution * 2.3 * effectiveMultiplier), // kWh
+        treesPlanted: Math.floor(contribution * 0.05 * effectiveMultiplier),
+        waterPurified: Math.floor(contribution * 10 * effectiveMultiplier) // gallons
       };
+    },
+    
+    // GXCOIN Anchor Power functions
+    getAnchorMultiplier: () => {
+      const anchorPower = get().anchorPower;
+      return Math.max(1, Math.min(2, 1 + 0.05 * anchorPower));
+    },
+    
+    setGXCoinStake: (stake: number) => {
+      console.log(`[GXCOIN] Setting stake: ${stake}`);
+      const newAnchorPower = get().computeAnchorPowerFromStake(stake);
+      set({ 
+        gxcoinStake: stake,
+        anchorPower: newAnchorPower
+      });
+      console.log(`[GXCOIN] New anchor power: ${newAnchorPower}, multiplier: ${get().getAnchorMultiplier()}`);
+    },
+    
+    setAnchorPower: (power: number) => {
+      console.log(`[GXCOIN] Setting anchor power directly: ${power}`);
+      set({ anchorPower: power });
+      console.log(`[GXCOIN] New multiplier: ${get().getAnchorMultiplier()}`);
+    },
+    
+    computeAnchorPowerFromStake: (stake: number) => {
+      return Math.floor(stake / 1000);
     },
     
     getCurrentRank: () => {
