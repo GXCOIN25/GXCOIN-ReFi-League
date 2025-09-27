@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { users, contributions, nftBadges, missions, patents, economicRewards, userPatentAccess, environmentalBattles, userEconomicStats,
+import { users, contributions, nftBadges, missions, patents, economicRewards, userPatentAccess, environmentalBattles, userEconomicStats, githubOAuthStates,
          type User, type InsertUser, 
          type Contribution, type InsertContribution,
          type NftBadge, type InsertNftBadge,
@@ -8,10 +8,13 @@ import { users, contributions, nftBadges, missions, patents, economicRewards, us
          type EconomicReward, type InsertEconomicReward,
          type UserPatentAccess, type InsertUserPatentAccess,
          type EnvironmentalBattle, type InsertEnvironmentalBattle,
-         type UserEconomicStats, type InsertUserEconomicStats } from "@shared/schema";
-import { eq, desc, sum, and } from "drizzle-orm";
+         type UserEconomicStats, type InsertUserEconomicStats,
+         type GitHubOAuthState, type InsertGitHubOAuthState } from "@shared/schema";
+import { eq, desc, sum, and, sql, lt } from "drizzle-orm";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { PATENTS_DATABASE } from "../client/src/data/patents";
 
 // Interface for environmental impact structure
 interface EnvironmentalImpact {
@@ -39,6 +42,12 @@ export interface IStorage {
   getUserByReplitUserId(replitUserId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   upsertReplitUser(replitUserId: string, replitUsername: string, email?: string): Promise<User>;
+  updateUserGitHubInfo(userId: number, githubInfo: {
+    githubUsername: string;
+    githubAvatarUrl: string;
+    githubProfileUrl: string;
+    githubConnectedAt: Date;
+  }): Promise<User>;
   authenticateUser(username: string, password: string): Promise<User | null>;
   generateToken(user: User): string;
   verifyToken(token: string): { userId: number } | null;
@@ -78,6 +87,23 @@ export interface IStorage {
   calculateCarbonCreditValue(carbonTons: number): number;
   calculatePlasticConversionValue(bottleCount: number): number;
   calculatePatentLicensingValue(patentId: number, usageCount: number): Promise<number>;
+  
+  // GitHub OAuth methods
+  createOAuthState(userId: number): Promise<{ state: string; codeVerifier: string }>;
+  verifyOAuthState(state: string, userId: number): Promise<{ codeVerifier: string } | null>;
+  cleanupExpiredOAuthStates(): Promise<void>;
+  updateUserGitHubOAuth(userId: number, tokens: {
+    accessToken: string;
+    refreshToken?: string;
+    expiresAt?: Date;
+    githubUserId: string;
+    githubUsername: string;
+    githubAvatarUrl: string;
+    githubProfileUrl: string;
+  }): Promise<User>;
+  getUserGitHubToken(userId: number): Promise<string | null>;
+  encryptToken(token: string): string;
+  decryptToken(encryptedToken: string): string;
 }
 
 export class PostgresStorage implements IStorage {
@@ -167,6 +193,24 @@ export class PostgresStorage implements IStorage {
         throw error;
       }
     }
+  }
+
+  async updateUserGitHubInfo(userId: number, githubInfo: {
+    githubUsername: string;
+    githubAvatarUrl: string;
+    githubProfileUrl: string;
+    githubConnectedAt: Date;
+  }): Promise<User> {
+    const result = await db.update(users)
+      .set({
+        githubUsername: githubInfo.githubUsername,
+        githubAvatarUrl: githubInfo.githubAvatarUrl,
+        githubProfileUrl: githubInfo.githubProfileUrl,
+        githubConnectedAt: githubInfo.githubConnectedAt,
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return result[0];
   }
 
   async authenticateUser(username: string, password: string): Promise<User | null> {
@@ -414,84 +458,177 @@ export class PostgresStorage implements IStorage {
     const diminishingFactor = Math.log(usageCount + 1) / Math.log(10); // Logarithmic scaling
     return baseValue * usageCount * (0.5 + diminishingFactor * 0.5);
   }
-}
 
-export const storage = new PostgresStorage();
+  // GitHub OAuth methods implementation
+  async createOAuthState(userId: number): Promise<{ state: string; codeVerifier: string }> {
+    const state = crypto.randomBytes(32).toString('base64url');
+    const codeVerifier = crypto.randomBytes(32).toString('base64url');
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-// Initialize comprehensive patents database - Industry-First Patent-Powered Gaming
-export async function initializePatents() {
-  console.log('🔬 Initializing patent registry with comprehensive industry-first database...');
-  
-  try {
-    const patents = await storage.getAllPatents();
-    console.log(`📋 Found ${patents.length} existing patents in database`);
+    await db.insert(githubOAuthStates).values({
+      userId,
+      state,
+      codeVerifier,
+      expiresAt
+    });
+
+    return { state, codeVerifier };
+  }
+
+  async verifyOAuthState(state: string, userId: number): Promise<{ codeVerifier: string } | null> {
+    const result = await db.select()
+      .from(githubOAuthStates)
+      .where(and(
+        eq(githubOAuthStates.state, state),
+        eq(githubOAuthStates.userId, userId),
+        sql`${githubOAuthStates.expiresAt} > NOW()`
+      ))
+      .limit(1);
+
+    if (!result[0]) return null;
+
+    // Clean up used state
+    await db.delete(githubOAuthStates)
+      .where(eq(githubOAuthStates.state, state));
+
+    return { codeVerifier: result[0].codeVerifier };
+  }
+
+  async cleanupExpiredOAuthStates(): Promise<void> {
+    await db.delete(githubOAuthStates)
+      .where(lt(githubOAuthStates.expiresAt, new Date()));
+  }
+
+  async updateUserGitHubOAuth(userId: number, tokens: {
+    accessToken: string;
+    refreshToken?: string;
+    expiresAt?: Date;
+    githubUserId: string;
+    githubUsername: string;
+    githubAvatarUrl: string;
+    githubProfileUrl: string;
+  }): Promise<User> {
+    const encryptedAccessToken = this.encryptToken(tokens.accessToken);
+    const encryptedRefreshToken = tokens.refreshToken ? this.encryptToken(tokens.refreshToken) : null;
+
+    const result = await db.update(users)
+      .set({
+        githubAccessToken: encryptedAccessToken,
+        githubRefreshToken: encryptedRefreshToken,
+        githubTokenExpiresAt: tokens.expiresAt,
+        githubUserId: tokens.githubUserId,
+        githubUsername: tokens.githubUsername,
+        githubAvatarUrl: tokens.githubAvatarUrl,
+        githubProfileUrl: tokens.githubProfileUrl,
+        githubConnectedAt: new Date()
+      })
+      .where(eq(users.id, userId))
+      .returning();
+
+    return result[0];
+  }
+
+  async getUserGitHubToken(userId: number): Promise<string | null> {
+    const result = await db.select({ githubAccessToken: users.githubAccessToken })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (!result[0]?.githubAccessToken) return null;
+
+    return this.decryptToken(result[0].githubAccessToken);
+  }
+
+  encryptToken(token: string): string {
+    const algorithm = 'aes-256-gcm';
+    const secretKey = process.env.ENCRYPTION_KEY || process.env.JWT_SECRET;
     
-    if (patents.length === 0) {
-      console.log('🌱 Seeding comprehensive patent database (18 revolutionary patents)...');
-      
-      // Import the comprehensive patent database from client data
-      const { PATENTS_DATABASE } = await import('../client/src/data/patents');
-      
-      // Transform patents for database insertion
-      const patentsToInsert: InsertPatent[] = PATENTS_DATABASE.map(patent => ({
-        patentNumber: patent.patentNumber,
-        title: patent.title,
-        description: patent.description,
-        category: patent.category,
-        economicValue: patent.economicValue,
-        environmentalImpact: patent.environmentalImpact,
-        accessLevel: patent.accessLevel,
-        heroAssociation: patent.heroAssociation
-      }));
-      
-      console.log(`📄 Inserting ${patentsToInsert.length} industry-first patents...`);
-      
-      let insertedCount = 0;
-      for (const patent of patentsToInsert) {
-        try {
-          await storage.createPatent(patent);
-          insertedCount++;
-          console.log(`  ✅ ${insertedCount}/${patentsToInsert.length}: ${patent.patentNumber} - ${patent.title}`);
-        } catch (error) {
-          console.error(`  ❌ Failed to insert patent ${patent.patentNumber}:`, error);
-        }
-      }
-      
-      console.log(`🎉 Successfully seeded ${insertedCount} revolutionary patents!`);
-      
-      // Log comprehensive breakdown for verification
-      const finalPatents = await storage.getAllPatents();
-      const categoryBreakdown = finalPatents.reduce((acc, patent) => {
-        acc[patent.category] = (acc[patent.category] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-      
-      console.log('📊 Patent categories seeded:', categoryBreakdown);
-      console.log('💡 Economic value range:', {
-        min: Math.min(...finalPatents.map(p => p.economicValue)),
-        max: Math.max(...finalPatents.map(p => p.economicValue)),
-        avg: Math.round(finalPatents.reduce((sum, p) => sum + p.economicValue, 0) / finalPatents.length)
-      });
-      console.log('🌍 Total environmental impact potential:', {
-        maxCO2Sequestration: Math.max(...finalPatents.map(p => (p.environmentalImpact as EnvironmentalImpact).co2Sequestered || 0)),
-        maxPlasticConversion: Math.max(...finalPatents.map(p => (p.environmentalImpact as EnvironmentalImpact).plasticConverted || 0)),
-        maxEnergyGeneration: Math.max(...finalPatents.map(p => (p.environmentalImpact as EnvironmentalImpact).energyGenerated || 0))
-      });
-      
-    } else {
-      console.log(`✅ Patent database already initialized with ${patents.length} patents`);
-      
-      // Verify we have the expected 18 patents
-      if (patents.length < 18) {
-        console.warn(`⚠️  Expected 18 patents but found only ${patents.length}. Consider re-seeding.`);
-      } else if (patents.length >= 18) {
-        console.log('🏆 Complete patent registry loaded: Revolutionary patent-powered gaming ready!');
-      }
+    if (!secretKey) {
+      throw new Error('ENCRYPTION_KEY or JWT_SECRET environment variable is required for token encryption');
     }
+
+    // Create a hash of the secret to ensure it's 32 bytes
+    const key = crypto.createHash('sha256').update(secretKey).digest();
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipher(algorithm, key);
     
-    return patents;
-  } catch (error) {
-    console.error('❌ CRITICAL ERROR during patent initialization:', error);
-    throw new Error(`Patent initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    let encrypted = cipher.update(token, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+    const authTag = cipher.getAuthTag();
+    
+    // Combine iv, authTag, and encrypted data
+    return iv.toString('hex') + ':' + authTag.toString('hex') + ':' + encrypted;
+  }
+
+  decryptToken(encryptedToken: string): string {
+    const algorithm = 'aes-256-gcm';
+    const secretKey = process.env.ENCRYPTION_KEY || process.env.JWT_SECRET;
+    
+    if (!secretKey) {
+      throw new Error('ENCRYPTION_KEY or JWT_SECRET environment variable is required for token decryption');
+    }
+
+    // Create a hash of the secret to ensure it's 32 bytes
+    const key = crypto.createHash('sha256').update(secretKey).digest();
+    
+    const [ivHex, authTagHex, encrypted] = encryptedToken.split(':');
+    const iv = Buffer.from(ivHex, 'hex');
+    const authTag = Buffer.from(authTagHex, 'hex');
+    
+    const decipher = crypto.createDecipher(algorithm, key);
+    decipher.setAuthTag(authTag);
+    
+    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
+    
+    return decrypted;
   }
 }
+
+// Patent initialization function
+export async function initializePatents(): Promise<void> {
+  console.log('🌱 Starting patent database initialization...');
+  
+  try {
+    // Check if patents already exist to avoid duplicates
+    const existingPatents = await db.select().from(patents);
+    
+    if (existingPatents.length > 0) {
+      console.log(`📋 Found ${existingPatents.length} existing patents. Skipping initialization.`);
+      return;
+    }
+    
+    // Transform patents data for database insertion
+    const patentsToInsert = PATENTS_DATABASE.map(patent => ({
+      patentNumber: patent.patentNumber,
+      title: patent.title,
+      description: patent.description,
+      category: patent.category,
+      economicValue: patent.economicValue,
+      environmentalImpact: patent.environmentalImpact,
+      accessLevel: patent.accessLevel,
+      heroAssociation: patent.heroAssociation
+    }));
+    
+    // Insert all patents
+    console.log(`📄 Inserting ${patentsToInsert.length} patents...`);
+    const insertedPatents = await db.insert(patents).values(patentsToInsert).returning();
+    
+    console.log(`✅ Successfully initialized ${insertedPatents.length} patents!`);
+    
+    // Log category breakdown
+    const categoryBreakdown = insertedPatents.reduce((acc, patent) => {
+      acc[patent.category] = (acc[patent.category] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    console.log('📊 Patent categories:', categoryBreakdown);
+    
+  } catch (error) {
+    console.error('❌ Error initializing patents:', error);
+    throw error;
+  }
+}
+
+// Export a singleton instance of the storage
+export const storage = new PostgresStorage();

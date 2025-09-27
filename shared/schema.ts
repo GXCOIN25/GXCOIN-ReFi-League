@@ -10,6 +10,15 @@ export const users = pgTable("users", {
   replitUserId: text("replit_user_id").unique(),
   replitUsername: text("replit_username"),
   email: text("email"),
+  githubUsername: text("github_username"),
+  githubAvatarUrl: text("github_avatar_url"),
+  githubProfileUrl: text("github_profile_url"),
+  githubConnectedAt: timestamp("github_connected_at"),
+  // GitHub OAuth fields for per-user authentication
+  githubAccessToken: text("github_access_token"), // Encrypted OAuth access token
+  githubRefreshToken: text("github_refresh_token"), // Encrypted OAuth refresh token
+  githubTokenExpiresAt: timestamp("github_token_expires_at"),
+  githubUserId: text("github_user_id"), // GitHub user ID for identity verification
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -53,12 +62,28 @@ export const insertUserSchema = createInsertSchema(users).pick({
   replitUserId: true,
   replitUsername: true,
   email: true,
+  githubUsername: true,
+  githubAvatarUrl: true,
+  githubProfileUrl: true,
+  githubConnectedAt: true,
+  githubAccessToken: true,
+  githubRefreshToken: true,
+  githubTokenExpiresAt: true,
+  githubUserId: true,
 }).extend({
   password: z.string().optional().nullable(), // Allow null for SSO users
   walletAddress: z.string().optional().nullable(),
   replitUserId: z.string().optional().nullable(),
   replitUsername: z.string().optional().nullable(),
   email: z.string().optional().nullable(),
+  githubUsername: z.string().optional().nullable(),
+  githubAvatarUrl: z.string().optional().nullable(),
+  githubProfileUrl: z.string().optional().nullable(),
+  githubConnectedAt: z.date().optional().nullable(),
+  githubAccessToken: z.string().optional().nullable(),
+  githubRefreshToken: z.string().optional().nullable(),
+  githubTokenExpiresAt: z.date().optional().nullable(),
+  githubUserId: z.string().optional().nullable(),
 });
 
 export const insertContributionSchema = createInsertSchema(contributions).pick({
@@ -201,8 +226,27 @@ export const insertUserEconomicStatsSchema = createInsertSchema(userEconomicStat
   patentsUnlocked: true,
 });
 
+// GitHub OAuth State Management
+export const githubOAuthStates = pgTable("github_oauth_states", {
+  id: serial("id").primaryKey(),
+  state: text("state").notNull().unique(), // Random state parameter for CSRF protection
+  codeVerifier: text("code_verifier").notNull(), // PKCE code verifier
+  userId: integer("user_id").references(() => users.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: timestamp("expires_at").notNull(), // OAuth state expires after 10 minutes
+});
+
+export const insertGitHubOAuthStateSchema = createInsertSchema(githubOAuthStates).pick({
+  state: true,
+  codeVerifier: true,
+  userId: true,
+  expiresAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+export type GitHubOAuthState = typeof githubOAuthStates.$inferSelect;
+export type InsertGitHubOAuthState = z.infer<typeof insertGitHubOAuthStateSchema>;
 export type InsertContribution = z.infer<typeof insertContributionSchema>;
 export type Contribution = typeof contributions.$inferSelect;
 export type InsertNftBadge = z.infer<typeof insertNftBadgeSchema>;
