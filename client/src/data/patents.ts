@@ -41,7 +41,7 @@ export const PATENTS_DATABASE: Patent[] = [
       carbonStorage: 1.8
     },
     accessLevel: 1,
-    heroAssociation: "biochar_batt",
+    heroAssociation: "graphene_batt",
     unlockCost: 100,
     dailyUsageLimit: 5,
     realWorldApplication: "Caribbean ocean cleanup combined with premium biochar production for agriculture and carbon markets",
@@ -60,7 +60,7 @@ export const PATENTS_DATABASE: Patent[] = [
       co2Sequestered: 1.5
     },
     accessLevel: 2,
-    heroAssociation: "biochar_batt",
+    heroAssociation: "graphene_batt",
     unlockCost: 250,
     dailyUsageLimit: 3,
     realWorldApplication: "Converting hemp farming waste into graphene for electronics industry while sequestering carbon",
@@ -79,7 +79,7 @@ export const PATENTS_DATABASE: Patent[] = [
       carbonStorage: 2.1
     },
     accessLevel: 3,
-    heroAssociation: "biochar_batt",
+    heroAssociation: "graphene_batt",
     unlockCost: 400,
     dailyUsageLimit: 4,
     realWorldApplication: "Large-scale algae farms producing both biofuel and high-value activated carbon for environmental remediation",
@@ -100,7 +100,7 @@ export const PATENTS_DATABASE: Patent[] = [
       co2Sequestered: 0.8
     },
     accessLevel: 2,
-    heroAssociation: "aqua_ocean",
+    heroAssociation: "aqua_wtr",
     unlockCost: 300,
     dailyUsageLimit: 2,
     realWorldApplication: "Autonomous ocean cleanup platforms that break down plastic waste using biotechnology",
@@ -119,7 +119,7 @@ export const PATENTS_DATABASE: Patent[] = [
       co2Sequestered: 0.5
     },
     accessLevel: 1,
-    heroAssociation: "aqua_ocean",
+    heroAssociation: "aqua_wtr",
     unlockCost: 200,
     dailyUsageLimit: 6,
     realWorldApplication: "Providing clean water in water-scarce regions using only solar energy and atmospheric humidity",
@@ -138,7 +138,7 @@ export const PATENTS_DATABASE: Patent[] = [
       wasteReduction: 25
     },
     accessLevel: 4,
-    heroAssociation: "aqua_ocean",
+    heroAssociation: "aqua_wtr",
     unlockCost: 600,
     dailyUsageLimit: 3,
     realWorldApplication: "Municipal water treatment plants removing microplastics from drinking water supplies",
@@ -158,7 +158,7 @@ export const PATENTS_DATABASE: Patent[] = [
       co2Sequestered: 2.0
     },
     accessLevel: 3,
-    heroAssociation: "voltra_energy",
+    heroAssociation: "voltra_gpwr",
     unlockCost: 500,
     dailyUsageLimit: 4,
     realWorldApplication: "Ultra-high efficiency solar panels for residential and commercial installations",
@@ -176,7 +176,7 @@ export const PATENTS_DATABASE: Patent[] = [
       co2Sequestered: 3.5
     },
     accessLevel: 5,
-    heroAssociation: "voltra_energy",
+    heroAssociation: "voltra_gpwr",
     unlockCost: 800,
     dailyUsageLimit: 2,
     realWorldApplication: "Grid-scale energy storage enabling 24/7 renewable energy supply from intermittent wind sources",
@@ -195,7 +195,7 @@ export const PATENTS_DATABASE: Patent[] = [
       oceanCleanup: 5
     },
     accessLevel: 6,
-    heroAssociation: "voltra_energy",
+    heroAssociation: "voltra_gpwr",
     unlockCost: 1000,
     dailyUsageLimit: 1,
     realWorldApplication: "Coastal tidal energy farms providing consistent renewable power to coastal communities",
@@ -215,7 +215,7 @@ export const PATENTS_DATABASE: Patent[] = [
       carbonStorage: 8.5
     },
     accessLevel: 4,
-    heroAssociation: "graphene_tech",
+    heroAssociation: "graphene_batt",
     unlockCost: 700,
     dailyUsageLimit: 3,
     realWorldApplication: "Industrial-scale atmospheric CO2 removal for carbon negative manufacturing processes",
@@ -234,7 +234,7 @@ export const PATENTS_DATABASE: Patent[] = [
       wasteReduction: 30
     },
     accessLevel: 2,
-    heroAssociation: "graphene_tech",
+    heroAssociation: "graphene_batt",
     unlockCost: 350,
     dailyUsageLimit: 5,
     realWorldApplication: "Agricultural soil enhancement that permanently stores CO2 while increasing crop yields",
@@ -253,7 +253,7 @@ export const PATENTS_DATABASE: Patent[] = [
       wasteReduction: 100
     },
     accessLevel: 7,
-    heroAssociation: "graphene_tech",
+    heroAssociation: "graphene_batt",
     unlockCost: 1200,
     dailyUsageLimit: 1,
     realWorldApplication: "Manufacturing high-value carbon fiber products directly from industrial CO2 emissions",
@@ -274,7 +274,7 @@ export const PATENTS_DATABASE: Patent[] = [
       carbonStorage: 2.5
     },
     accessLevel: 3,
-    heroAssociation: "trader_market",
+    heroAssociation: "trader_gcct",
     unlockCost: 450,
     dailyUsageLimit: 4,
     realWorldApplication: "Revolutionary building materials that grow themselves while sequestering carbon and using agricultural waste",
@@ -293,7 +293,7 @@ export const PATENTS_DATABASE: Patent[] = [
       wasteReduction: 150
     },
     accessLevel: 5,
-    heroAssociation: "trader_market",
+    heroAssociation: "trader_gcct",
     unlockCost: 750,
     dailyUsageLimit: 2,
     realWorldApplication: "Self-repairing infrastructure that dramatically reduces maintenance costs and material waste",
@@ -313,7 +313,7 @@ export const PATENTS_DATABASE: Patent[] = [
       co2Sequestered: 1.5
     },
     accessLevel: 2,
-    heroAssociation: "trader_market",
+    heroAssociation: "trader_gcct",
     unlockCost: 300,
     dailyUsageLimit: 6,
     realWorldApplication: "Building homes and infrastructure using ocean plastic waste as primary construction material",
@@ -335,7 +335,7 @@ export const PATENTS_DATABASE: Patent[] = [
       waterPurified: 25000
     },
     accessLevel: 8,
-    heroAssociation: "biochar_batt",
+    heroAssociation: "graphene_batt",
     unlockCost: 1500,
     dailyUsageLimit: 1,
     realWorldApplication: "Integrated facilities producing energy, water treatment, and carbon sequestration simultaneously",
@@ -355,7 +355,7 @@ export const PATENTS_DATABASE: Patent[] = [
       co2Sequestered: 6.8
     },
     accessLevel: 9,
-    heroAssociation: "aqua_ocean",
+    heroAssociation: "aqua_wtr",
     unlockCost: 2000,
     dailyUsageLimit: 1,
     realWorldApplication: "Autonomous ocean cleanup systems that power themselves while removing plastic and generating clean energy",
@@ -373,7 +373,7 @@ export const PATENTS_DATABASE: Patent[] = [
       co2Sequestered: 12.5
     },
     accessLevel: 10,
-    heroAssociation: "voltra_energy",
+    heroAssociation: "voltra_gpwr",
     unlockCost: 2500,
     dailyUsageLimit: 1,
     realWorldApplication: "Next-generation energy systems harvesting power from all available atmospheric sources",

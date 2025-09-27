@@ -20,6 +20,7 @@ import { CommunityFeatures } from "@/components/CommunityFeatures";
 import { TokenIntegration } from "@/components/TokenIntegration";
 import { NFTMinting } from "@/components/NFTMinting";
 import GameArena from "@/components/GameArena";
+import LandingPage from "@/components/LandingPage";
 import { 
   Volume2, 
   VolumeX, 
@@ -31,7 +32,8 @@ import {
   Wallet,
   Globe,
   Coins,
-  Gamepad2
+  Gamepad2,
+  Home
 } from "lucide-react";
 import "@fontsource/inter";
 
@@ -150,7 +152,7 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
 }
 
 function MainExperience() {
-  const [currentTab, setCurrentTab] = useState("heroes");
+  const [currentTab, setCurrentTab] = useState("home");
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showNFTMinting, setShowNFTMinting] = useState<{ heroId: string; level: number } | null>(null);
   const { isLoggedIn } = useUser();
@@ -221,7 +223,11 @@ function MainExperience() {
         <div className="max-w-7xl mx-auto px-4">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
             <div className="flex justify-center mb-8">
-              <TabsList className="mobile-tabs-list w-full max-w-5xl bg-black/60 backdrop-blur-sm p-2 flex overflow-x-auto scroll-smooth gap-1 md:grid md:grid-cols-9">
+              <TabsList className="mobile-tabs-list w-full max-w-6xl bg-black/60 backdrop-blur-sm p-2 flex overflow-x-auto scroll-smooth gap-1 md:grid md:grid-cols-10">
+                <TabsTrigger value="home" className="mobile-tab-trigger text-xs flex items-center gap-1 cursor-pointer hover:bg-white/10 rounded flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
+                  <Home className="w-3 h-3" />
+                  <span className="hidden sm:inline">Home</span>
+                </TabsTrigger>
                 <TabsTrigger value="heroes" className="mobile-tab-trigger text-xs flex items-center gap-1 cursor-pointer hover:bg-white/10 rounded flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
                   <Shield className="w-3 h-3" />
                   <span className="hidden sm:inline">Heroes</span>
@@ -262,6 +268,10 @@ function MainExperience() {
             </div>
 
             <div className="space-y-8 min-h-screen overflow-y-auto px-2">
+              <TabsContent value="home" className="mt-0">
+                <LandingPage />
+              </TabsContent>
+
               <TabsContent value="heroes" className="space-y-8 mt-0">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}

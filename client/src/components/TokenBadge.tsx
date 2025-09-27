@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 const TOKEN_IMAGES = {
   GCCT: "/gcct-badge.jpg", // Carbon Credits shield badge
   WTR: "/wtr-badge.jpg", // Water warrior badge
-  GPWR: "/heroes-group.jpg", // Use group image for GPWR until we have individual one
+  GPWR: "/gpwr-badge.jpg", // Green Power energy warrior badge
   BATT: "/batt-badge.jpg", // Battery/tech warrior badge
   HEMP: "/hemp-badge.jpg" // Hemp nature warrior badge
 } as const;
@@ -286,26 +286,13 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               if (process.env.NODE_ENV !== 'production') {
-                console.log(`Image failed to load for ${tokenSymbol}:`, target.src);
+                console.error(`Image failed to load for ${tokenSymbol}:`, target.src);
               }
-              
-              if (!imageError && target.src !== '/heroes-group.jpg') {
-                if (process.env.NODE_ENV !== 'production') {
-                  console.log(`Falling back to heroes-group.jpg for ${tokenSymbol}`);
-                }
-                setCurrentImageSrc('/heroes-group.jpg');
-                setImageError(true);
-                setImageLoaded(false);
-              } else {
-                if (process.env.NODE_ENV !== 'production') {
-                  console.error(`All image sources failed for ${tokenSymbol}`);
-                }
-                setAllImagesFailed(true);
-                setImageLoaded(false); // Keep as false to allow placeholder to show
-              }
+              setAllImagesFailed(true);
+              setImageLoaded(false); // Show placeholder instead of fallback image
             }}
           />
-          {(allImagesFailed || (imageError && currentImageSrc === '/heroes-group.jpg' && !imageLoaded)) && (
+          {allImagesFailed && (
             <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
               <div className="text-center text-white">
                 <div className="text-lg font-bold">{tokenSymbol}</div>

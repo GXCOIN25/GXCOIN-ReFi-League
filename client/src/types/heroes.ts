@@ -48,6 +48,7 @@ export interface NFTBadge {
 export interface GameHero {
   id: string;
   name: string;
+  symbol: string;
   title: string;
   description: string;
   element: 'Fire' | 'Ice' | 'Electric' | 'Dark' | 'Earth' | 'Air' | 'Light' | 'Universal' | 'BioChar' | 'Water' | 'Carbon' | 'Energy' | 'Construction' | 'DeFi';

@@ -11,12 +11,22 @@ export default function BlackCard() {
   const { currentRank } = useContribution();
 
   const cardFeatures = [
-    "$500,000 spending power",
-    "Self-custody security",
-    "Bitcoin cashback rewards",
-    "VIP Concierge benefits",
-    "Global event access",
-    "Impact dashboard"
+    "$500,000 spending power limit",
+    "Bitcoin cashback on all purchases", 
+    "VIP Concierge services 24/7",
+    "Self-custody security protocol",
+    "Global premium event access",
+    "Real-time impact dashboard",
+    "Patent licensing profit sharing",
+    "Eco-warrior reward multipliers"
+  ];
+
+  const rankTiers = [
+    { name: "Bronze Recruit", color: "#cd7f32", contribution: "175+" },
+    { name: "Silver Defender", color: "#c0c0c0", contribution: "500+" },
+    { name: "Gold Guardian", color: "#ffd700", contribution: "1,000+" },
+    { name: "Platinum Champion", color: "#e5e4e2", contribution: "5,000+" },
+    { name: "Diamond Legend", color: "#b9f2ff", contribution: "10,000+" }
   ];
 
   // Check if user prefers reduced motion
@@ -56,10 +66,10 @@ export default function BlackCard() {
               </motion.div>
               
               <h3 className="text-xl font-bold text-white mb-2">
-                GXCOIN BLACK CARD
+                GXCOIN PLATINUM BLACK CARD
               </h3>
               <p className="text-gray-400 text-sm mb-4">
-                The ultimate tool for eco-warriors
+                Patent-powered crypto BLACK CARD for eco-warriors
               </p>
               
               <Button 
@@ -118,19 +128,21 @@ export default function BlackCard() {
               </div>
 
               <div className="space-y-2">
-                <h4 className="text-white font-bold text-sm mb-3">Platinum Benefits:</h4>
-                {cardFeatures.map((feature, index) => (
-                  <motion.div
-                    key={feature}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.1 * index }}
-                    className="flex items-center gap-2 text-xs"
-                  >
-                    <Star className="h-3 w-3 text-yellow-400 flex-shrink-0" />
-                    <span className="text-gray-300">{feature}</span>
-                  </motion.div>
-                ))}
+                <h4 className="text-white font-bold text-sm mb-2">BLACK CARD Benefits:</h4>
+                <div className="max-h-36 overflow-y-auto space-y-1">
+                  {cardFeatures.map((feature, index) => (
+                    <motion.div
+                      key={feature}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.05 * index }}
+                      className="flex items-center gap-2 text-xs"
+                    >
+                      <Star className="h-2 w-2 text-yellow-400 flex-shrink-0" />
+                      <span className="text-gray-300">{feature}</span>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
 
               <div className="absolute bottom-4 right-4">
@@ -146,17 +158,50 @@ export default function BlackCard() {
       </motion.div>
 
       {/* Card Actions */}
+      {/* Hero Rank Progression */}
       <motion.div 
-        className="mt-6 space-y-3"
+        className="mt-6 bg-gray-900/50 rounded-lg p-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.7 }}
       >
-        <Button className="w-full bg-yellow-600 hover:bg-yellow-500 text-white min-h-[44px] touch-manipulation">
+        <h4 className="text-white font-bold text-sm mb-3 text-center">Hero Rank Progression</h4>
+        <div className="space-y-2">
+          {rankTiers.map((tier, index) => (
+            <div 
+              key={tier.name}
+              className={`flex items-center justify-between p-2 rounded text-xs ${
+                tier.name === currentRank.name 
+                  ? 'bg-yellow-500/20 border border-yellow-500/30' 
+                  : 'bg-gray-800/50'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <div 
+                  className="w-3 h-3 rounded-full"
+                  style={{ backgroundColor: tier.color }}
+                />
+                <span className="text-white font-medium">{tier.name}</span>
+              </div>
+              <span className="text-gray-400">${tier.contribution}</span>
+            </div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Card Actions */}
+      <motion.div 
+        className="mt-4 space-y-3"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.9 }}
+      >
+        <Button className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white min-h-[44px] touch-manipulation">
+          <CreditCard className="h-4 w-4 mr-2" />
           Apply for BLACK CARD
         </Button>
         <p className="text-center text-xs text-gray-400">
-          Available for {currentRank.name} and above
+          Available for Platinum+ ranks • Patent-powered rewards included
         </p>
       </motion.div>
     </div>
