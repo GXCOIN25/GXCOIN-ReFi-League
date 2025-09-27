@@ -5,10 +5,10 @@ import { Crown, Link } from "lucide-react";
 // Token-specific image mappings to the uploaded NFT card images
 const TOKEN_IMAGES = {
   GCCT: "/gcct-warrior-badge.jpg", // Carbon Credits warrior badge (CORRECT)
-  WTR: "/batt-badge.jpg", // AGUA ($WTR) - Water warrior badge
+  WTR: "/wtr-badge.jpg", // AGUA ($WTR) - Water warrior badge (FIXED)
   GPWR: "/gpwr-badge.jpg", // VOLTRA ($GPWR) - Green Power energy warrior badge (CORRECT)
-  BATT: "/wtr-badge.jpg", // GRAPHENE ($BATT) - Battery/tech warrior badge
-  HEMP: "/gcct-badge.jpg", // HEMP ($HEMP) - Hemp nature warrior badge
+  BATT: "/batt-badge.jpg", // GRAPHENE ($BATT) - Battery/tech warrior badge (FIXED)
+  HEMP: "/hemp-badge.jpg", // HEMP ($HEMP) - Hemp nature warrior badge (FIXED)
   GXCOIN: "/heroes-group.jpg" // GXCOIN Anchor badge (using heroes group as anchor image)
 } as const;
 
