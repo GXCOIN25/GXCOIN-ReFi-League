@@ -246,13 +246,16 @@ export default function LandingPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3 }}
               >
-                <img 
-                  src="/Screenshot_20250924_133119_Chrome~2_1758993229689.jpg" 
-                  alt="GXCOIN Eco-Warrior Limited Edition dNFTs - WTR, GPWR, BATT, HEMP, GCCT Platinum Series featuring all five superhero warriors" 
-                  className="w-full max-w-5xl mx-auto rounded-lg sm:rounded-2xl shadow-xl sm:shadow-2xl border border-green-500/20 object-cover"
-                  loading="lazy"
-                  style={{ maxHeight: "400px", objectFit: "cover" }}
-                />
+                <div className="w-full max-w-5xl mx-auto aspect-[5/2] sm:aspect-[16/9] lg:aspect-[5/2]">
+                  <img 
+                    src="/images/gxcoin-hero-promo.jpg" 
+                    alt="GXCOIN Eco-Warrior Limited Edition dNFTs - WTR, GPWR, BATT, HEMP, GCCT Platinum Series featuring all five superhero warriors" 
+                    className="w-full h-full object-contain rounded-lg sm:rounded-2xl shadow-xl sm:shadow-2xl border border-green-500/20"
+                    loading="lazy"
+                    width="1200"
+                    height="480"
+                  />
+                </div>
               </motion.div>
 
               {/* GXCOIN Anchor Hero - Full Width Featured */}
