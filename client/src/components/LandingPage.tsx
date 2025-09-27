@@ -711,7 +711,7 @@ export default function LandingPage() {
         </div>
       </motion.section>
 
-      {/* Premium Visa Card Program Section */}
+      {/* Enhanced Premium Visa Card Program Header */}
       <motion.section 
         className="px-4 py-16 bg-gradient-to-r from-slate-900/30 via-gray-900/30 to-slate-900/30"
         initial={{ opacity: 0, y: 50 }}
@@ -720,19 +720,228 @@ export default function LandingPage() {
       >
         <div className="max-w-7xl mx-auto">
           <motion.div 
-            className="text-center mb-12"
+            className="text-center mb-16"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.6 }}
           >
-            <h2 className="text-4xl font-bold text-white mb-4">
+            <div className="mb-8">
+              <h2 className="sr-only">Premium Visa Card Program</h2>
+              <img 
+                src="/visa-program-header.jpg" 
+                alt="Premium Visa Card Program - Experience the future of environmental finance" 
+                className="w-full max-w-4xl mx-auto rounded-2xl shadow-2xl"
+                loading="lazy"
+              />
+            </div>
+          </motion.div>
+
+          {/* Choose Your Card Type Section */}
+          <motion.div 
+            className="mb-16"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.8 }}
+          >
+            <div className="text-center mb-12">
+              <h3 className="text-3xl font-bold text-white mb-4">
+                <span className="bg-gradient-to-r from-green-400 via-emerald-500 to-green-600 bg-clip-text text-transparent">
+                  Choose Your Card Type
+                </span>
+              </h3>
+              <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+                Select between Debit and Credit options with flexible funding that suits your financial needs
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+              {/* Debit Card Features */}
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 2.0 }}
+              >
+                <Card className="h-full bg-gradient-to-br from-green-900/40 via-emerald-900/30 to-green-800/40 backdrop-blur-sm border-green-500/30 hover:border-green-400/60 transition-all duration-300">
+                  <CardContent className="p-8">
+                    <div className="mb-6">
+                      <img 
+                        src="/debit-card-features.jpg" 
+                        alt="Debit Card Features" 
+                        className="w-full rounded-lg shadow-lg"
+                      />
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-green-500/20">
+                          <CreditCard className="h-6 w-6 text-green-400" />
+                        </div>
+                        <div>
+                          <h4 className="text-xl font-bold text-green-300">Debit Card</h4>
+                          <p className="text-sm text-gray-400">Spend only what you load</p>
+                        </div>
+                      </div>
+                      <div className="bg-green-500/10 p-4 rounded-lg border border-green-500/20">
+                        <div className="space-y-2 text-sm text-gray-300">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full" />
+                            <span>Load values: $500 - $500,000 USD</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full" />
+                            <span>Real-time transaction processing</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full" />
+                            <span>Direct crypto rewards deposit</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full" />
+                            <span>Perfect for budgeting & control</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Credit Card Features */}
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 2.2 }}
+              >
+                <Card className="h-full bg-gradient-to-br from-blue-900/40 via-indigo-900/30 to-blue-800/40 backdrop-blur-sm border-blue-500/30 hover:border-blue-400/60 transition-all duration-300">
+                  <CardContent className="p-8">
+                    <div className="mb-6">
+                      <img 
+                        src="/credit-card-features.jpg" 
+                        alt="Credit Card Features" 
+                        className="w-full rounded-lg shadow-lg"
+                      />
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-blue-500/20">
+                          <Sparkles className="h-6 w-6 text-blue-400" />
+                        </div>
+                        <div>
+                          <h4 className="text-xl font-bold text-blue-300">Credit Card</h4>
+                          <p className="text-sm text-gray-400">Build credit & earn rewards</p>
+                        </div>
+                      </div>
+                      <div className="bg-blue-500/10 p-4 rounded-lg border border-blue-500/20">
+                        <div className="space-y-2 text-sm text-gray-300">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                            <span>Credit limits: $5,000 - $500,000 USD</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                            <span>1:10 reserve ratio funding model</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                            <span>Build credit history & rewards</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                            <span>Premium travel & purchase protections</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* Choose Your Tier Section */}
+          <motion.div 
+            className="mb-16"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.4 }}
+          >
+            <div className="text-center mb-12">
+              <h3 className="text-3xl font-bold text-white mb-4">
+                <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+                  Choose Your Tier
+                </span>
+              </h3>
+              <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+                Select the premium tier that matches your environmental impact and financial goals
+              </p>
+            </div>
+
+            <div className="max-w-4xl mx-auto">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 2.6 }}
+              >
+                <Card className="bg-gradient-to-br from-slate-900/60 via-gray-900/40 to-slate-800/60 backdrop-blur-sm border-purple-500/30 hover:border-purple-400/60 transition-all duration-300 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 via-transparent to-pink-500/10" />
+                  
+                  <CardContent className="p-8 relative z-10">
+                    <div className="text-center mb-8">
+                      <img 
+                        src="/platinum-card-tier.jpg" 
+                        alt="GXCOIN Platinum Card Tier" 
+                        className="w-full max-w-lg mx-auto rounded-xl shadow-2xl"
+                      />
+                    </div>
+                    
+                    <div className="text-center">
+                      <h4 className="text-2xl font-bold text-white mb-4">
+                        Premium GXCOIN Platinum Card
+                      </h4>
+                      <p className="text-purple-300 text-lg font-medium mb-4">
+                        Experience the future of environmental finance
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div className="bg-purple-500/20 p-4 rounded-lg border border-purple-500/30">
+                          <div className="text-purple-300 font-bold text-lg mb-1">Premium</div>
+                          <div className="text-sm text-gray-400">Member Status</div>
+                        </div>
+                        <div className="bg-blue-500/20 p-4 rounded-lg border border-blue-500/30">
+                          <div className="text-blue-300 font-bold text-lg mb-1">Global</div>
+                          <div className="text-sm text-gray-400">Visa Acceptance</div>
+                        </div>
+                        <div className="bg-green-500/20 p-4 rounded-lg border border-green-500/30">
+                          <div className="text-green-300 font-bold text-lg mb-1">Eco-Impact</div>
+                          <div className="text-sm text-gray-400">Rewards Program</div>
+                        </div>
+                      </div>
+                      <Button 
+                        size="lg"
+                        className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-700 hover:from-purple-700 hover:via-pink-700 hover:to-purple-800 text-white font-bold px-8 py-3 text-lg"
+                      >
+                        <Crown className="h-5 w-5 mr-2" />
+                        Apply for Premium Tier
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+          </motion.div>
+
+          {/* Existing Tier Cards Header */}
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.8 }}
+          >
+            <h3 className="text-3xl font-bold text-white mb-4">
               <span className="bg-gradient-to-r from-gray-400 via-white to-gray-400 bg-clip-text text-transparent">
-                Premium Visa Card Program
+                All Available Tiers
               </span>
-            </h2>
+            </h3>
             <p className="text-gray-300 text-lg max-w-3xl mx-auto">
-              Experience the future of environmental finance with our exclusive tiered card program. 
-              Each tier unlocks enhanced benefits and rewards powered by real environmental impact.
+              Choose from our complete range of premium card tiers, each offering unique benefits and rewards
             </p>
           </motion.div>
 
