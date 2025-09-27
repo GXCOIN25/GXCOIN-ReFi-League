@@ -1,5 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { randomBytes } from "crypto";
+import { randomBytes } from "node:crypto";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializePatents, storage } from "./storage";
