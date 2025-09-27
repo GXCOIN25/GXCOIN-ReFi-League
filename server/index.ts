@@ -4,6 +4,10 @@ import { setupVite, serveStatic, log } from "./vite";
 import { initializePatents, storage } from "./storage";
 
 const app = express();
+
+// Trust proxy for proper client IP detection with rate limiting
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
