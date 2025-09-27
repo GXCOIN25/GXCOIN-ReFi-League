@@ -91,17 +91,17 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 p-4 md:p-0">
       {/* Hero Section */}
       <motion.section 
-        className="relative px-4 py-16 sm:py-20"
+        className="relative px-2 py-8 sm:px-4 sm:py-16 md:py-20"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
       >
         <div className="max-w-6xl mx-auto text-center">
           <motion.h1 
-            className="text-4xl sm:text-6xl font-bold text-white mb-6"
+            className="text-2xl sm:text-4xl md:text-6xl font-bold text-white mb-4 sm:mb-6 px-2"
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -113,7 +113,7 @@ export default function LandingPage() {
           </motion.h1>
           
           <motion.p 
-            className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto"
+            className="text-sm sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 max-w-3xl mx-auto px-2"
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
@@ -124,25 +124,25 @@ export default function LandingPage() {
           </motion.p>
 
           <motion.div 
-            className="flex flex-wrap justify-center gap-4 mb-12"
+            className="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8 sm:mb-12 px-2"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.6 }}
           >
-            <Badge className="bg-green-600/20 text-green-400 border-green-500/30 text-sm px-4 py-2">
-              <Crown className="h-4 w-4 mr-2" />
+            <Badge className="bg-green-600/20 text-green-400 border-green-500/30 text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2">
+              <Crown className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               GXCOIN Anchor
             </Badge>
-            <Badge className="bg-blue-600/20 text-blue-400 border-blue-500/30 text-sm px-4 py-2">
-              <Users className="h-4 w-4 mr-2" />
+            <Badge className="bg-blue-600/20 text-blue-400 border-blue-500/30 text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2">
+              <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               5 Ranks
             </Badge>
-            <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/30 text-sm px-4 py-2">
-              <Sparkles className="h-4 w-4 mr-2" />
+            <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/30 text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2">
+              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               Dynamic NFTs
             </Badge>
-            <Badge className="bg-yellow-600/20 text-yellow-400 border-yellow-500/30 text-sm px-4 py-2">
-              <Trophy className="h-4 w-4 mr-2" />
+            <Badge className="bg-yellow-600/20 text-yellow-400 border-yellow-500/30 text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2">
+              <Trophy className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
               Real Impact
             </Badge>
           </motion.div>
@@ -151,7 +151,7 @@ export default function LandingPage() {
 
       {/* GXCOIN Anchor Centerpiece */}
       <motion.section 
-        className="px-4 pb-12"
+        className="px-2 sm:px-4 pb-8 sm:pb-12"
         initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 1.0 }}
@@ -160,47 +160,47 @@ export default function LandingPage() {
           <Card className="bg-gradient-to-br from-green-900/40 via-emerald-900/30 to-green-800/40 backdrop-blur-sm border-green-500/30 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 via-transparent to-emerald-500/10" />
             
-            <CardContent className="p-8 relative z-10">
-              <div className="text-center mb-8">
-                <div className="flex justify-center mb-4">
-                  <div className="p-4 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg">
-                    <Crown className="h-12 w-12 text-white" />
+            <CardContent className="p-4 sm:p-6 md:p-8 relative z-10">
+              <div className="text-center mb-6 sm:mb-8">
+                <div className="flex justify-center mb-3 sm:mb-4">
+                  <div className="p-3 sm:p-4 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg">
+                    <Crown className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-white" />
                   </div>
                 </div>
-                <h3 className="text-3xl font-bold text-white mb-2">
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">
                   GXCOIN Anchor dNFT
                 </h3>
-                <p className="text-green-300 text-lg font-medium mb-2">
+                <p className="text-green-300 text-sm sm:text-base md:text-lg font-medium mb-2">
                   The Central Hub Powering All Heroes
                 </p>
-                <p className="text-gray-400 max-w-xl mx-auto">
+                <p className="text-gray-400 text-xs sm:text-sm md:text-base max-w-xl mx-auto px-2">
                   Your gateway to the entire ReFi League ecosystem. Stake GXCOIN to unlock and amplify all Eco-Warrior abilities.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="text-center p-4 bg-green-500/10 rounded-lg border border-green-500/20">
-                  <div className="text-2xl font-bold text-green-400 mb-1">{anchorPower}</div>
-                  <div className="text-sm text-gray-400">Anchor Power</div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                <div className="text-center p-3 sm:p-4 bg-green-500/10 rounded-lg border border-green-500/20">
+                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-400 mb-1">{anchorPower}</div>
+                  <div className="text-xs sm:text-sm text-gray-400">Anchor Power</div>
                   <div className="text-xs text-green-300 mt-1">{getAnchorMultiplier().toFixed(2)}x multiplier</div>
                 </div>
-                <div className="text-center p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-                  <div className="text-2xl font-bold text-emerald-400 mb-1">5</div>
-                  <div className="text-sm text-gray-400">Heroes Powered</div>
+                <div className="text-center p-3 sm:p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-emerald-400 mb-1">5</div>
+                  <div className="text-xs sm:text-sm text-gray-400">Heroes Powered</div>
                   <div className="text-xs text-emerald-300 mt-1">AQUA, HEMP, VOLTRA, GRAPHENE, CARBON</div>
                 </div>
-                <div className="text-center p-4 bg-green-600/10 rounded-lg border border-green-600/20">
-                  <div className="text-2xl font-bold text-green-300 mb-1">${gxcoinStake}</div>
-                  <div className="text-sm text-gray-400">Your GXCOIN Stake</div>
+                <div className="text-center p-3 sm:p-4 bg-green-600/10 rounded-lg border border-green-600/20">
+                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-green-300 mb-1">${gxcoinStake}</div>
+                  <div className="text-xs sm:text-sm text-gray-400">Your GXCOIN Stake</div>
                   <div className="text-xs text-green-300 mt-1">Next threshold: ${Math.ceil((anchorPower + 1) * 1000)}</div>
                 </div>
               </div>
 
               <div className="flex justify-center">
                 <Button 
-                  className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold px-8 py-3 text-lg"
+                  className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold px-4 sm:px-6 md:px-8 py-2 sm:py-3 text-sm sm:text-base md:text-lg"
                 >
-                  <Zap className="h-5 w-5 mr-2" />
+                  <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
                   Power Your Heroes
                 </Button>
               </div>
@@ -241,7 +241,7 @@ export default function LandingPage() {
 
               {/* Epic Heroes Showcase */}
               <motion.div 
-                className="mb-12"
+                className="mb-8 sm:mb-12 px-2"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3 }}
@@ -249,8 +249,9 @@ export default function LandingPage() {
                 <img 
                   src="/Screenshot_20250924_133119_Chrome~2_1758993229689.jpg" 
                   alt="GXCOIN Eco-Warrior Limited Edition dNFTs - WTR, GPWR, BATT, HEMP, GCCT Platinum Series featuring all five superhero warriors" 
-                  className="w-full max-w-5xl mx-auto rounded-2xl shadow-2xl border border-green-500/20"
+                  className="w-full max-w-5xl mx-auto rounded-lg sm:rounded-2xl shadow-xl sm:shadow-2xl border border-green-500/20 object-cover"
                   loading="lazy"
+                  style={{ maxHeight: "400px", objectFit: "cover" }}
                 />
               </motion.div>
 

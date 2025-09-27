@@ -158,6 +158,8 @@ function MainExperience() {
   const [showNFTMinting, setShowNFTMinting] = useState<{ heroId: string; level: number } | null>(null);
   const { isLoggedIn } = useUser();
   const { heroes, selectHero } = useHeroes();
+  
+  // Mobile tab state management for conditional background display
 
   // Remove automatic login modal - let users explore freely
   // useEffect(() => {
@@ -168,9 +170,11 @@ function MainExperience() {
   // }, [isLoggedIn]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 relative overflow-y-auto">
-      {/* Background with Hero Visualization */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-gray-900 via-black to-blue-900 pointer-events-none">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-gray-900 via-black to-blue-900 relative overflow-y-auto">
+      {/* Background with Hero Visualization - Hidden on mobile when showing main content */}
+      <div className={`absolute inset-0 z-0 bg-gradient-to-br from-gray-900 via-black to-blue-900 pointer-events-none transition-opacity duration-300 ${
+        currentTab === "home" ? "md:opacity-100 opacity-0" : "opacity-100"
+      }`}>
         <div className="w-full h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="grid grid-cols-2 md:grid-cols-5 gap-6 max-w-4xl">
@@ -224,7 +228,7 @@ function MainExperience() {
         <div className="max-w-7xl mx-auto px-4">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
             <div className="flex justify-center mb-8">
-              <TabsList className="mobile-tabs-list w-full max-w-6xl bg-black/60 backdrop-blur-sm p-2 flex overflow-x-auto scroll-smooth gap-1 md:grid md:grid-cols-10">
+              <TabsList className="mobile-tabs-list w-full max-w-6xl bg-black/80 backdrop-blur-md p-2 flex overflow-x-auto scroll-smooth gap-1 md:grid md:grid-cols-10 border border-green-500/20">
                 <TabsTrigger value="home" className="mobile-tab-trigger text-xs flex items-center gap-1 cursor-pointer hover:bg-white/10 rounded flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '10px' }}>
                   <Home className="w-3 h-3" />
                   <span className="hidden sm:inline">Home</span>
@@ -269,7 +273,7 @@ function MainExperience() {
             </div>
 
             <div className="space-y-8 min-h-screen overflow-y-auto px-2">
-              <TabsContent value="home" className="mt-0">
+              <TabsContent value="home" className="mt-0 relative z-20 bg-gradient-to-br from-gray-900/95 via-black/95 to-blue-900/95 backdrop-blur-sm rounded-lg">
                 <LandingPage />
               </TabsContent>
 
