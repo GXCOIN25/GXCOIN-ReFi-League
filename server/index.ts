@@ -47,6 +47,9 @@ app.use((req, res, next) => {
   
   // 🔒 Production-ready configuration validation
   function validateProductionConfig() {
+    const isProduction = process.env.NODE_ENV === 'production';
+    let hasErrors = false;
+    
     // Check for DATABASE_URL but don't crash if missing
     if (!process.env.DATABASE_URL) {
       console.warn('⚠️  WARNING: DATABASE_URL not set - database features will be limited');
@@ -55,7 +58,7 @@ app.use((req, res, next) => {
     
     // JWT_SECRET validation with secure fallback generation
     if (!process.env.JWT_SECRET) {
-      if (process.env.NODE_ENV === 'production') {
+      if (isProduction) {
         // Generate a cryptographically secure fallback for production
         const fallbackSecret = randomBytes(64).toString('hex');
         process.env.JWT_SECRET = fallbackSecret;
@@ -67,6 +70,76 @@ app.use((req, res, next) => {
         console.warn('🚨 NEVER deploy to production without setting JWT_SECRET!');
         process.env.JWT_SECRET = 'dev-gxcoin-jwt-secret-' + Date.now();
       }
+    }
+    
+    // 🔐 GitHub OAuth Configuration Validation
+    console.log('🔍 Validating GitHub OAuth configuration...');
+    
+    if (!process.env.GITHUB_CLIENT_ID) {
+      if (isProduction) {
+        console.error('❌ FATAL: GITHUB_CLIENT_ID is required in production');
+        console.error('🚨 GitHub OAuth integration will not work without this');
+        hasErrors = true;
+      } else {
+        console.warn('⚠️  WARNING: GITHUB_CLIENT_ID not set - GitHub OAuth will be disabled');
+        console.warn('💡 Set GITHUB_CLIENT_ID to enable GitHub OAuth in development');
+      }
+    } else {
+      console.log('✅ GITHUB_CLIENT_ID configured');
+    }
+    
+    if (!process.env.GITHUB_CLIENT_SECRET) {
+      if (isProduction) {
+        console.error('❌ FATAL: GITHUB_CLIENT_SECRET is required in production');
+        console.error('🚨 GitHub OAuth token exchange will fail without this');
+        hasErrors = true;
+      } else {
+        console.warn('⚠️  WARNING: GITHUB_CLIENT_SECRET not set - GitHub OAuth will be disabled');
+        console.warn('💡 Set GITHUB_CLIENT_SECRET to enable GitHub OAuth in development');
+      }
+    } else {
+      console.log('✅ GITHUB_CLIENT_SECRET configured');
+    }
+    
+    if (!process.env.GITHUB_REDIRECT_URI) {
+      console.log('💡 GITHUB_REDIRECT_URI not set - using default callback URL');
+      const defaultRedirectUri = `${process.env.APP_URL || 'http://localhost:5000'}/api/github/oauth/callback`;
+      process.env.GITHUB_REDIRECT_URI = defaultRedirectUri;
+      console.log(`🔗 Using redirect URI: ${defaultRedirectUri}`);
+    } else {
+      console.log(`✅ GITHUB_REDIRECT_URI configured: ${process.env.GITHUB_REDIRECT_URI}`);
+    }
+    
+    // 🔑 Encryption Key Validation (for GitHub tokens)
+    if (!process.env.ENCRYPTION_KEY) {
+      if (isProduction) {
+        console.error('❌ FATAL: ENCRYPTION_KEY is required in production');
+        console.error('🚨 GitHub OAuth tokens cannot be safely stored without this');
+        console.error('🔐 Generate a strong 32-byte encryption key and set ENCRYPTION_KEY');
+        hasErrors = true;
+      } else {
+        // Generate a development fallback
+        const devEncryptionKey = randomBytes(32).toString('hex');
+        process.env.ENCRYPTION_KEY = devEncryptionKey;
+        console.warn('⚠️  WARNING: ENCRYPTION_KEY not set - generated development fallback');
+        console.warn('🚨 NEVER use this in production! Set a permanent ENCRYPTION_KEY!');
+      }
+    } else {
+      console.log('✅ ENCRYPTION_KEY configured for secure token storage');
+    }
+    
+    // 🛡️ Security scope validation
+    const requiredScopes = ['user:email', 'repo'];
+    console.log(`🔒 GitHub OAuth will request minimal scopes: ${requiredScopes.join(', ')}`);
+    
+    if (hasErrors && isProduction) {
+      console.error('💥 STARTUP FAILED: Missing required environment variables in production');
+      console.error('📋 Required for GitHub OAuth in production:');
+      console.error('   - GITHUB_CLIENT_ID');
+      console.error('   - GITHUB_CLIENT_SECRET');
+      console.error('   - ENCRYPTION_KEY (32-byte hex string)');
+      console.error('   - Optional: GITHUB_REDIRECT_URI');
+      process.exit(1);
     }
     
     console.log('✅ Production configuration validated successfully');

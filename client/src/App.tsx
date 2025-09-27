@@ -409,13 +409,29 @@ function MainExperience() {
 
 function App() {
   const { start } = useGame();
-  const { initializeAuth } = useUser();
+  const { initializeAuth, completeGitHubOAuth } = useUser();
   const [showWelcome, setShowWelcome] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const initializeApp = async () => {
       try {
+        // Handle GitHub OAuth callback if present
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        const storedState = sessionStorage.getItem('github_oauth_state');
+        
+        if (code && state && storedState === state) {
+          console.log('Processing GitHub OAuth callback...');
+          try {
+            await completeGitHubOAuth(code, state);
+            console.log('GitHub OAuth completed successfully');
+          } catch (error) {
+            console.error('GitHub OAuth callback failed:', error);
+          }
+        }
+        
         await initializeAuth();
         setIsLoading(false);
       } catch (error) {
@@ -425,7 +441,7 @@ function App() {
     };
 
     initializeApp();
-  }, [initializeAuth]);
+  }, [initializeAuth, completeGitHubOAuth]);
 
   const handleEnterExperience = () => {
     setShowWelcome(false);

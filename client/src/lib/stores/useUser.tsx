@@ -1,12 +1,19 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
-import { GXCoinAPI, type ApiUser } from "@/lib/api";
+import { GXCoinAPI, type ApiUser, type GitHubProfile, type GitHubRepository } from "@/lib/api";
 
 interface UserState {
   currentUser: ApiUser | null;
   isLoggedIn: boolean;
   isLoading: boolean;
   error: string | null;
+  
+  // GitHub state
+  githubProfile: GitHubProfile | null;
+  githubRepositories: GitHubRepository[];
+  isGitHubConnected: boolean;
+  isLoadingGitHub: boolean;
+  githubError: string | null;
   
   // Actions
   register: (userData: { username: string; password: string; walletAddress?: string }) => Promise<void>;
@@ -15,6 +22,14 @@ interface UserState {
   logout: () => Promise<void>;
   initializeAuth: () => Promise<void>;
   setError: (error: string | null) => void;
+  
+  // GitHub actions
+  startGitHubOAuth: () => Promise<void>;
+  completeGitHubOAuth: (code: string, state: string) => Promise<void>;
+  handleGitHubConnection: () => Promise<void>;
+  fetchGitHubProfile: () => Promise<void>;
+  fetchGitHubRepositories: () => Promise<void>;
+  setGitHubError: (error: string | null) => void;
 }
 
 export const useUser = create<UserState>()(
@@ -23,6 +38,13 @@ export const useUser = create<UserState>()(
     isLoggedIn: false,
     isLoading: false,
     error: null,
+    
+    // GitHub state
+    githubProfile: null,
+    githubRepositories: [],
+    isGitHubConnected: false,
+    isLoadingGitHub: false,
+    githubError: null,
     
     register: async (userData) => {
       set({ isLoading: true, error: null });
@@ -112,6 +134,138 @@ export const useUser = create<UserState>()(
     
     setError: (error) => {
       set({ error });
+    },
+    
+    // GitHub OAuth actions
+    startGitHubOAuth: async () => {
+      set({ isLoadingGitHub: true, githubError: null });
+      try {
+        const { authUrl, state } = await GXCoinAPI.startGitHubOAuth();
+        
+        // Store OAuth state for verification
+        sessionStorage.setItem('github_oauth_state', state);
+        
+        // Redirect to GitHub OAuth
+        window.location.href = authUrl;
+      } catch (error) {
+        set({ 
+          githubError: error instanceof Error ? error.message : 'Failed to start GitHub OAuth', 
+          isLoadingGitHub: false 
+        });
+      }
+    },
+
+    completeGitHubOAuth: async (code: string, state: string) => {
+      set({ isLoadingGitHub: true, githubError: null });
+      try {
+        const result = await GXCoinAPI.completeGitHubOAuth(code, state);
+        set({ 
+          currentUser: result.user, 
+          isGitHubConnected: !!result.user.githubUsername,
+          isLoadingGitHub: false 
+        });
+        
+        // Auto-fetch GitHub profile after successful connection
+        get().fetchGitHubProfile();
+        
+        // Clean up stored OAuth state
+        sessionStorage.removeItem('github_oauth_state');
+        
+        // Clean up URL parameters
+        const cleanUrl = window.location.href.split('?')[0];
+        window.history.replaceState({}, document.title, cleanUrl);
+      } catch (error) {
+        set({ 
+          githubError: error instanceof Error ? error.message : 'Failed to complete GitHub OAuth', 
+          isLoadingGitHub: false 
+        });
+      }
+    },
+
+    handleGitHubConnection: async () => {
+      set({ isLoadingGitHub: true, githubError: null });
+      try {
+        // Try to use the initiateGitHubConnection method which handles OAuth flow properly
+        const result = await GXCoinAPI.initiateGitHubConnection();
+        set({ 
+          currentUser: result.user, 
+          isGitHubConnected: !!result.user.githubUsername,
+          isLoadingGitHub: false 
+        });
+        
+        // Auto-fetch GitHub profile after successful connection
+        get().fetchGitHubProfile();
+      } catch (error) {
+        if (error instanceof Error && error.message === 'REDIRECTING_TO_OAUTH') {
+          // This is expected when redirecting to OAuth, don't set it as an error
+          return;
+        }
+        set({ 
+          githubError: error instanceof Error ? error.message : 'Failed to connect GitHub', 
+          isLoadingGitHub: false 
+        });
+      }
+    },
+    
+    fetchGitHubProfile: async () => {
+      set({ isLoadingGitHub: true, githubError: null });
+      try {
+        const profile = await GXCoinAPI.getGitHubProfile();
+        set({ 
+          githubProfile: profile,
+          isGitHubConnected: true,
+          isLoadingGitHub: false 
+        });
+      } catch (error) {
+        set({ 
+          githubError: error instanceof Error ? error.message : 'Failed to fetch GitHub profile', 
+          isLoadingGitHub: false,
+          isGitHubConnected: false
+        });
+      }
+    },
+    
+    fetchGitHubRepositories: async () => {
+      set({ isLoadingGitHub: true, githubError: null });
+      try {
+        const repositories = await GXCoinAPI.getGitHubRepositories();
+        set({ 
+          githubRepositories: repositories,
+          isLoadingGitHub: false 
+        });
+      } catch (error) {
+        set({ 
+          githubError: error instanceof Error ? error.message : 'Failed to fetch GitHub repositories', 
+          isLoadingGitHub: false 
+        });
+      }
+    },
+    
+    setGitHubError: (error) => {
+      set({ githubError: error });
     }
   }))
+);
+
+// Initialize GitHub connection status based on current user
+useUser.subscribe(
+  (state) => state.currentUser,
+  (currentUser) => {
+    if (currentUser) {
+      const isConnected = !!currentUser.githubUsername;
+      useUser.setState({ isGitHubConnected: isConnected });
+      
+      // Auto-fetch GitHub profile if connected
+      if (isConnected) {
+        useUser.getState().fetchGitHubProfile();
+      }
+    } else {
+      useUser.setState({ 
+        isGitHubConnected: false,
+        githubProfile: null,
+        githubRepositories: [],
+        githubError: null
+      });
+    }
+  }
 );

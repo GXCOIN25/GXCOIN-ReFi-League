@@ -5,6 +5,10 @@ export interface ApiUser {
   id: number;
   username: string;
   walletAddress?: string;
+  githubUsername?: string;
+  githubAvatarUrl?: string;
+  githubProfileUrl?: string;
+  githubConnectedAt?: string;
   createdAt?: string;
 }
 
@@ -32,6 +36,32 @@ export interface ApiNftBadge {
   rarity: string;
   attributes: Record<string, number>;
   minted: boolean;
+  createdAt: string;
+}
+
+export interface GitHubProfile {
+  username: string;
+  name: string;
+  avatarUrl: string;
+  profileUrl: string;
+  bio: string;
+  publicRepos: number;
+  followers: number;
+  following: number;
+  createdAt: string;
+}
+
+export interface GitHubRepository {
+  id: number;
+  name: string;
+  fullName: string;
+  description: string;
+  language: string;
+  stargazersCount: number;
+  forksCount: number;
+  htmlUrl: string;
+  private: boolean;
+  updatedAt: string;
   createdAt: string;
 }
 
@@ -306,5 +336,124 @@ export class GXCoinAPI {
     });
     if (!response.ok) throw new Error('Failed to get economic stats');
     return response.json();
+  }
+
+  // GitHub Integration API methods
+  static async getGitHubProfile(): Promise<GitHubProfile> {
+    const response = await fetch(`${API_BASE}/github/profile`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to get GitHub profile');
+    }
+    return response.json();
+  }
+
+  static async getGitHubRepositories(): Promise<GitHubRepository[]> {
+    const response = await fetch(`${API_BASE}/github/repos`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to get GitHub repositories');
+    }
+    return response.json();
+  }
+
+  // OAuth-based GitHub connection methods
+  static async startGitHubOAuth(): Promise<{ authUrl: string; state: string }> {
+    const response = await fetch(`${API_BASE}/github/oauth/start`, {
+      method: 'GET',
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to start GitHub OAuth flow');
+    }
+    return response.json();
+  }
+
+  static async completeGitHubOAuth(code: string, state: string): Promise<{ user: ApiUser; message: string }> {
+    const response = await fetch(`${API_BASE}/github/oauth/callback`, {
+      method: 'POST',
+      headers: this.getAuthHeaders(),
+      body: JSON.stringify({ code, state })
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to complete GitHub OAuth');
+    }
+    return response.json();
+  }
+
+  // Legacy connect method for development environments
+  static async connectGitHub(): Promise<{ user: ApiUser; message: string }> {
+    // Check if we should redirect to OAuth flow
+    const response = await fetch(`${API_BASE}/github/connect`, {
+      method: 'POST',
+      headers: this.getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      // If response indicates we should use OAuth, start the OAuth flow
+      if (error.redirectTo === '/api/github/oauth/start') {
+        throw new Error('OAUTH_REQUIRED'); // Special error to trigger OAuth flow
+      }
+      throw new Error(error.error || 'Failed to connect GitHub account');
+    }
+    return response.json();
+  }
+
+  // Helper method to handle GitHub OAuth popup/redirect flow
+  static async initiateGitHubConnection(): Promise<{ user: ApiUser; message: string }> {
+    try {
+      // Try the legacy connection first (for development environments)
+      return await this.connectGitHub();
+    } catch (error) {
+      if (error instanceof Error && error.message === 'OAUTH_REQUIRED') {
+        // Start OAuth flow
+        const { authUrl, state } = await this.startGitHubOAuth();
+        
+        // Store state for later verification
+        sessionStorage.setItem('github_oauth_state', state);
+        
+        // Redirect to GitHub OAuth
+        window.location.href = authUrl;
+        
+        // This will not return as we're redirecting
+        throw new Error('REDIRECTING_TO_OAUTH');
+      }
+      throw error;
+    }
+  }
+
+  // Method to handle OAuth callback from URL parameters
+  static async handleGitHubOAuthCallback(): Promise<{ user: ApiUser; message: string }> {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+    const storedState = sessionStorage.getItem('github_oauth_state');
+
+    if (!code || !state) {
+      throw new Error('Missing OAuth callback parameters');
+    }
+
+    if (state !== storedState) {
+      throw new Error('Invalid OAuth state parameter');
+    }
+
+    // Clean up stored state
+    sessionStorage.removeItem('github_oauth_state');
+
+    // Complete the OAuth flow
+    const result = await this.completeGitHubOAuth(code, state);
+    
+    // Clean up URL parameters
+    const cleanUrl = window.location.href.split('?')[0];
+    window.history.replaceState({}, document.title, cleanUrl);
+    
+    return result;
   }
 }

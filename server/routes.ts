@@ -7,6 +7,7 @@ import rateLimit from "express-rate-limit";
 import slowDown from "express-slow-down";
 import type { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
+import { Octokit } from '@octokit/rest';
 
 interface AuthRequest extends Request {
   userId?: number;
@@ -152,6 +153,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   };
 
+  // GitHub OAuth configuration
+  const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
+  const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
+  const GITHUB_REDIRECT_URI = process.env.GITHUB_REDIRECT_URI || `${process.env.APP_URL || 'http://localhost:5000'}/api/github/oauth/callback`;
+
+  // Helper function to create authenticated GitHub client for a specific user
+  async function getUserGitHubClient(userId: number): Promise<Octokit> {
+    const accessToken = await storage.getUserGitHubToken(userId);
+    if (!accessToken) {
+      throw new Error('GitHub not connected for this user');
+    }
+    return new Octokit({ auth: accessToken });
+  }
+
+  // Helper function to generate PKCE code challenge
+  function generateCodeChallenge(codeVerifier: string): string {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(codeVerifier);
+    const hash = crypto.createHash('sha256').update(data).digest();
+    return hash.toString('base64url');
+  }
+
+  // Check if running in production environment with fallback to Replit connector
+  const isProductionEnvironment = !process.env.REPLIT_CONNECTORS_HOSTNAME;
+  
+  // Legacy Replit connector fallback for development
+  let connectionSettings: any;
+  async function getFallbackAccessToken() {
+    if (connectionSettings && connectionSettings.settings.expires_at && new Date(connectionSettings.settings.expires_at).getTime() > Date.now()) {
+      return connectionSettings.settings.access_token;
+    }
+    
+    const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME
+    const xReplitToken = process.env.REPL_IDENTITY 
+      ? 'repl ' + process.env.REPL_IDENTITY 
+      : process.env.WEB_REPL_RENEWAL 
+      ? 'depl ' + process.env.WEB_REPL_RENEWAL 
+      : null;
+
+    if (!xReplitToken) {
+      throw new Error('X_REPLIT_TOKEN not found for repl/depl');
+    }
+
+    connectionSettings = await fetch(
+      'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=github',
+      {
+        headers: {
+          'Accept': 'application/json',
+          'X_REPLIT_TOKEN': xReplitToken
+        }
+      }
+    ).then(res => res.json()).then(data => data.items?.[0]);
+
+    const accessToken = connectionSettings?.settings?.access_token || connectionSettings.settings?.oauth?.credentials?.access_token;
+
+    if (!connectionSettings || !accessToken) {
+      throw new Error('GitHub not connected');
+    }
+    return accessToken;
+  }
+
+  async function getFallbackGitHubClient() {
+    const accessToken = await getFallbackAccessToken();
+    return new Octokit({ auth: accessToken });
+  }
+
   // Secure Replit Auth endpoint with proper cryptographic verification
   app.post("/api/auth/replit", authRateLimit, authSpeedLimit, async (req, res) => {
     try {
@@ -277,6 +344,248 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(safeUser);
   });
 
+  // GitHub Integration Routes with rate limiting
+  const githubRateLimit = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 30, // 30 GitHub API calls per window per IP
+    message: { error: 'GitHub API rate limit exceeded. Please try again later.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
+  // GitHub OAuth Start - initiates the OAuth flow
+  app.get("/api/github/oauth/start", authenticate, async (req: AuthRequest, res) => {
+    try {
+      if (!GITHUB_CLIENT_ID) {
+        return res.status(500).json({ 
+          error: 'GitHub OAuth not configured. Please set GITHUB_CLIENT_ID environment variable.' 
+        });
+      }
+
+      // Create OAuth state for CSRF protection
+      const { state, codeVerifier } = await storage.createOAuthState(req.userId!);
+      const codeChallenge = generateCodeChallenge(codeVerifier);
+
+      // Build GitHub OAuth URL with PKCE
+      const githubOAuthUrl = new URL('https://github.com/login/oauth/authorize');
+      githubOAuthUrl.searchParams.set('client_id', GITHUB_CLIENT_ID);
+      githubOAuthUrl.searchParams.set('redirect_uri', GITHUB_REDIRECT_URI);
+      githubOAuthUrl.searchParams.set('scope', 'user:email repo');
+      githubOAuthUrl.searchParams.set('state', state);
+      githubOAuthUrl.searchParams.set('code_challenge', codeChallenge);
+      githubOAuthUrl.searchParams.set('code_challenge_method', 'S256');
+
+      res.json({ 
+        authUrl: githubOAuthUrl.toString(),
+        state 
+      });
+    } catch (error: any) {
+      console.error('GitHub OAuth start error:', error);
+      res.status(500).json({ error: 'Failed to start GitHub OAuth flow', details: error.message });
+    }
+  });
+
+  // GitHub OAuth Callback - handles the OAuth response from GitHub
+  app.post("/api/github/oauth/callback", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const { code, state } = req.body;
+
+      if (!code || !state) {
+        return res.status(400).json({ error: 'Missing authorization code or state' });
+      }
+
+      if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
+        return res.status(500).json({ 
+          error: 'GitHub OAuth not configured. Please set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET environment variables.' 
+        });
+      }
+
+      // Verify state and get code verifier
+      const stateData = await storage.verifyOAuthState(state, req.userId!);
+      if (!stateData) {
+        return res.status(401).json({ error: 'Invalid or expired OAuth state' });
+      }
+
+      // Exchange authorization code for access token
+      const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          client_id: GITHUB_CLIENT_ID,
+          client_secret: GITHUB_CLIENT_SECRET,
+          code,
+          redirect_uri: GITHUB_REDIRECT_URI,
+          code_verifier: stateData.codeVerifier,
+        }),
+      });
+
+      const tokenData = await tokenResponse.json();
+
+      if (tokenData.error) {
+        console.error('GitHub OAuth token error:', tokenData);
+        return res.status(400).json({ error: 'GitHub OAuth failed', details: tokenData.error_description });
+      }
+
+      // Get user info from GitHub
+      const github = new Octokit({ auth: tokenData.access_token });
+      const { data: profile } = await github.rest.users.getAuthenticated();
+
+      // Store the tokens and update user with GitHub info
+      const updatedUser = await storage.updateUserGitHubOAuth(req.userId!, {
+        accessToken: tokenData.access_token,
+        refreshToken: tokenData.refresh_token,
+        expiresAt: tokenData.expires_in ? new Date(Date.now() + tokenData.expires_in * 1000) : undefined,
+        githubUserId: profile.id.toString(),
+        githubUsername: profile.login,
+        githubAvatarUrl: profile.avatar_url,
+        githubProfileUrl: profile.html_url,
+      });
+
+      const { password, githubAccessToken, githubRefreshToken, ...safeUser } = updatedUser;
+      res.json({ 
+        user: safeUser,
+        message: 'GitHub account successfully connected via OAuth'
+      });
+    } catch (error: any) {
+      console.error('GitHub OAuth callback error:', error);
+      res.status(500).json({ error: 'Failed to complete GitHub OAuth', details: error.message });
+    }
+  });
+
+  // GET /api/github/profile - fetch user's GitHub profile
+  app.get("/api/github/profile", authenticate, githubRateLimit, async (req: AuthRequest, res) => {
+    try {
+      // Try per-user GitHub client first, fallback to connector in development
+      let github: Octokit;
+      try {
+        github = await getUserGitHubClient(req.userId!);
+      } catch (error) {
+        if (!isProductionEnvironment) {
+          console.warn('Using fallback GitHub client for development');
+          github = await getFallbackGitHubClient();
+        } else {
+          throw error;
+        }
+      }
+
+      const { data: profile } = await github.rest.users.getAuthenticated();
+      
+      res.json({
+        username: profile.login,
+        name: profile.name,
+        avatarUrl: profile.avatar_url,
+        profileUrl: profile.html_url,
+        bio: profile.bio,
+        publicRepos: profile.public_repos,
+        followers: profile.followers,
+        following: profile.following,
+        createdAt: profile.created_at
+      });
+    } catch (error: any) {
+      console.error('GitHub profile fetch error:', error);
+      if (error.status === 401) {
+        res.status(401).json({ error: 'GitHub authentication failed. Please reconnect your GitHub account.' });
+      } else if (error.status === 403) {
+        res.status(429).json({ error: 'GitHub API rate limit exceeded. Please try again later.' });
+      } else {
+        res.status(500).json({ error: 'Failed to fetch GitHub profile', details: error.message });
+      }
+    }
+  });
+
+  // GET /api/github/repos - list user's repositories
+  app.get("/api/github/repos", authenticate, githubRateLimit, async (req: AuthRequest, res) => {
+    try {
+      // Try per-user GitHub client first, fallback to connector in development
+      let github: Octokit;
+      try {
+        github = await getUserGitHubClient(req.userId!);
+      } catch (error) {
+        if (!isProductionEnvironment) {
+          console.warn('Using fallback GitHub client for development');
+          github = await getFallbackGitHubClient();
+        } else {
+          throw error;
+        }
+      }
+
+      const { data: repos } = await github.rest.repos.listForAuthenticatedUser({
+        sort: 'updated',
+        per_page: 50,
+        type: 'all'
+      });
+      
+      // Return minimal repository data
+      const repoData = repos.map(repo => ({
+        id: repo.id,
+        name: repo.name,
+        fullName: repo.full_name,
+        description: repo.description,
+        language: repo.language,
+        stargazersCount: repo.stargazers_count,
+        forksCount: repo.forks_count,
+        htmlUrl: repo.html_url,
+        private: repo.private,
+        updatedAt: repo.updated_at,
+        createdAt: repo.created_at
+      }));
+      
+      res.json(repoData);
+    } catch (error: any) {
+      console.error('GitHub repos fetch error:', error);
+      if (error.status === 401) {
+        res.status(401).json({ error: 'GitHub authentication failed. Please reconnect your GitHub account.' });
+      } else if (error.status === 403) {
+        res.status(429).json({ error: 'GitHub API rate limit exceeded. Please try again later.' });
+      } else {
+        res.status(500).json({ error: 'Failed to fetch GitHub repositories', details: error.message });
+      }
+    }
+  });
+
+  // POST /api/github/connect - deprecated endpoint, redirects to OAuth flow
+  app.post("/api/github/connect", authenticate, githubRateLimit, async (req: AuthRequest, res) => {
+    if (isProductionEnvironment) {
+      // In production, force users to use OAuth flow
+      return res.status(400).json({ 
+        error: 'Direct GitHub connection is deprecated. Please use OAuth flow.',
+        redirectTo: '/api/github/oauth/start'
+      });
+    }
+
+    // Fallback for development environment using Replit connector
+    try {
+      const github = await getFallbackGitHubClient();
+      const { data: profile } = await github.rest.users.getAuthenticated();
+      
+      // Update user with GitHub information
+      const updatedUser = await storage.updateUserGitHubInfo(req.userId!, {
+        githubUsername: profile.login,
+        githubAvatarUrl: profile.avatar_url,
+        githubProfileUrl: profile.html_url,
+        githubConnectedAt: new Date()
+      });
+      
+      const { password, ...safeUser } = updatedUser;
+      res.json({ 
+        user: safeUser,
+        message: 'GitHub account successfully connected to GXCOIN profile (development mode)'
+      });
+    } catch (error: any) {
+      console.error('GitHub connect error:', error);
+      if (error.status === 401) {
+        res.status(401).json({ error: 'GitHub authentication failed. Please check your GitHub connection.' });
+      } else if (error.status === 403) {
+        res.status(429).json({ error: 'GitHub API rate limit exceeded. Please try again later.' });
+      } else {
+        res.status(500).json({ error: 'Failed to connect GitHub account', details: error.message });
+      }
+    }
+  });
+
   // Protected contribution routes
   app.get("/api/contributions", authenticate, async (req: AuthRequest, res) => {
     const contributions = await storage.getUserContributions(req.userId!);
@@ -391,7 +700,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if user already has access
       const existingAccess = await storage.getUserPatentAccess(req.userId!);
-      if (existingAccess.some(access => access.patentId === patentId)) {
+      if (existingAccess.some((access: any) => access.patentId === patentId)) {
         return res.status(409).json({ error: "Patent already unlocked" });
       }
       
@@ -410,7 +719,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Verify user has access to this patent
       const userAccess = await storage.getUserPatentAccess(req.userId!);
-      const access = userAccess.find(a => a.patentId === patentId);
+      const access = userAccess.find((a: any) => a.patentId === patentId);
       
       if (!access) {
         return res.status(403).json({ error: "Patent access required" });
