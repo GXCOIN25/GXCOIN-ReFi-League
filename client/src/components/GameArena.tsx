@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Sword, Crown, Star, Trophy, Coins, Factory, Zap, Leaf, Recycle, DollarSign, Globe, TrendingUp, Award, Unlock, Bot } from 'lucide-react';
+import { Shield, Sword, Crown, Star, Trophy, Coins, Factory, Zap, Leaf, Recycle, DollarSign, Globe, TrendingUp, Award, Unlock, Bot, LogIn, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useGameArena } from '@/lib/stores/useGameArena';
+import { useUser } from '@/lib/stores/useUser';
 import { GameHero, EnvironmentalThreat } from '@/types/heroes';
 import { environmentalThreats, calculateThreatRewards } from '@/data/environmentalThreats';
 import { PatentRegistry } from '@/components/PatentRegistry';
 import { EconomicsDashboard } from '@/components/EconomicsDashboard';
+import LoginModal from '@/components/LoginModal';
 
 interface HeroCardProps {
   hero: GameHero;
@@ -22,19 +24,35 @@ function HeroCard({ hero, onSelect, showStats = true }: HeroCardProps) {
   const { selectHero, selectedHero, unlockPatent, isLoading } = useGameArena();
   const isSelected = selectedHero?.id === hero.id;
   
+  // Create proper hero-to-patent mapping
+  const getHeroPatentIds = (heroId: string): number[] => {
+    const heroPatentMap: Record<string, number[]> = {
+      "aqua_wtr": [4, 5, 6, 17], // Water category patents
+      "hemp_builder": [13, 14, 15], // Construction category patents
+      "voltra_gpwr": [7, 8, 9, 18], // Energy category patents
+      "graphene_batt": [1, 2, 3, 10, 11, 12, 16], // Biochar/Carbon category patents
+      "trader_gcct": [13, 14, 15], // Construction/Carbon category patents
+      "gxcoin_anchor": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] // Universal access
+    };
+    return heroPatentMap[heroId] || [1]; // Default to patent 1 if no mapping found
+  };
+
   const handleUnlockPatent = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('🚀 Attempting to unlock patent for hero:', hero.name);
+    console.log('🚀 Attempting to unlock patent for hero:', hero.name, '(' + hero.id + ')');
     
-    // For demo purposes, associate hero with patent ID based on hero ID
-    const patentId = parseInt(hero.id.replace('hero-', '')) || 1;
+    // Get the appropriate patent IDs for this hero
+    const heroPatentIds = getHeroPatentIds(hero.id);
+    const primaryPatentId = heroPatentIds[0]; // Use the first patent as primary
+    
+    console.log('🎯 Hero', hero.name, 'is associated with patents:', heroPatentIds, '| Unlocking primary patent:', primaryPatentId);
     
     try {
-      const success = await unlockPatent(patentId);
+      const success = await unlockPatent(primaryPatentId);
       if (success) {
-        console.log('✅ Patent unlocked successfully! Hero should now be available.');
+        console.log('✅ Patent', primaryPatentId, 'unlocked successfully! Hero should now be available.');
       } else {
-        console.warn('❌ Failed to unlock patent - may already be unlocked');
+        console.warn('❌ Failed to unlock patent', primaryPatentId, '- may already be unlocked');
       }
     } catch (error) {
       console.error('❌ Error unlocking patent:', error);
@@ -556,10 +574,98 @@ function PlayerStats() {
   );
 }
 
+// Login prompt component for Patent Registry
+function PatentLoginPrompt({ onOpenLogin }: { onOpenLogin: () => void }) {
+  return (
+    <div className="space-y-6">
+      <div className="text-center bg-gradient-to-r from-purple-900/20 to-indigo-900/20 rounded-lg p-8 border border-purple-500/30">
+        <Unlock className="w-16 h-16 mx-auto mb-4 text-purple-400" />
+        <h2 className="text-3xl font-bold text-purple-300 mb-4">🔓 Revolutionary Patent Technologies</h2>
+        <p className="text-cyan-400 text-lg mb-4">Access cutting-edge environmental patents that power real-world innovation</p>
+        <p className="text-gray-300 mb-6">🌍 Unlock patent-powered eco-warriors with REAL technologies that generate economic value through carbon credits, plastic conversion, and clean energy solutions.</p>
+        <Button 
+          onClick={onOpenLogin}
+          className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-8 py-3 text-lg"
+        >
+          <LogIn className="w-5 h-5 mr-2" />
+          Login to Access Patent Registry
+        </Button>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 text-sm">
+          <div className="bg-green-900/20 rounded-lg p-3">
+            <h4 className="text-green-400 font-medium mb-1">🌿 Environmental Innovation</h4>
+            <p className="text-gray-300">Real patents for carbon sequestration, water purification, and renewable energy</p>
+          </div>
+          <div className="bg-blue-900/20 rounded-lg p-3">
+            <h4 className="text-blue-400 font-medium mb-1">💰 Economic Value</h4>
+            <p className="text-gray-300">Generate actual revenue through patent licensing and environmental impact</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Login prompt component for Economic Impact
+function EconomicsLoginPrompt({ onOpenLogin }: { onOpenLogin: () => void }) {
+  return (
+    <div className="space-y-6">
+      <div className="text-center bg-gradient-to-r from-green-900/20 to-emerald-900/20 rounded-lg p-8 border border-green-500/30">
+        <DollarSign className="w-16 h-16 mx-auto mb-4 text-green-400" />
+        <h2 className="text-3xl font-bold text-green-300 mb-4">💰 Track Your Environmental Impact</h2>
+        <p className="text-cyan-400 text-lg mb-4">Monitor your real-world economic and environmental contributions</p>
+        <p className="text-gray-300 mb-6">🌍 See your carbon credits earned, plastic converted, clean energy generated, and patent licensing revenue in real-time. Every action creates measurable value!</p>
+        <Button 
+          onClick={onOpenLogin}
+          className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-8 py-3 text-lg"
+        >
+          <LogIn className="w-5 h-5 mr-2" />
+          Login to Track Your Impact
+        </Button>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 text-sm">
+          <div className="bg-green-900/20 rounded-lg p-3">
+            <h4 className="text-green-400 font-medium mb-1">🌿 Carbon Credits</h4>
+            <p className="text-gray-300">$175+ per ton CO₂</p>
+          </div>
+          <div className="bg-blue-900/20 rounded-lg p-3">
+            <h4 className="text-blue-400 font-medium mb-1">♻️ Plastic Conversion</h4>
+            <p className="text-gray-300">$1.25 per bottle</p>
+          </div>
+          <div className="bg-yellow-900/20 rounded-lg p-3">
+            <h4 className="text-yellow-400 font-medium mb-1">⚡ Clean Energy</h4>
+            <p className="text-gray-300">$100+ per kWh</p>
+          </div>
+          <div className="bg-purple-900/20 rounded-lg p-3">
+            <h4 className="text-purple-400 font-medium mb-1">🔓 Patent Licensing</h4>
+            <p className="text-gray-300">Direct revenue</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function GameArena() {
+  const { isLoggedIn } = useUser();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  const handleOpenLogin = () => setIsLoginModalOpen(true);
+  const handleCloseLogin = () => setIsLoginModalOpen(false);
+  
+  // Demo mode indicator
+  const isDemoMode = !isLoggedIn;
+
   return (
     <div className="space-y-6 bg-gradient-to-br from-gray-900 via-green-900/10 to-emerald-900/10 min-h-screen">
       <div className="text-center bg-gradient-to-r from-green-900/20 to-emerald-900/20 rounded-lg p-8 border border-green-500/30">
+        {isDemoMode && (
+          <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
+            <div className="flex items-center justify-center gap-2 text-blue-300 font-bold text-lg">
+              <Bot className="w-5 h-5" />
+              DEMO MODE - Experience Full Platform Features
+            </div>
+            <p className="text-blue-200 text-sm mt-1">All functionality available with realistic demo data</p>
+          </div>
+        )}
         <h1 className="text-4xl font-bold text-green-300 mb-3 flex items-center justify-center gap-3">
           <Globe className="w-10 h-10" />
           EPIC ECO-GAMING REVOLUTION
@@ -572,6 +678,18 @@ export default function GameArena() {
           <span className="text-emerald-400 font-bold">⚡ $100+ Clean Energy</span>
           <span className="text-purple-400 font-bold">🔓 Real Patents</span>
         </div>
+        {isDemoMode && (
+          <div className="mt-4 p-3 bg-green-900/30 border border-green-500/50 rounded-lg">
+            <Button 
+              onClick={handleOpenLogin}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-6 py-2"
+            >
+              <User className="w-4 h-4 mr-2" />
+              Sign Up to Save Your Progress
+            </Button>
+            <p className="text-green-200 text-xs mt-2">Create account to persist your achievements and earnings</p>
+          </div>
+        )}
       </div>
 
       <PlayerStats />
@@ -612,6 +730,8 @@ export default function GameArena() {
           <EconomicsDashboard />
         </TabsContent>
       </Tabs>
+      
+      <LoginModal isOpen={isLoginModalOpen} onClose={handleCloseLogin} />
     </div>
   );
 }

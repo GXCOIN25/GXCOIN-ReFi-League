@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { DollarSign, TrendingUp, Leaf, Zap, Recycle, Award, Globe, Factory } from 'lucide-react';
+import { DollarSign, TrendingUp, Leaf, Zap, Recycle, Award, Globe, Factory, Bot } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useGameArena } from '@/lib/stores/useGameArena';
+import { useUser } from '@/lib/stores/useUser';
 
 export function EconomicsDashboard() {
   const { 
@@ -18,12 +19,31 @@ export function EconomicsDashboard() {
     getPlasticConversionValue,
     getEnergyGenerationValue
   } = useGameArena();
+  const { isLoggedIn } = useUser();
+
+  // Load user economic stats when authenticated
+  useEffect(() => {
+    if (isLoggedIn) {
+      // Load economic stats here if needed
+      // This ensures we only call APIs when authenticated
+      console.log('User is authenticated, loading economic data...');
+    }
+  }, [isLoggedIn]);
 
   const recentRewards = economicRewards.slice(-10); // Last 10 rewards
 
   return (
     <div className="space-y-6">
       <div className="text-center bg-gradient-to-r from-green-900/20 to-emerald-900/20 rounded-lg p-6 border border-green-500/30">
+        {!isLoggedIn && (
+          <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
+            <div className="flex items-center justify-center gap-2 text-blue-300 font-bold">
+              <Bot className="w-4 h-4" />
+              DEMO MODE - Live Economic Tracking
+            </div>
+            <p className="text-blue-200 text-xs mt-1">Real-time session: $2,847.50 | Lifetime: $18,945.23 | 47 battles won</p>
+          </div>
+        )}
         <h2 className="text-3xl font-bold text-green-300 mb-2 flex items-center justify-center gap-2">
           <DollarSign className="w-8 h-8" />
           Real Economic Impact Dashboard
