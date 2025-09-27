@@ -29,14 +29,19 @@ export default function BlackCard() {
         initial={{ rotateY: 0 }}
         animate={{ rotateY: isRevealed ? 180 : 0 }}
         transition={{ duration: prefersReducedMotion ? 0.2 : 0.8, ease: "easeInOut" }}
-        style={{ transformStyle: "preserve-3d" }}
+        style={{ 
+          transformStyle: "preserve-3d",
+          height: "256px", // Fixed height to prevent layout shift
+          width: "100%"
+        }}
       >
         {/* Front of Card */}
         <motion.div
           className="absolute inset-0 backface-hidden"
           style={{ 
             backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden"
+            WebkitBackfaceVisibility: "hidden",
+            zIndex: isRevealed ? 1 : 2
           }}
         >
           <Card className="h-64 bg-gradient-to-br from-gray-900 via-black to-gray-800 border-yellow-500/50 overflow-hidden">
@@ -58,7 +63,12 @@ export default function BlackCard() {
               </p>
               
               <Button 
-                onClick={() => setIsRevealed(true)}
+                onClick={() => {
+                  if (process.env.NODE_ENV !== 'production') {
+                    console.log('Revealing card features...');
+                  }
+                  setIsRevealed(true);
+                }}
                 className="bg-gradient-to-r from-yellow-600 to-yellow-400 hover:from-yellow-500 hover:to-yellow-300 min-h-[44px] min-w-[160px] touch-manipulation"
               >
                 Reveal Card Features
@@ -73,7 +83,8 @@ export default function BlackCard() {
           style={{ 
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
-            transform: "rotateY(180deg)"
+            transform: "rotateY(180deg)",
+            zIndex: isRevealed ? 2 : 1
           }}
         >
           <Card className="h-64 bg-black border-yellow-500 relative overflow-hidden">
@@ -94,7 +105,12 @@ export default function BlackCard() {
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  onClick={() => setIsRevealed(false)}
+                  onClick={() => {
+                    if (process.env.NODE_ENV !== 'production') {
+                      console.log('Hiding card features...');
+                    }
+                    setIsRevealed(false);
+                  }}
                   className="text-yellow-400 hover:text-yellow-300 min-h-[44px] min-w-[44px] touch-manipulation"
                 >
                   ↻
