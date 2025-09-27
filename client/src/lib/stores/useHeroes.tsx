@@ -1,13 +1,14 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
-import { heroes as heroData } from "@/data/heroes";
-import { Hero, NFTBadge } from "@/types/heroes";
+import { gameHeroes as heroData } from "@/data/gameHeroes";
+import { GameHero, NFTBadge } from "@/types/heroes";
 import { GXCoinAPI } from "@/lib/api";
 import { useUser } from "./useUser";
+import { useContribution } from "./useContribution";
 
 interface HeroState {
-  heroes: Hero[];
-  selectedHero: Hero | null;
+  heroes: GameHero[];
+  selectedHero: GameHero | null;
   nftBadges: NFTBadge[];
   
   // Actions
@@ -17,6 +18,10 @@ interface HeroState {
   loadUserNFTs: () => Promise<void>;
   getNFTBadges: (heroId: string) => NFTBadge[];
   isLoading: boolean;
+  
+  // GXCOIN Anchor Power selectors
+  isHeroUnlocked: (heroId: string) => boolean;
+  getEffectiveStats: (heroId: string) => { power: number; health: number; speed: number } | null;
 }
 
 export const useHeroes = create<HeroState>()(
@@ -106,6 +111,58 @@ export const useHeroes = create<HeroState>()(
     
     getNFTBadges: (heroId: string) => {
       return get().nftBadges.filter(badge => badge.heroId === heroId);
+    },
+    
+    // GXCOIN Anchor Power selectors
+    isHeroUnlocked: (heroId: string) => {
+      const hero = get().heroes.find(h => h.id === heroId);
+      if (!hero) {
+        console.log(`[GXCOIN] Hero not found: ${heroId}`);
+        return false;
+      }
+      
+      // Anchor heroes are always unlocked
+      if (hero.isAnchor) {
+        console.log(`[GXCOIN] Anchor hero ${heroId} is always unlocked`);
+        return true;
+      }
+      
+      // Non-anchor heroes that require anchor need anchorPower >= 1
+      if (hero.requireAnchor) {
+        const anchorPower = useContribution.getState().anchorPower;
+        const unlocked = anchorPower >= 1;
+        console.log(`[GXCOIN] Hero ${heroId} requires anchor. AnchorPower: ${anchorPower}, Unlocked: ${unlocked}`);
+        return unlocked;
+      }
+      
+      // Heroes that don't require anchor are always unlocked
+      console.log(`[GXCOIN] Hero ${heroId} doesn't require anchor, always unlocked`);
+      return true;
+    },
+    
+    getEffectiveStats: (heroId: string) => {
+      const hero = get().heroes.find(h => h.id === heroId);
+      if (!hero || !hero.stats) {
+        console.log(`[GXCOIN] Hero not found or has no stats: ${heroId}`);
+        return null;
+      }
+      
+      // Anchor heroes return their base stats unchanged
+      if (hero.isAnchor) {
+        console.log(`[GXCOIN] Anchor hero ${heroId} returns base stats:`, hero.stats);
+        return hero.stats;
+      }
+      
+      // Non-anchor heroes get their stats multiplied by anchor multiplier
+      const anchorMultiplier = useContribution.getState().getAnchorMultiplier();
+      const effectiveStats = {
+        power: Math.round(hero.stats.power * anchorMultiplier),
+        health: Math.round(hero.stats.health * anchorMultiplier),
+        speed: Math.round(hero.stats.speed * anchorMultiplier)
+      };
+      
+      console.log(`[GXCOIN] Hero ${heroId} effective stats (${anchorMultiplier}x):`, effectiveStats);
+      return effectiveStats;
     }
   }))
 );

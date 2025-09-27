@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Crown, Link } from "lucide-react";
 
 // Token-specific image mappings to the uploaded NFT card images
 const TOKEN_IMAGES = {
@@ -318,8 +319,10 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
           <div 
             className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold shadow-xl"
             style={{ 
-              background: `radial-gradient(circle, ${theme.primary}, ${theme.gradient[2]})`,
-              border: `2px solid white`,
+              background: tokenSymbol === 'GCCT' 
+                ? `radial-gradient(circle, #22c55e, #16a34a)` 
+                : `radial-gradient(circle, ${theme.primary}, ${theme.gradient[2]})`,
+              border: `2px solid ${tokenSymbol === 'GCCT' ? '#22c55e' : 'white'}`,
               color: 'white'
             }}
           >
@@ -327,23 +330,77 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
             {tokenSymbol === 'HEMP' && '🌿'}
             {tokenSymbol === 'GPWR' && '⚡'}
             {tokenSymbol === 'BATT' && '🔋'}
-            {tokenSymbol === 'GCCT' && '📈'}
+            {tokenSymbol === 'GCCT' && <Crown className="h-5 w-5" />}
           </div>
         </div>
 
-        {/* Token symbol overlay with enhanced visibility */}
-        <div className="absolute top-2 left-2">
-          <div 
-            className="px-3 py-2 rounded-lg text-sm font-bold text-white shadow-xl"
-            style={{ 
-              background: `linear-gradient(135deg, ${theme.gradient[0]}, ${theme.gradient[1]})`,
-              border: `2px solid ${theme.primary}`,
-              backdropFilter: 'blur(4px)'
-            }}
-          >
-            ${tokenSymbol}
-          </div>
-        </div>
+        {/* GXCOIN Anchor vs Powered-by States */}
+        {tokenSymbol === 'GCCT' ? (
+          /* ANCHOR STATE - Special styling for GXCOIN */
+          <>
+            {/* Anchor Crown Symbol */}
+            <div className="absolute top-2 left-2">
+              <div 
+                className="px-3 py-2 rounded-lg text-sm font-bold text-white shadow-xl flex items-center gap-1"
+                style={{ 
+                  background: `linear-gradient(135deg, #22c55e, #16a34a)`,
+                  border: `2px solid #22c55e`,
+                  backdropFilter: 'blur(4px)'
+                }}
+              >
+                <Crown className="h-4 w-4" />
+                ${tokenSymbol}
+              </div>
+            </div>
+            
+            {/* ANCHOR Chip */}
+            <div className="absolute top-2 right-12">
+              <div 
+                className="px-2 py-1 rounded-md text-xs font-bold text-white shadow-xl"
+                style={{ 
+                  background: `linear-gradient(135deg, #16a34a, #15803d)`,
+                  border: `1px solid #22c55e`
+                }}
+              >
+                ANCHOR
+              </div>
+            </div>
+          </>
+        ) : (
+          /* POWERED-BY STATE - For all other heroes */
+          <>
+            {/* Token symbol overlay */}
+            <div className="absolute top-2 left-2">
+              <div 
+                className="px-3 py-2 rounded-lg text-sm font-bold text-white shadow-xl"
+                style={{ 
+                  background: `linear-gradient(135deg, ${theme.gradient[0]}, ${theme.gradient[1]})`,
+                  border: `2px solid ${theme.primary}`,
+                  backdropFilter: 'blur(4px)'
+                }}
+              >
+                ${tokenSymbol}
+              </div>
+            </div>
+            
+            {/* Powered by GXCOIN Ribbon */}
+            <div className="absolute top-2 right-12">
+              <div 
+                className="px-2 py-1 rounded-md text-xs font-medium text-green-300 shadow-lg flex items-center gap-1"
+                style={{ 
+                  background: `linear-gradient(135deg, #16a34a80, #15803d80)`,
+                  border: `1px solid #22c55e60`,
+                  backdropFilter: 'blur(2px)'
+                }}
+                title="This hero is powered by GXCOIN Anchor"
+              >
+                <Crown className="h-2 w-2" />
+                <span>Powered by GXCOIN</span>
+                <Link className="h-2 w-2 opacity-70" />
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Level indicator */}
         <div className="absolute top-2 right-2">

@@ -40,7 +40,7 @@ const getValidTokenSymbol = (heroSymbol: string): TokenSymbol => {
 
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState("heroes");
-  const { currentRank, impactMetrics } = useContribution();
+  const { currentRank, impactMetrics, anchorPower, gxcoinStake, getAnchorMultiplier } = useContribution();
 
   const rankTiers = [
     { 
@@ -117,9 +117,9 @@ export default function LandingPage() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            Meet the 5 Eco-Warrior Superheroes revolutionizing regenerative finance through 
-            patent-powered gaming. Each hero represents breakthrough environmental technologies 
-            that generate real-world impact and economic returns.
+            GXCOIN Anchor dNFT powers the entire ReFi League ecosystem. The central hub 
+            that unlocks and amplifies 5 patent-backed Eco-Warrior Superheroes, democratizing 
+            access to breakthrough environmental technologies with real economic returns.
           </motion.p>
 
           <motion.div 
@@ -129,8 +129,8 @@ export default function LandingPage() {
             transition={{ delay: 0.6 }}
           >
             <Badge className="bg-green-600/20 text-green-400 border-green-500/30 text-sm px-4 py-2">
-              <Shield className="h-4 w-4 mr-2" />
-              5 Heroes
+              <Crown className="h-4 w-4 mr-2" />
+              GXCOIN Anchor
             </Badge>
             <Badge className="bg-blue-600/20 text-blue-400 border-blue-500/30 text-sm px-4 py-2">
               <Users className="h-4 w-4 mr-2" />
@@ -145,6 +145,66 @@ export default function LandingPage() {
               Real Impact
             </Badge>
           </motion.div>
+        </div>
+      </motion.section>
+
+      {/* GXCOIN Anchor Centerpiece */}
+      <motion.section 
+        className="px-4 pb-12"
+        initial={{ y: 30, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 1.0 }}
+      >
+        <div className="max-w-4xl mx-auto">
+          <Card className="bg-gradient-to-br from-green-900/40 via-emerald-900/30 to-green-800/40 backdrop-blur-sm border-green-500/30 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 via-transparent to-emerald-500/10" />
+            
+            <CardContent className="p-8 relative z-10">
+              <div className="text-center mb-8">
+                <div className="flex justify-center mb-4">
+                  <div className="p-4 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg">
+                    <Crown className="h-12 w-12 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-3xl font-bold text-white mb-2">
+                  GXCOIN Anchor dNFT
+                </h3>
+                <p className="text-green-300 text-lg font-medium mb-2">
+                  The Central Hub Powering All Heroes
+                </p>
+                <p className="text-gray-400 max-w-xl mx-auto">
+                  Your gateway to the entire ReFi League ecosystem. Stake GXCOIN to unlock and amplify all Eco-Warrior abilities.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="text-center p-4 bg-green-500/10 rounded-lg border border-green-500/20">
+                  <div className="text-2xl font-bold text-green-400 mb-1">{anchorPower}</div>
+                  <div className="text-sm text-gray-400">Anchor Power</div>
+                  <div className="text-xs text-green-300 mt-1">{getAnchorMultiplier().toFixed(2)}x multiplier</div>
+                </div>
+                <div className="text-center p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                  <div className="text-2xl font-bold text-emerald-400 mb-1">4</div>
+                  <div className="text-sm text-gray-400">Heroes Powered</div>
+                  <div className="text-xs text-emerald-300 mt-1">AQUA, HEMP, VOLTRA, GRAPHENE</div>
+                </div>
+                <div className="text-center p-4 bg-green-600/10 rounded-lg border border-green-600/20">
+                  <div className="text-2xl font-bold text-green-300 mb-1">${gxcoinStake}</div>
+                  <div className="text-sm text-gray-400">Your GXCOIN Stake</div>
+                  <div className="text-xs text-green-300 mt-1">Next threshold: ${Math.ceil((anchorPower + 1) * 1000)}</div>
+                </div>
+              </div>
+
+              <div className="flex justify-center">
+                <Button 
+                  className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold px-8 py-3 text-lg"
+                >
+                  <Zap className="h-5 w-5 mr-2" />
+                  Power Your Heroes
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </motion.section>
 
@@ -167,16 +227,112 @@ export default function LandingPage() {
             <TabsContent value="heroes" className="space-y-8">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-white mb-4">
-                  5 Eco-Warrior Superheroes
+                  <span className="bg-gradient-to-r from-green-400 via-emerald-500 to-green-600 bg-clip-text text-transparent">
+                    GXCOIN Anchor
+                  </span>{" "}
+                  Powers the ReFi League
                 </h2>
                 <p className="text-gray-400 max-w-2xl mx-auto">
-                  Each hero represents breakthrough environmental technologies with real patent backing, 
-                  generating both environmental impact and economic returns.
+                  The central anchor dNFT that unlocks and amplifies all 5 Eco-Warrior Superheroes. 
+                  GXCOIN democratizes access to 18+ patented environmental technologies while generating real impact and economic returns.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {gameHeroes.map((hero, index) => {
+              {/* GXCOIN Anchor Hero - Full Width Featured */}
+              {(() => {
+                const anchorHero = gameHeroes.find(hero => hero.isAnchor || hero.symbol === 'GCCT');
+                if (!anchorHero) return null;
+                
+                const IconComponent = heroIcons[anchorHero.id as keyof typeof heroIcons] || Crown;
+                
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="mb-8"
+                  >
+                    <Card className="bg-gradient-to-br from-green-900/60 via-emerald-900/40 to-green-800/60 backdrop-blur-sm border-green-500/50 hover:border-green-400/70 transition-colors">
+                      <div className="absolute top-4 right-4">
+                        <Badge className="bg-green-600/20 text-green-300 border-green-500/40 font-bold">
+                          <Crown className="h-3 w-3 mr-1" />
+                          ANCHOR dNFT
+                        </Badge>
+                      </div>
+                      
+                      <CardContent className="p-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                          {/* Left: Hero Info */}
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-4 mb-4">
+                              <div className="p-4 rounded-full bg-gradient-to-r from-green-600 to-emerald-600">
+                                <IconComponent className="h-8 w-8 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="text-2xl font-bold text-white mb-1">
+                                  {anchorHero.name}
+                                </h3>
+                                <p className="text-green-300 font-medium">
+                                  {anchorHero.title}
+                                </p>
+                                {anchorHero.subtitle && (
+                                  <p className="text-green-400 text-sm font-medium">
+                                    {anchorHero.subtitle}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            
+                            <p className="text-gray-300 leading-relaxed">
+                              {anchorHero.description}
+                            </p>
+                            
+                            <div className="flex gap-4 text-center">
+                              <div className="bg-green-500/20 px-4 py-2 rounded-lg">
+                                <div className="text-green-300 font-bold">Level {anchorHero.level}</div>
+                                <div className="text-xs text-gray-400">Anchor Level</div>
+                              </div>
+                              <div className="bg-emerald-500/20 px-4 py-2 rounded-lg">
+                                <div className="text-emerald-300 font-bold">{anchorHero.rarity}</div>
+                                <div className="text-xs text-gray-400">Rarity</div>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Right: NFT Badge */}
+                          <div className="flex justify-center">
+                            <TokenBadge
+                              tokenSymbol="GCCT"
+                              attributes={{
+                                power: anchorHero.stats.power,
+                                impact: anchorHero.stats.health,
+                                rarity: anchorHero.stats.speed
+                              }}
+                              rarity={anchorHero.rarity as 'Common' | 'Rare' | 'Legendary'}
+                              level={anchorHero.level}
+                              size="lg"
+                              animated={true}
+                            />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })()}
+
+              {/* Powered Heroes Grid */}
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-white mb-2 text-center">
+                  Heroes Powered by GXCOIN Anchor
+                </h3>
+                <p className="text-gray-400 text-center text-sm mb-6">
+                  Unlock and amplify these environmental warriors through your GXCOIN stake
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {gameHeroes.filter(hero => !hero.isAnchor && hero.symbol !== 'GCCT').map((hero, index) => {
                   const IconComponent = heroIcons[hero.id as keyof typeof heroIcons] || Zap;
                   
                   return (
@@ -184,10 +340,18 @@ export default function LandingPage() {
                       key={hero.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
+                      transition={{ delay: (index + 1) * 0.1 }}
                     >
-                      <Card className="h-full bg-black/60 backdrop-blur-sm border-gray-700 hover:border-gray-500 transition-colors group">
-                        <CardHeader className="pb-4">
+                      <Card className="h-full bg-black/60 backdrop-blur-sm border-gray-700 hover:border-gray-500 transition-colors group relative">
+                        {/* Powered by GXCOIN Ribbon */}
+                        <div className="absolute top-3 left-3 z-10">
+                          <Badge className="bg-green-600/20 text-green-400 border-green-500/40 text-xs">
+                            <Crown className="h-2 w-2 mr-1" />
+                            Powered by GXCOIN
+                          </Badge>
+                        </div>
+                        
+                        <CardHeader className="pb-4 pt-12">
                           <div className="flex items-center justify-between mb-4">
                             <div className="p-3 rounded-full bg-gradient-to-r from-gray-800 to-gray-700">
                               <IconComponent className="h-6 w-6" style={{ color: hero.color }} />
@@ -209,6 +373,11 @@ export default function LandingPage() {
                           <p className="text-sm" style={{ color: hero.color }}>
                             {hero.title}
                           </p>
+                          {hero.subtitle && (
+                            <p className="text-green-400 text-xs font-medium">
+                              {hero.subtitle}
+                            </p>
+                          )}
                         </CardHeader>
 
                         <CardContent className="space-y-4">
@@ -227,23 +396,14 @@ export default function LandingPage() {
                               }}
                               rarity={hero.rarity as 'Common' | 'Rare' | 'Legendary'}
                               level={hero.level}
-                              size="md"
+                              size="sm"
                               animated={true}
                             />
                           </div>
 
                           <p className="text-gray-400 text-sm leading-relaxed">
-                            {hero.description}
+                            {hero.description.length > 120 ? hero.description.substring(0, 120) + '...' : hero.description}
                           </p>
-
-                          <div className="space-y-2">
-                            <h4 className="text-white font-semibold text-sm">Key Abilities:</h4>
-                            {hero.abilities.slice(0, 2).map((ability, abilityIndex) => (
-                              <div key={abilityIndex} className="text-xs text-gray-400">
-                                <span className="text-white font-medium">{ability.name}:</span> {ability.description}
-                              </div>
-                            ))}
-                          </div>
 
                           <div className="flex justify-between items-center pt-2 border-t border-gray-700">
                             <span className="text-xs text-gray-500">Level {hero.level}</span>

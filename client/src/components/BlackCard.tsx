@@ -8,18 +8,50 @@ import { CreditCard, Star, Shield, Crown, Zap } from "lucide-react";
 
 export default function BlackCard() {
   const [isRevealed, setIsRevealed] = useState(false);
-  const { currentRank } = useContribution();
+  const { currentRank, anchorPower, gxcoinStake, getAnchorMultiplier } = useContribution();
 
-  const cardFeatures = [
-    "$500,000 spending power limit",
-    "Bitcoin cashback on all purchases", 
-    "VIP Concierge services 24/7",
-    "Self-custody security protocol",
-    "Global premium event access",
-    "Real-time impact dashboard",
-    "Patent licensing profit sharing",
-    "Eco-warrior reward multipliers"
-  ];
+  const anchorMultiplier = getAnchorMultiplier();
+  
+  // Gate premium benefits based on GXCOIN Anchor Power thresholds
+  const getAvailableFeatures = () => {
+    const baseFeatures = [
+      "Patent licensing profit sharing",
+      "Eco-warrior reward multipliers"
+    ];
+    
+    const bronzeFeatures = [
+      ...baseFeatures,
+      "Real-time impact dashboard",
+      "GXCOIN staking rewards"
+    ];
+    
+    const silverFeatures = [
+      ...bronzeFeatures,
+      "VIP Concierge services 24/7",
+      "Self-custody security protocol"
+    ];
+    
+    const goldFeatures = [
+      ...silverFeatures,
+      "Global premium event access",
+      "Bitcoin cashback on all purchases"
+    ];
+    
+    const platinumFeatures = [
+      ...goldFeatures,
+      "$500,000 spending power limit",
+      "Private wealth management"
+    ];
+    
+    // Gate features based on anchor power thresholds
+    if (anchorPower >= 10) return platinumFeatures;
+    if (anchorPower >= 5) return goldFeatures;
+    if (anchorPower >= 2) return silverFeatures;
+    if (anchorPower >= 1) return bronzeFeatures;
+    return baseFeatures;
+  };
+  
+  const cardFeatures = getAvailableFeatures();
 
   const rankTiers = [
     { name: "Bronze Recruit", color: "#cd7f32", contribution: "175+" },
@@ -68,9 +100,15 @@ export default function BlackCard() {
               <h3 className="text-xl font-bold text-white mb-2">
                 GXCOIN PLATINUM BLACK CARD
               </h3>
-              <p className="text-gray-400 text-sm mb-4">
-                Patent-powered crypto BLACK CARD for eco-warriors
-              </p>
+              <div className="mb-4 space-y-1">
+                <p className="text-gray-400 text-sm">
+                  Patent-powered crypto BLACK CARD for eco-warriors
+                </p>
+                <div className="flex items-center justify-center gap-2 text-green-400 text-xs font-medium">
+                  <Crown className="h-3 w-3" />
+                  <span>Backed by GXCOIN Anchor</span>
+                </div>
+              </div>
               
               <Button 
                 onClick={() => {
@@ -128,8 +166,24 @@ export default function BlackCard() {
               </div>
 
               <div className="space-y-2">
-                <h4 className="text-white font-bold text-sm mb-2">BLACK CARD Benefits:</h4>
-                <div className="max-h-36 overflow-y-auto space-y-1">
+                {/* GXCOIN Anchor Status */}
+                <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-2 mb-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-green-300 font-medium">Anchor Power</span>
+                    <span className="text-green-400 font-bold">{anchorPower}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-green-300 font-medium">GXCOIN Stake</span>
+                    <span className="text-green-400 font-bold">${gxcoinStake}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-green-300 font-medium">Power Multiplier</span>
+                    <span className="text-green-400 font-bold">{anchorMultiplier.toFixed(2)}x</span>
+                  </div>
+                </div>
+                
+                <h4 className="text-white font-bold text-sm mb-2">Available Benefits:</h4>
+                <div className="max-h-24 overflow-y-auto space-y-1">
                   {cardFeatures.map((feature, index) => (
                     <motion.div
                       key={feature}
@@ -143,6 +197,15 @@ export default function BlackCard() {
                     </motion.div>
                   ))}
                 </div>
+                
+                {/* Locked Features */}
+                {anchorPower < 10 && (
+                  <div className="mt-2 p-2 bg-gray-800/50 rounded-lg">
+                    <p className="text-xs text-gray-400 text-center">
+                      Unlock more features by increasing your GXCOIN stake
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="absolute bottom-4 right-4">
@@ -200,9 +263,14 @@ export default function BlackCard() {
           <CreditCard className="h-4 w-4 mr-2" />
           Apply for BLACK CARD
         </Button>
-        <p className="text-center text-xs text-gray-400">
-          Available for Platinum+ ranks • Patent-powered rewards included
-        </p>
+        <div className="text-center space-y-1">
+          <p className="text-xs text-gray-400">
+            Available for Platinum+ ranks • Patent-powered rewards included
+          </p>
+          <p className="text-xs text-green-400">
+            Powered by GXCOIN Anchor • {anchorPower} Anchor Power Active
+          </p>
+        </div>
       </motion.div>
     </div>
   );
