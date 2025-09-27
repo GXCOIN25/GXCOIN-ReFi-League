@@ -605,6 +605,1007 @@ export default function LandingPage() {
           </Tabs>
         </div>
       </motion.section>
+
+      {/* Hero Collection Promotional Section */}
+      <motion.section 
+        className="px-4 py-16 bg-gradient-to-r from-purple-900/20 via-blue-900/20 to-green-900/20"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.2 }}
+      >
+        <div className="max-w-6xl mx-auto">
+          <Card className="bg-gradient-to-br from-purple-900/40 via-blue-900/30 to-green-900/40 backdrop-blur-sm border-purple-500/30 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 via-blue-500/10 to-green-500/10" />
+            
+            <CardContent className="p-8 relative z-10">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                {/* Left: Hero Collection Image */}
+                <div className="flex justify-center">
+                  <motion.div
+                    className="relative rounded-lg overflow-hidden shadow-2xl"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <img 
+                      src="/hero-collection-promo.jpg" 
+                      alt="GXCOIN ECO-WARRIOR LIMITED EDITION dNFTs" 
+                      className="w-full h-auto max-w-md object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                  </motion.div>
+                </div>
+
+                {/* Right: Content */}
+                <div className="space-y-6">
+                  <div className="text-center lg:text-left">
+                    <motion.h2 
+                      className="text-3xl lg:text-4xl font-bold text-white mb-4"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 1.4 }}
+                    >
+                      <span className="bg-gradient-to-r from-purple-400 via-blue-500 to-green-400 bg-clip-text text-transparent">
+                        GXCOIN ECO-WARRIOR
+                      </span>
+                      <br />
+                      LIMITED EDITION dNFT's
+                    </motion.h2>
+                    
+                    <motion.p 
+                      className="text-gray-300 text-lg mb-6 leading-relaxed"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 1.6 }}
+                    >
+                      Unleash the power of all 5 revolutionary patent-backed superheroes: 
+                      <span className="text-blue-400 font-semibold"> $WTR</span>,
+                      <span className="text-yellow-400 font-semibold"> $GPWR</span>,
+                      <span className="text-green-400 font-semibold"> $BATT</span>,
+                      <span className="text-purple-400 font-semibold"> $HEMP</span>, and
+                      <span className="text-orange-400 font-semibold"> $GCCT</span> 
+                      in dynamic NFT superhero form.
+                    </motion.p>
+
+                    <div className="flex flex-wrap justify-center lg:justify-start gap-3 mb-8">
+                      <Badge className="bg-blue-600/20 text-blue-400 border-blue-500/30 px-3 py-1">
+                        <Droplets className="h-3 w-3 mr-1" />
+                        AQUA $WTR
+                      </Badge>
+                      <Badge className="bg-yellow-600/20 text-yellow-400 border-yellow-500/30 px-3 py-1">
+                        <Zap className="h-3 w-3 mr-1" />
+                        VOLTRA $GPWR
+                      </Badge>
+                      <Badge className="bg-green-600/20 text-green-400 border-green-500/30 px-3 py-1">
+                        <Battery className="h-3 w-3 mr-1" />
+                        GRAPHENE $BATT
+                      </Badge>
+                      <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/30 px-3 py-1">
+                        <Leaf className="h-3 w-3 mr-1" />
+                        HEMP $HEMP
+                      </Badge>
+                      <Badge className="bg-orange-600/20 text-orange-400 border-orange-500/30 px-3 py-1">
+                        <TrendingUp className="h-3 w-3 mr-1" />
+                        CARBON $GCCT
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <motion.div 
+                    className="flex justify-center lg:justify-start"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 1.8 }}
+                  >
+                    <Button 
+                      size="lg"
+                      className="bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 hover:from-purple-700 hover:via-blue-700 hover:to-green-700 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      <Sparkles className="h-5 w-5 mr-2" />
+                      JOIN THE REFI LEAGUE TODAY!
+                    </Button>
+                  </motion.div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </motion.section>
+
+      {/* Premium Visa Card Program Section */}
+      <motion.section 
+        className="px-4 py-16 bg-gradient-to-r from-slate-900/30 via-gray-900/30 to-slate-900/30"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.4 }}
+      >
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.6 }}
+          >
+            <h2 className="text-4xl font-bold text-white mb-4">
+              <span className="bg-gradient-to-r from-gray-400 via-white to-gray-400 bg-clip-text text-transparent">
+                Premium Visa Card Program
+              </span>
+            </h2>
+            <p className="text-gray-300 text-lg max-w-3xl mx-auto">
+              Experience the future of environmental finance with our exclusive tiered card program. 
+              Each tier unlocks enhanced benefits and rewards powered by real environmental impact.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            {/* Bronze Spark Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.8 }}
+            >
+              <Card className="h-full bg-gradient-to-br from-orange-900/40 to-amber-900/40 backdrop-blur-sm border-orange-500/30 hover:border-orange-400/60 transition-all duration-300 group">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <div className="mb-4">
+                      <img 
+                        src="/bronze-spark.jpg" 
+                        alt="Bronze Spark Card" 
+                        className="w-full h-32 object-cover rounded-lg shadow-lg group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <h3 className="text-xl font-bold text-orange-300 mb-2">Bronze Spark</h3>
+                    <p className="text-2xl font-bold text-white mb-4">$175/year</p>
+                    <div className="space-y-2 text-sm text-gray-300">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                        Basic eco-rewards
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                        1% cashback
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full" />
+                        Community access
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Silver Spark Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2.0 }}
+            >
+              <Card className="h-full bg-gradient-to-br from-gray-800/40 to-slate-800/40 backdrop-blur-sm border-gray-500/30 hover:border-gray-400/60 transition-all duration-300 group">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <div className="mb-4">
+                      <img 
+                        src="/silver-spark.jpg" 
+                        alt="Silver Spark Card" 
+                        className="w-full h-32 object-cover rounded-lg shadow-lg group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-300 mb-2">Silver Spark</h3>
+                    <p className="text-2xl font-bold text-white mb-4">$500/year</p>
+                    <div className="space-y-2 text-sm text-gray-300">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-gray-500 rounded-full" />
+                        Enhanced rewards
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-gray-500 rounded-full" />
+                        2% cashback
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-gray-500 rounded-full" />
+                        Priority support
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Gold Spark Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2.2 }}
+            >
+              <Card className="h-full bg-gradient-to-br from-yellow-900/40 to-amber-900/40 backdrop-blur-sm border-yellow-500/30 hover:border-yellow-400/60 transition-all duration-300 group">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <div className="mb-4">
+                      <img 
+                        src="/gold-spark.jpg" 
+                        alt="Gold Spark Card" 
+                        className="w-full h-32 object-cover rounded-lg shadow-lg group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <h3 className="text-xl font-bold text-yellow-300 mb-2">Gold Spark</h3>
+                    <p className="text-2xl font-bold text-white mb-4">$1,000/year</p>
+                    <div className="space-y-2 text-sm text-gray-300">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+                        Premium rewards
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+                        3% cashback
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-yellow-500 rounded-full" />
+                        VIP events access
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Platinum Ambassador Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2.4 }}
+            >
+              <Card className="h-full bg-gradient-to-br from-purple-900/40 to-indigo-900/40 backdrop-blur-sm border-purple-500/30 hover:border-purple-400/60 transition-all duration-300 group">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <div className="mb-4">
+                      <img 
+                        src="/platinum-ambassador.jpg" 
+                        alt="Platinum Ambassador Card" 
+                        className="w-full h-32 object-cover rounded-lg shadow-lg group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <h3 className="text-xl font-bold text-purple-300 mb-2">Platinum Ambassador</h3>
+                    <p className="text-2xl font-bold text-white mb-4">$5,000/year</p>
+                    <div className="space-y-2 text-sm text-gray-300">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                        Elite benefits
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                        5% cashback
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                        Concierge service
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Diamond Elite Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2.6 }}
+            >
+              <Card className="h-full bg-gradient-to-br from-blue-900/40 to-cyan-900/40 backdrop-blur-sm border-blue-500/30 hover:border-blue-400/60 transition-all duration-300 group">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <div className="mb-4">
+                      <img 
+                        src="/diamond-elite.jpg" 
+                        alt="Diamond Elite Card" 
+                        className="w-full h-32 object-cover rounded-lg shadow-lg group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <h3 className="text-xl font-bold text-blue-300 mb-2">Diamond Elite</h3>
+                    <p className="text-2xl font-bold text-white mb-4">$10,000/year</p>
+                    <div className="space-y-2 text-sm text-gray-300">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                        Ultimate rewards
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                        10% cashback
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                        DAO voting rights
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+
+          <motion.div 
+            className="text-center mt-12"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.8 }}
+          >
+            <Button 
+              size="lg"
+              className="bg-gradient-to-r from-gray-600 to-slate-600 hover:from-gray-700 hover:to-slate-700 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <CreditCard className="h-5 w-5 mr-2" />
+              Apply for Your Card Today
+            </Button>
+          </motion.div>
+        </div>
+      </motion.section>
+
+      {/* SEC-Compliant DeFi Section */}
+      <motion.section 
+        className="px-4 py-16 bg-gradient-to-r from-emerald-900/20 via-teal-900/20 to-green-900/20"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.6 }}
+      >
+        <div className="max-w-6xl mx-auto">
+          <Card className="bg-gradient-to-br from-emerald-900/40 via-teal-900/30 to-green-900/40 backdrop-blur-sm border-emerald-500/30 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 via-teal-500/10 to-green-500/10" />
+            
+            <CardContent className="p-8 relative z-10">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                {/* Left: Content */}
+                <div className="space-y-6">
+                  <motion.div
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 1.8 }}
+                  >
+                    <Badge className="bg-emerald-600/20 text-emerald-400 border-emerald-500/30 mb-4">
+                      <Shield className="h-3 w-3 mr-1" />
+                      SEC-COMPLIANT PLATFORM
+                    </Badge>
+                    
+                    <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+                      <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-green-400 bg-clip-text text-transparent">
+                        First SEC-compliant
+                      </span>
+                      <br />
+                      RWA-backed DeFi platform
+                      <br />
+                      <span className="text-emerald-300 text-2xl">with Dynamic NFTs</span>
+                    </h2>
+
+                    <p className="text-gray-300 text-lg leading-relaxed mb-6">
+                      Democratizing access to the <span className="text-emerald-400 font-bold">$1.45T+ sustainability markets</span> with 
+                      revolutionary <span className="text-green-400 font-bold">$175+ entry points</span>. Real-world assets meet DeFi innovation 
+                      in the first fully compliant platform designed for environmental impact.
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                      <div className="bg-emerald-500/10 p-4 rounded-lg border border-emerald-500/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Shield className="h-5 w-5 text-emerald-400" />
+                          <span className="text-emerald-300 font-semibold">SEC Compliant</span>
+                        </div>
+                        <p className="text-gray-400 text-sm">Fully regulated DeFi platform meeting all compliance requirements</p>
+                      </div>
+                      
+                      <div className="bg-teal-500/10 p-4 rounded-lg border border-teal-500/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <TrendingUp className="h-5 w-5 text-teal-400" />
+                          <span className="text-teal-300 font-semibold">RWA-backed</span>
+                        </div>
+                        <p className="text-gray-400 text-sm">Real-world environmental assets backing digital investments</p>
+                      </div>
+                      
+                      <div className="bg-green-500/10 p-4 rounded-lg border border-green-500/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Sparkles className="h-5 w-5 text-green-400" />
+                          <span className="text-green-300 font-semibold">Dynamic NFTs</span>
+                        </div>
+                        <p className="text-gray-400 text-sm">Living NFTs that evolve with real environmental impact</p>
+                      </div>
+                      
+                      <div className="bg-cyan-500/10 p-4 rounded-lg border border-cyan-500/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Users className="h-5 w-5 text-cyan-400" />
+                          <span className="text-cyan-300 font-semibold">$175 Entry</span>
+                        </div>
+                        <p className="text-gray-400 text-sm">Accessible entry points to trillion-dollar markets</p>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div 
+                    className="flex gap-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 2.0 }}
+                  >
+                    <Button 
+                      size="lg"
+                      className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      <Shield className="h-5 w-5 mr-2" />
+                      Learn More
+                    </Button>
+                    <Button 
+                      size="lg"
+                      variant="outline"
+                      className="border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10 px-6 py-3"
+                    >
+                      <TrendingUp className="h-5 w-5 mr-2" />
+                      View Markets
+                    </Button>
+                  </motion.div>
+                </div>
+
+                {/* Right: SEC Compliant Image */}
+                <div className="flex justify-center">
+                  <motion.div
+                    className="relative rounded-lg overflow-hidden shadow-2xl"
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 2.2 }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <img 
+                      src="/sec-compliant-defi.jpg" 
+                      alt="SEC-Compliant RWA-backed DeFi Platform" 
+                      className="w-full h-auto max-w-md object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/50 via-transparent to-transparent" />
+                    
+                    {/* Overlay Stats */}
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <div className="bg-black/60 backdrop-blur-sm rounded-lg p-4 border border-emerald-500/30">
+                        <div className="grid grid-cols-2 gap-4 text-center">
+                          <div>
+                            <div className="text-2xl font-bold text-emerald-400">$1.45T+</div>
+                            <div className="text-xs text-gray-300">Market Access</div>
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold text-green-400">$175+</div>
+                            <div className="text-xs text-gray-300">Entry Point</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </motion.section>
+
+      {/* AQUA Water dNFT Hero Spotlight Section */}
+      <motion.section 
+        className="px-4 py-16 bg-gradient-to-r from-blue-900/20 via-cyan-900/20 to-teal-900/20"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.8 }}
+      >
+        <div className="max-w-6xl mx-auto">
+          <Card className="bg-gradient-to-br from-blue-900/40 via-cyan-900/30 to-teal-900/40 backdrop-blur-sm border-blue-500/30 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-cyan-500/10 to-teal-500/10" />
+            
+            <CardContent className="p-8 relative z-10">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                {/* Left: AQUA Water Image */}
+                <div className="flex justify-center">
+                  <motion.div
+                    className="relative rounded-lg overflow-hidden shadow-2xl"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 2.0 }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <img 
+                      src="/aqua-water-spotlight.jpg" 
+                      alt="AQUA Water dNFT Hero Spotlight" 
+                      className="w-full h-auto max-w-md object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent" />
+                    
+                    {/* AQUA Badge Overlay */}
+                    <div className="absolute top-4 left-4">
+                      <Badge className="bg-blue-600/80 text-blue-100 border-blue-400/60 px-3 py-1 backdrop-blur-sm">
+                        <Droplets className="h-3 w-3 mr-1" />
+                        AQUA $WTR
+                      </Badge>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Right: Content */}
+                <div className="space-y-6">
+                  <motion.div
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 2.2 }}
+                  >
+                    <Badge className="bg-blue-600/20 text-blue-400 border-blue-500/30 mb-4">
+                      <Droplets className="h-3 w-3 mr-1" />
+                      HERO SPOTLIGHT
+                    </Badge>
+                    
+                    <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+                      <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
+                        AQUA ($WTR)
+                      </span>
+                      <br />
+                      Water dNFT Hero
+                    </h2>
+
+                    <p className="text-gray-300 text-lg leading-relaxed mb-6">
+                      Harness the power of <span className="text-blue-400 font-bold">480 million year-old healing springs</span> 
+                      producing <span className="text-cyan-400 font-bold">10MM gallons daily</span>. Revolutionary water technology 
+                      meets ancient mineral wisdom in the world's most advanced hydration ecosystem.
+                    </p>
+                  </motion.div>
+
+                  {/* Healing Waters Portfolio */}
+                  <motion.div
+                    className="space-y-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 2.4 }}
+                  >
+                    <h3 className="text-xl font-bold text-blue-300 mb-3">
+                      💧 Healing Waters Portfolio
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="bg-blue-500/10 p-3 rounded-lg border border-blue-500/20">
+                        <div className="text-blue-300 font-semibold text-sm">Ancient Springs</div>
+                        <div className="text-gray-400 text-xs">480M year-old mineral sources</div>
+                      </div>
+                      <div className="bg-cyan-500/10 p-3 rounded-lg border border-cyan-500/20">
+                        <div className="text-cyan-300 font-semibold text-sm">Daily Production</div>
+                        <div className="text-gray-400 text-xs">10MM gallons sustainable flow</div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Product Innovation */}
+                  <motion.div
+                    className="space-y-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 2.6 }}
+                  >
+                    <h3 className="text-xl font-bold text-cyan-300 mb-3">
+                      🚀 Product Innovation
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-gray-300">
+                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                        <span className="text-sm">Hemp-based biodegradable bottles</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-300">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                        <span className="text-sm">Energy-infused structured water technology</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-300">
+                        <div className="w-2 h-2 bg-cyan-500 rounded-full" />
+                        <span className="text-sm">Smart hydration tracking integration</span>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Mineral Composition */}
+                  <motion.div
+                    className="space-y-4"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 2.8 }}
+                  >
+                    <h3 className="text-xl font-bold text-teal-300 mb-3">
+                      ⚗️ Mineral Composition
+                    </h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-teal-500/10 p-3 rounded-lg border border-teal-500/20 text-center">
+                        <div className="text-teal-300 font-bold text-lg">Lithium</div>
+                        <div className="text-gray-400 text-xs">Cognitive enhancement</div>
+                      </div>
+                      <div className="bg-blue-500/10 p-3 rounded-lg border border-blue-500/20 text-center">
+                        <div className="text-blue-300 font-bold text-lg">Zinc</div>
+                        <div className="text-gray-400 text-xs">Immune system support</div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div 
+                    className="flex gap-4 pt-4"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 3.0 }}
+                  >
+                    <Button 
+                      size="lg"
+                      className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      <Droplets className="h-5 w-5 mr-2" />
+                      Activate AQUA dNFT
+                    </Button>
+                    <Button 
+                      size="lg"
+                      variant="outline"
+                      className="border-blue-500/50 text-blue-300 hover:bg-blue-500/10 px-6 py-3"
+                    >
+                      Learn More
+                    </Button>
+                  </motion.div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </motion.section>
+
+      {/* Patent Infrastructure Section */}
+      <motion.section 
+        className="px-4 py-16 bg-gradient-to-r from-gray-900/30 via-slate-900/30 to-zinc-900/30"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2.0 }}
+      >
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.2 }}
+          >
+            <Badge className="bg-gray-600/20 text-gray-400 border-gray-500/30 mb-4">
+              <Shield className="h-3 w-3 mr-1" />
+              CORE PATENT INFRASTRUCTURE
+            </Badge>
+            <h2 className="text-4xl font-bold text-white mb-4">
+              <span className="bg-gradient-to-r from-gray-400 via-white to-gray-400 bg-clip-text text-transparent">
+                Revolutionary Patent Chain Technology
+              </span>
+            </h2>
+            <p className="text-gray-300 text-lg max-w-4xl mx-auto">
+              Our interconnected patent ecosystem creates the world's first comprehensive environmental technology platform, 
+              where each innovation amplifies the next in a seamless sustainability chain.
+            </p>
+          </motion.div>
+
+          <div className="relative">
+            {/* Patent Chain Flow */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+              {/* Carbon Sequestration */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 2.4 }}
+              >
+                <Card className="h-full bg-gradient-to-br from-green-900/40 to-emerald-900/40 backdrop-blur-sm border-green-500/30 hover:border-green-400/60 transition-all duration-300 group">
+                  <CardContent className="p-6 text-center">
+                    <div className="mb-4">
+                      <div className="p-4 rounded-full bg-green-600/20 mx-auto w-fit">
+                        <Leaf className="h-8 w-8 text-green-400" />
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-bold text-green-300 mb-2">Carbon Sequestration</h3>
+                    <p className="text-gray-400 text-sm">Revolutionary carbon capture and storage technologies</p>
+                    <div className="mt-4 text-xs text-green-400 font-semibold">STEP 1</div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Arrow */}
+              <div className="hidden lg:flex items-center justify-center">
+                <div className="text-gray-500 text-2xl">→</div>
+              </div>
+
+              {/* Water Rights */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 2.6 }}
+              >
+                <Card className="h-full bg-gradient-to-br from-blue-900/40 to-cyan-900/40 backdrop-blur-sm border-blue-500/30 hover:border-blue-400/60 transition-all duration-300 group">
+                  <CardContent className="p-6 text-center">
+                    <div className="mb-4">
+                      <div className="p-4 rounded-full bg-blue-600/20 mx-auto w-fit">
+                        <Droplets className="h-8 w-8 text-blue-400" />
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-bold text-blue-300 mb-2">Water Rights</h3>
+                    <p className="text-gray-400 text-sm">Ancient spring water sourcing and purification systems</p>
+                    <div className="mt-4 text-xs text-blue-400 font-semibold">STEP 2</div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Arrow */}
+              <div className="hidden lg:flex items-center justify-center">
+                <div className="text-gray-500 text-2xl">→</div>
+              </div>
+
+              {/* Hemp Production */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 2.8 }}
+              >
+                <Card className="h-full bg-gradient-to-br from-purple-900/40 to-indigo-900/40 backdrop-blur-sm border-purple-500/30 hover:border-purple-400/60 transition-all duration-300 group">
+                  <CardContent className="p-6 text-center">
+                    <div className="mb-4">
+                      <div className="p-4 rounded-full bg-purple-600/20 mx-auto w-fit">
+                        <Leaf className="h-8 w-8 text-purple-400" />
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-bold text-purple-300 mb-2">Hemp Production</h3>
+                    <p className="text-gray-400 text-sm">Sustainable hemp cultivation and processing innovations</p>
+                    <div className="mt-4 text-xs text-purple-400 font-semibold">STEP 3</div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Arrow */}
+              <div className="hidden lg:flex items-center justify-center">
+                <div className="text-gray-500 text-2xl">→</div>
+              </div>
+
+              {/* Battery Storage */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 3.0 }}
+              >
+                <Card className="h-full bg-gradient-to-br from-yellow-900/40 to-orange-900/40 backdrop-blur-sm border-yellow-500/30 hover:border-yellow-400/60 transition-all duration-300 group">
+                  <CardContent className="p-6 text-center">
+                    <div className="mb-4">
+                      <div className="p-4 rounded-full bg-yellow-600/20 mx-auto w-fit">
+                        <Battery className="h-8 w-8 text-yellow-400" />
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-bold text-yellow-300 mb-2">Battery Storage</h3>
+                    <p className="text-gray-400 text-sm">Advanced graphene battery technology and energy storage</p>
+                    <div className="mt-4 text-xs text-yellow-400 font-semibold">STEP 4</div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Arrow */}
+              <div className="hidden lg:flex items-center justify-center">
+                <div className="text-gray-500 text-2xl">→</div>
+              </div>
+
+              {/* Wireless Power */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 3.2 }}
+              >
+                <Card className="h-full bg-gradient-to-br from-cyan-900/40 to-teal-900/40 backdrop-blur-sm border-cyan-500/30 hover:border-cyan-400/60 transition-all duration-300 group">
+                  <CardContent className="p-6 text-center">
+                    <div className="mb-4">
+                      <div className="p-4 rounded-full bg-cyan-600/20 mx-auto w-fit">
+                        <Zap className="h-8 w-8 text-cyan-400" />
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-bold text-cyan-300 mb-2">Wireless Power</h3>
+                    <p className="text-gray-400 text-sm">Revolutionary wireless energy transmission technology</p>
+                    <div className="mt-4 text-xs text-cyan-400 font-semibold">STEP 5</div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Launch Information Section */}
+      <motion.section 
+        className="px-4 py-16 bg-gradient-to-r from-violet-900/20 via-purple-900/20 to-fuchsia-900/20"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2.2 }}
+      >
+        <div className="max-w-6xl mx-auto">
+          <Card className="bg-gradient-to-br from-violet-900/40 via-purple-900/30 to-fuchsia-900/40 backdrop-blur-sm border-violet-500/30 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-violet-400/10 via-purple-500/10 to-fuchsia-500/10" />
+            
+            <CardContent className="p-8 relative z-10">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                {/* Left: Launch Info Image */}
+                <div className="flex justify-center">
+                  <motion.div
+                    className="relative rounded-lg overflow-hidden shadow-2xl"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 2.4 }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <img 
+                      src="/gxcoin-launch-info.jpg" 
+                      alt="GXCOIN Launch Information" 
+                      className="w-full h-auto max-w-md object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-violet-900/60 via-transparent to-transparent" />
+                  </motion.div>
+                </div>
+
+                {/* Right: Content */}
+                <div className="space-y-6">
+                  <motion.div
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 2.6 }}
+                  >
+                    <Badge className="bg-violet-600/20 text-violet-400 border-violet-500/30 mb-4">
+                      <Crown className="h-3 w-3 mr-1" />
+                      OFFICIAL LAUNCH
+                    </Badge>
+                    
+                    <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
+                      <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
+                        GXCOIN Launch
+                      </span>
+                      <br />
+                      <span className="text-violet-300 text-2xl">Q3 2025</span>
+                    </h2>
+
+                    <div className="space-y-4">
+                      <div className="bg-violet-500/10 p-4 rounded-lg border border-violet-500/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Crown className="h-5 w-5 text-violet-400" />
+                          <span className="text-violet-300 font-semibold">Official Website</span>
+                        </div>
+                        <p className="text-white text-lg font-bold">gxcoin.world</p>
+                      </div>
+
+                      <div className="bg-purple-500/10 p-4 rounded-lg border border-purple-500/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Shield className="h-5 w-5 text-purple-400" />
+                          <span className="text-purple-300 font-semibold">Technology Backing</span>
+                        </div>
+                        <p className="text-gray-300 text-lg">
+                          <span className="text-purple-400 font-bold">$5-50B</span> in Technology, IP & Patents
+                        </p>
+                      </div>
+
+                      <div className="bg-fuchsia-500/10 p-4 rounded-lg border border-fuchsia-500/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Sparkles className="h-5 w-5 text-fuchsia-400" />
+                          <span className="text-fuchsia-300 font-semibold">Launch Timeline</span>
+                        </div>
+                        <p className="text-gray-300">Revolutionary patent-powered gaming platform launching Q3 2025</p>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div 
+                    className="flex gap-4 pt-4"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 2.8 }}
+                  >
+                    <Button 
+                      size="lg"
+                      className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-bold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      <Crown className="h-5 w-5 mr-2" />
+                      Visit gxcoin.world
+                    </Button>
+                    <Button 
+                      size="lg"
+                      variant="outline"
+                      className="border-violet-500/50 text-violet-300 hover:bg-violet-500/10 px-6 py-3"
+                    >
+                      Subscribe Updates
+                    </Button>
+                  </motion.div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </motion.section>
+
+      {/* Avengers-Style Heroes Section */}
+      <motion.section 
+        className="px-4 py-16 bg-gradient-to-r from-indigo-900/20 via-blue-900/20 to-purple-900/20"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2.4 }}
+      >
+        <div className="max-w-6xl mx-auto">
+          <Card className="bg-gradient-to-br from-indigo-900/40 via-blue-900/30 to-purple-900/40 backdrop-blur-sm border-indigo-500/30 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-400/10 via-blue-500/10 to-purple-500/10" />
+            
+            <CardContent className="p-8 relative z-10">
+              <div className="text-center space-y-8">
+                {/* Epic Heroes Image */}
+                <motion.div
+                  className="relative rounded-lg overflow-hidden shadow-2xl mx-auto max-w-4xl"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 2.6 }}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <img 
+                    src="/avengers-style-heroes.jpg" 
+                    alt="GXCOIN Avengers-Style Heroes" 
+                    className="w-full h-auto object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                  
+                  {/* Epic Tagline Overlay */}
+                  <div className="absolute bottom-8 left-8 right-8">
+                    <motion.div
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 3.0 }}
+                    >
+                      <h1 className="text-4xl lg:text-6xl font-bold text-white mb-4 text-center">
+                        <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+                          GXCOIN
+                        </span>
+                      </h1>
+                      <p className="text-xl lg:text-2xl text-gray-300 text-center font-medium">
+                        Earned NFTs. Real Impact.
+                      </p>
+                    </motion.div>
+                  </div>
+                </motion.div>
+
+                <motion.div 
+                  className="space-y-6"
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 3.2 }}
+                >
+                  <h2 className="text-3xl font-bold text-white">
+                    <span className="bg-gradient-to-r from-indigo-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                      The Ultimate Environmental Heroes
+                    </span>
+                  </h2>
+                  <p className="text-gray-300 text-lg max-w-3xl mx-auto leading-relaxed">
+                    Unite with the most powerful eco-warriors in the multiverse. Each hero represents real-world 
+                    environmental technology backed by revolutionary patents. Together, they form an unstoppable 
+                    force for planetary healing and sustainable innovation.
+                  </p>
+
+                  <div className="flex flex-wrap justify-center gap-4">
+                    <Badge className="bg-blue-600/20 text-blue-400 border-blue-500/30 px-4 py-2">
+                      <Droplets className="h-4 w-4 mr-2" />
+                      Earned Through Impact
+                    </Badge>
+                    <Badge className="bg-purple-600/20 text-purple-400 border-purple-500/30 px-4 py-2">
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Real-World Utility
+                    </Badge>
+                    <Badge className="bg-indigo-600/20 text-indigo-400 border-indigo-500/30 px-4 py-2">
+                      <Shield className="h-4 w-4 mr-2" />
+                      Patent-Powered
+                    </Badge>
+                  </div>
+
+                  <motion.div 
+                    className="flex justify-center"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 3.4 }}
+                  >
+                    <Button 
+                      size="lg"
+                      className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:from-indigo-700 hover:via-blue-700 hover:to-purple-700 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      <Sparkles className="h-5 w-5 mr-2" />
+                      Assemble Your Heroes
+                    </Button>
+                  </motion.div>
+                </motion.div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </motion.section>
     </div>
   );
 }
