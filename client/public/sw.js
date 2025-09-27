@@ -22,7 +22,7 @@ const STATIC_CACHE_FILES = [
   '/fonts/inter.json',
   
   // Hero artwork and key images
-  '/Screenshot_20250924_133119_Chrome~2_1758960841210.jpg',
+  '/Screenshot_20250924_133119_Chrome~2_1758993229689.jpg',
   '/heroes-group.jpg',
   '/gxcoin-ecosystem-overview.jpg',
   '/hero-collection-promo.jpg',
