@@ -21,6 +21,7 @@ import { TokenIntegration } from "@/components/TokenIntegration";
 import { NFTMinting } from "@/components/NFTMinting";
 import GameArena from "@/components/GameArena";
 import LandingPage from "@/components/LandingPage";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import { 
   Volume2, 
   VolumeX, 
@@ -440,6 +441,9 @@ function App() {
           <MainExperience key="main" />
         )}
       </AnimatePresence>
+      
+      {/* PWA Install Prompt - Available across all screens */}
+      <PWAInstallPrompt />
     </div>
   );
 }
