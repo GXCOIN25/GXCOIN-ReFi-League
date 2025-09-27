@@ -44,6 +44,13 @@ export class GXCoinAPI {
     };
   }
 
+  // Helper method to detect if running in Replit environment
+  private static isReplitEnvironment(): boolean {
+    return typeof window !== 'undefined' && 
+           (window.location.hostname.includes('replit') || 
+            window.location.hostname.includes('repl.co'));
+  }
+
   // Authentication methods
   static async register(userData: { username: string; password: string; walletAddress?: string }): Promise<{ user: ApiUser; token: string }> {
     const response = await fetch(`${API_BASE}/auth/register`, {
@@ -72,6 +79,46 @@ export class GXCoinAPI {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Login failed');
+    }
+    
+    const data = await response.json();
+    localStorage.setItem('gxcoin_token', data.token);
+    return data;
+  }
+
+  static async loginWithReplit(email?: string, token?: string): Promise<{ user: ApiUser; token: string }> {
+    // Try the new secure endpoint first
+    try {
+      const response = await fetch(`${API_BASE}/auth/replit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, token }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem('gxcoin_token', data.token);
+        return data;
+      }
+      
+      // If secure endpoint fails, log the error but continue to fallback
+      const error = await response.json();
+      console.warn('Secure Replit auth failed, trying fallback:', error.error);
+    } catch (error) {
+      console.warn('Secure Replit auth endpoint error:', error);
+    }
+    
+    // Fallback to legacy callback (for development environments)
+    console.log('Using legacy Replit authentication callback');
+    const response = await fetch(`${API_BASE}/auth/replit/callback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Replit authentication failed');
     }
     
     const data = await response.json();

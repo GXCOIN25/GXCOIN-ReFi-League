@@ -11,6 +11,7 @@ interface UserState {
   // Actions
   register: (userData: { username: string; password: string; walletAddress?: string }) => Promise<void>;
   login: (credentials: { username: string; password: string }) => Promise<void>;
+  loginWithReplit: (email?: string) => Promise<void>;
   logout: () => Promise<void>;
   initializeAuth: () => Promise<void>;
   setError: (error: string | null) => void;
@@ -52,6 +53,23 @@ export const useUser = create<UserState>()(
       } catch (error) {
         set({ 
           error: error instanceof Error ? error.message : 'Failed to login', 
+          isLoading: false 
+        });
+      }
+    },
+    
+    loginWithReplit: async (email?) => {
+      set({ isLoading: true, error: null });
+      try {
+        const result = await GXCoinAPI.loginWithReplit(email);
+        set({ 
+          currentUser: result.user, 
+          isLoggedIn: true, 
+          isLoading: false 
+        });
+      } catch (error) {
+        set({ 
+          error: error instanceof Error ? error.message : 'Failed to login with Replit', 
           isLoading: false 
         });
       }
