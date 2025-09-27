@@ -7,7 +7,7 @@ const TOKEN_IMAGES = {
   GCCT: "/gcct-correct.jpg", // Carbon Credits - using user's correct image
   WTR: "/agua-wtr-correct.jpg", // AGUA ($WTR) - using user's correct water warrior image
   GPWR: "/gpwr-badge.jpg", // VOLTRA ($GPWR) - Green Power energy warrior badge (CORRECT)
-  BATT: "/batt-badge.jpg", // GRAPHENE ($BATT) - keeping original until user provides correct image
+  BATT: "/graphene-batt-correct.jpg", // GRAPHENE ($BATT) - using user's correct tech warrior image
   HEMP: "/hemp-correct.jpg", // HEMP ($HEMP) - using user's correct hemp warrior image
   GXCOIN: "/heroes-group.jpg" // GXCOIN Anchor badge (using heroes group as anchor image)
 } as const;
@@ -193,7 +193,7 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
     if (process.env.NODE_ENV !== 'production') {
       console.log(`🎯 TokenBadge ${tokenSymbol} loading image:`, cacheBustingUrl);
     }
-  }, [tokenSymbol]);
+  }, [tokenSymbol, imageSrc]);
   
   // Size configurations
   const sizeConfig = useMemo(() => {
