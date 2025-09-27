@@ -8,7 +8,8 @@ const TOKEN_IMAGES = {
   WTR: "/wtr-badge.jpg", // Water warrior badge
   GPWR: "/gpwr-badge.jpg", // Green Power energy warrior badge
   BATT: "/batt-badge.jpg", // Battery/tech warrior badge
-  HEMP: "/hemp-badge.jpg" // Hemp nature warrior badge
+  HEMP: "/hemp-badge.jpg", // Hemp nature warrior badge
+  GXCOIN: "/heroes-group.jpg" // GXCOIN Anchor badge (using heroes group as anchor image)
 } as const;
 
 // Token-specific color themes for progress rings and accents
@@ -37,6 +38,11 @@ const TOKEN_THEMES = {
     primary: "#84cc16", // lime
     gradient: ["#84cc16", "#65a30d", "#4d7c0f"],
     name: "Hemp"
+  },
+  GXCOIN: {
+    primary: "#ffd700", // gold
+    gradient: ["#ffd700", "#ffb300", "#ff8f00"],
+    name: "GXCOIN Anchor"
   }
 } as const;
 
@@ -319,10 +325,10 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
           <div 
             className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold shadow-xl"
             style={{ 
-              background: tokenSymbol === 'GCCT' 
-                ? `radial-gradient(circle, #22c55e, #16a34a)` 
+              background: tokenSymbol === 'GXCOIN' 
+                ? `radial-gradient(circle, #ffd700, #ffb300)` 
                 : `radial-gradient(circle, ${theme.primary}, ${theme.gradient[2]})`,
-              border: `2px solid ${tokenSymbol === 'GCCT' ? '#22c55e' : 'white'}`,
+              border: `2px solid ${tokenSymbol === 'GXCOIN' ? '#ffd700' : 'white'}`,
               color: 'white'
             }}
           >
@@ -330,12 +336,13 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
             {tokenSymbol === 'HEMP' && '🌿'}
             {tokenSymbol === 'GPWR' && '⚡'}
             {tokenSymbol === 'BATT' && '🔋'}
-            {tokenSymbol === 'GCCT' && <Crown className="h-5 w-5" />}
+            {tokenSymbol === 'GCCT' && '📈'}
+            {tokenSymbol === 'GXCOIN' && <Crown className="h-5 w-5" />}
           </div>
         </div>
 
         {/* GXCOIN Anchor vs Powered-by States */}
-        {tokenSymbol === 'GCCT' ? (
+        {tokenSymbol === 'GXCOIN' ? (
           /* ANCHOR STATE - Special styling for GXCOIN */
           <>
             {/* Anchor Crown Symbol */}
@@ -343,8 +350,8 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
               <div 
                 className="px-3 py-2 rounded-lg text-sm font-bold text-white shadow-xl flex items-center gap-1"
                 style={{ 
-                  background: `linear-gradient(135deg, #22c55e, #16a34a)`,
-                  border: `2px solid #22c55e`,
+                  background: `linear-gradient(135deg, #ffd700, #ffb300)`,
+                  border: `2px solid #ffd700`,
                   backdropFilter: 'blur(4px)'
                 }}
               >
@@ -358,8 +365,8 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
               <div 
                 className="px-2 py-1 rounded-md text-xs font-bold text-white shadow-xl"
                 style={{ 
-                  background: `linear-gradient(135deg, #16a34a, #15803d)`,
-                  border: `1px solid #22c55e`
+                  background: `linear-gradient(135deg, #ffb300, #ff8f00)`,
+                  border: `1px solid #ffd700`
                 }}
               >
                 ANCHOR
@@ -386,10 +393,10 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
             {/* Powered by GXCOIN Ribbon */}
             <div className="absolute top-2 right-12">
               <div 
-                className="px-2 py-1 rounded-md text-xs font-medium text-green-300 shadow-lg flex items-center gap-1"
+                className="px-2 py-1 rounded-md text-xs font-medium text-yellow-300 shadow-lg flex items-center gap-1"
                 style={{ 
-                  background: `linear-gradient(135deg, #16a34a80, #15803d80)`,
-                  border: `1px solid #22c55e60`,
+                  background: `linear-gradient(135deg, #ffb30080, #ff8f0080)`,
+                  border: `1px solid #ffd70060`,
                   backdropFilter: 'blur(2px)'
                 }}
                 title="This hero is powered by GXCOIN Anchor"

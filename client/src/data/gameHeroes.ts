@@ -8,7 +8,7 @@ export const gameHeroes: GameHero[] = [
     title: "💧 The Water Guardian",
     subtitle: "Powered by GXCOIN Anchor",
     description: "Purifying oceans and springs while creating hemp bottles to eliminate plastic waste. Masters the transformation of ocean pollution into sustainable materials, earning rewards while healing marine ecosystems worldwide.",
-    poweredBy: "GCCT",
+    poweredBy: "GXCOIN",
     requireAnchor: true,
     element: "Water",
     rarity: "Epic",
@@ -55,7 +55,7 @@ export const gameHeroes: GameHero[] = [
     title: "🌿 The Green Builder",
     subtitle: "Powered by GXCOIN Anchor",
     description: "Weaving sustainable hemp into wellness, textiles, and industries. Master architect transforming global construction with carbon-negative hemp materials that sequester CO2 while building stronger, cheaper structures.",
-    poweredBy: "GCCT",
+    poweredBy: "GXCOIN",
     requireAnchor: true,
     element: "Construction",
     rarity: "Rare",
@@ -102,7 +102,7 @@ export const gameHeroes: GameHero[] = [
     title: "⚡ The Energy Warrior",
     subtitle: "Powered by GXCOIN Anchor",
     description: "Unleashing wireless green power across the globe. Revolutionary energy freedom fighter deploying wireless power grids that liberate communities from centralized energy monopolies while generating clean energy profits.",
-    poweredBy: "GCCT",
+    poweredBy: "GXCOIN",
     requireAnchor: true,
     element: "Energy",
     rarity: "Epic",
@@ -149,7 +149,7 @@ export const gameHeroes: GameHero[] = [
     title: "🔋 The Tech Titan",
     subtitle: "Powered by GXCOIN Anchor",
     description: "Harnessing hemp and seaweed for revolutionary graphene batteries. Advanced biotech warrior converting ocean sargassum and hemp waste into premium graphene oxide, creating next-generation battery technology.",
-    poweredBy: "GCCT",
+    poweredBy: "GXCOIN",
     requireAnchor: true,
     element: "BioChar",
     rarity: "Legendary",
@@ -191,13 +191,13 @@ export const gameHeroes: GameHero[] = [
   },
   {
     id: "trader_gcct",
-    name: "GXCOIN Anchor (GCCT)",
+    name: "CARBON ($GCCT)",
     symbol: "GCCT",
-    title: "👑 The Anchor dNFT",
-    subtitle: "Powers All Eco-Warriors",
-    description: "The central anchor dNFT powering GXCOIN's entire ecosystem. Supreme market coordinator orchestrating carbon credit trading and democratizing access to all patented green technologies through the ReFi League.",
-    isAnchor: true,
-    powersHeroes: ["WTR", "HEMP", "GPWR", "BATT"],
+    title: "📈 The Carbon Trader",
+    subtitle: "Powered by GXCOIN Anchor",
+    description: "Revolutionary market coordinator orchestrating carbon credit trading and democratizing access to green technologies. Masters the decentralized trading of verified carbon credits while ensuring fair market access for all producers.",
+    poweredBy: "GXCOIN",
+    requireAnchor: true,
     element: "Carbon",
     rarity: "Legendary",
     color: "#2d5a27",
@@ -235,5 +235,52 @@ export const gameHeroes: GameHero[] = [
     maxExperience: 400,
     avatar: "📈",
     battleSprite: "💰"
+  },
+  {
+    id: "gxcoin_anchor",
+    name: "GXCOIN Anchor",
+    symbol: "GXCOIN",
+    title: "👑 The Supreme Anchor",
+    subtitle: "Powers All ReFi Heroes",
+    description: "The supreme anchor dNFT powering GXCOIN's entire ReFi League ecosystem. Central orchestrator unlocking and amplifying all 5 patent-backed Eco-Warrior Superheroes, democratizing access to breakthrough environmental technologies with real economic returns.",
+    isAnchor: true,
+    powersHeroes: ["WTR", "HEMP", "GPWR", "BATT", "GCCT"],
+    element: "Universal",
+    rarity: "Mythic",
+    color: "#ffd700",
+    gradient: "from-yellow-500 via-amber-500 to-orange-500",
+    stats: {
+      power: 100,
+      health: 120,
+      speed: 80
+    },
+    abilities: [
+      {
+        name: "Ecosystem Amplification",
+        description: "Amplifies all hero abilities by 20%, unlocking maximum potential across the entire ReFi League",
+        cooldown: 2,
+        damage: 0,
+        effect: "hero_amplification"
+      },
+      {
+        name: "Patent Portfolio Activation",
+        description: "Activates access to all breakthrough patents, generating $200+ monthly recurring value per hero",
+        cooldown: 4,
+        effect: "patent_access"
+      },
+      {
+        name: "Global ReFi Coordination",
+        description: "Coordinates massive ecosystem activation generating $2500+ collective value across all heroes",
+        cooldown: 10,
+        damage: 200,
+        effect: "ecosystem_revolution"
+      }
+    ],
+    owned: true,
+    level: 10,
+    experience: 2500,
+    maxExperience: 3000,
+    avatar: "👑",
+    battleSprite: "✨"
   }
 ];
