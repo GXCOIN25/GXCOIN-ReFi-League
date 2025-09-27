@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 // Token-specific image mappings to the uploaded NFT card images
@@ -169,6 +169,23 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
   const imageSrc = TOKEN_IMAGES[tokenSymbol];
   const isLegendary = rarity === 'Legendary';
   
+  // Image loading state management
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [currentImageSrc, setCurrentImageSrc] = useState(imageSrc);
+  const [allImagesFailed, setAllImagesFailed] = useState(false);
+  
+  // Reset image state when tokenSymbol changes
+  useEffect(() => {
+    setImageLoaded(false);
+    setImageError(false);
+    setAllImagesFailed(false);
+    setCurrentImageSrc(TOKEN_IMAGES[tokenSymbol]);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`Loading image for token ${tokenSymbol}:`, TOKEN_IMAGES[tokenSymbol]);
+    }
+  }, [tokenSymbol]);
+  
   // Size configurations
   const sizeConfig = useMemo(() => {
     switch (size) {
@@ -244,21 +261,58 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
       >
         {/* Main NFT card image */}
         <div className="absolute inset-0">
+          {!imageLoaded && !imageError && (
+            <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+              <div className="text-white text-xs animate-pulse">Loading...</div>
+            </div>
+          )}
           <img
-            src={imageSrc}
+            src={currentImageSrc}
             alt={`${theme.name} NFT Badge`}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover transition-opacity duration-300 ${
+              imageLoaded ? 'opacity-100' : 'opacity-0'
+            }`}
             style={{
               filter: `brightness(1.1) contrast(1.1) saturate(1.2)`
             }}
+            onLoad={() => {
+              if (process.env.NODE_ENV !== 'production') {
+                console.log(`Image loaded successfully for ${tokenSymbol}:`, currentImageSrc);
+              }
+              setImageLoaded(true);
+              setImageError(false);
+              setAllImagesFailed(false);
+            }}
             onError={(e) => {
-              // Fallback to group image if individual image fails to load
               const target = e.target as HTMLImageElement;
-              if (target.src !== '/heroes-group.jpg') {
-                target.src = '/heroes-group.jpg';
+              if (process.env.NODE_ENV !== 'production') {
+                console.log(`Image failed to load for ${tokenSymbol}:`, target.src);
+              }
+              
+              if (!imageError && target.src !== '/heroes-group.jpg') {
+                if (process.env.NODE_ENV !== 'production') {
+                  console.log(`Falling back to heroes-group.jpg for ${tokenSymbol}`);
+                }
+                setCurrentImageSrc('/heroes-group.jpg');
+                setImageError(true);
+                setImageLoaded(false);
+              } else {
+                if (process.env.NODE_ENV !== 'production') {
+                  console.error(`All image sources failed for ${tokenSymbol}`);
+                }
+                setAllImagesFailed(true);
+                setImageLoaded(false); // Keep as false to allow placeholder to show
               }
             }}
           />
+          {(allImagesFailed || (imageError && currentImageSrc === '/heroes-group.jpg' && !imageLoaded)) && (
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-700 to-gray-900 flex items-center justify-center">
+              <div className="text-center text-white">
+                <div className="text-lg font-bold">{tokenSymbol}</div>
+                <div className="text-xs opacity-75">{theme.name}</div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Overlay gradient for better text visibility */}
