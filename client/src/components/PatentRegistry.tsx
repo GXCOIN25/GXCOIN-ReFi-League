@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Unlock, Award, TrendingUp, DollarSign, Zap, Factory, Leaf } from 'lucide-react';
+import { Unlock, Award, TrendingUp, DollarSign, Zap, Factory, Leaf, Bot, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useGameArena } from '@/lib/stores/useGameArena';
+import { useUser } from '@/lib/stores/useUser';
 
 export function PatentRegistry() {
   const { 
@@ -19,10 +20,18 @@ export function PatentRegistry() {
     isLoading,
     playerStats 
   } = useGameArena();
+  const { isLoggedIn } = useUser();
 
   useEffect(() => {
-    loadPatents();
-  }, []);
+    // Only load patents for authenticated users - demo data is already in store initialization
+    if (isLoggedIn) {
+      console.log('🔑 User authenticated, loading real patent data...');
+      loadPatents();
+    } else {
+      console.log('🎮 Demo mode active, using pre-loaded demo patent data');
+      // Demo data is already loaded in store initialization, no API call needed
+    }
+  }, [loadPatents, isLoggedIn]);
 
   const handleUnlockPatent = async (patentId: number) => {
     const success = await unlockPatent(patentId);
@@ -48,6 +57,15 @@ export function PatentRegistry() {
   return (
     <div className="space-y-6">
       <div className="text-center bg-gradient-to-r from-emerald-900/20 to-green-900/20 rounded-lg p-6 border border-green-500/30">
+        {!isLoggedIn && (
+          <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
+            <div className="flex items-center justify-center gap-2 text-blue-300 font-bold">
+              <Bot className="w-4 h-4" />
+              DEMO MODE - Full Patent Access
+            </div>
+            <p className="text-blue-200 text-xs mt-1">Experience all {availablePatents.length} real patents with {userPatentAccess.length} unlocked</p>
+          </div>
+        )}
         <h2 className="text-3xl font-bold text-green-300 mb-2 flex items-center justify-center gap-2">
           <Unlock className="w-8 h-8" />
           Revolutionary Patent Registry
