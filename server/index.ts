@@ -1,4 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
+import { randomBytes } from "crypto";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializePatents, storage } from "./storage";
@@ -56,8 +57,7 @@ app.use((req, res, next) => {
     if (!process.env.JWT_SECRET) {
       if (process.env.NODE_ENV === 'production') {
         // Generate a cryptographically secure fallback for production
-        const crypto = require('crypto');
-        const fallbackSecret = crypto.randomBytes(64).toString('hex');
+        const fallbackSecret = randomBytes(64).toString('hex');
         process.env.JWT_SECRET = fallbackSecret;
         console.warn('⚠️  WARNING: JWT_SECRET not set in production - generated secure fallback');
         console.warn('🚨 SECURITY NOTICE: For production deployments, set a permanent JWT_SECRET!');
