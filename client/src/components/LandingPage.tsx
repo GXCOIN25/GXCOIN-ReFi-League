@@ -247,7 +247,7 @@ export default function LandingPage() {
                 transition={{ delay: 0.3 }}
               >
                 <img 
-                  src="/Screenshot_20250924_133119_Chrome~2_1758960841210.jpg" 
+                  src="/Screenshot_20250924_133119_Chrome~2_1758993229689.jpg" 
                   alt="GXCOIN Eco-Warrior Limited Edition dNFTs - WTR, GPWR, BATT, HEMP, GCCT Platinum Series featuring all five superhero warriors" 
                   className="w-full max-w-5xl mx-auto rounded-2xl shadow-2xl border border-green-500/20"
                   loading="lazy"
