@@ -28,14 +28,15 @@ const heroIcons = {
   "hemp_builder": Leaf, 
   "voltra_gpwr": Zap,
   "graphene_batt": Battery,
-  "trader_gcct": TrendingUp
+  "trader_gcct": TrendingUp,
+  "gxcoin_anchor": Crown
 };
 
 const getValidTokenSymbol = (heroSymbol: string): TokenSymbol => {
-  if (['WTR', 'HEMP', 'GPWR', 'BATT', 'GCCT'].includes(heroSymbol)) {
+  if (['WTR', 'HEMP', 'GPWR', 'BATT', 'GCCT', 'GXCOIN'].includes(heroSymbol)) {
     return heroSymbol as TokenSymbol;
   }
-  return "GCCT"; // fallback
+  return "GXCOIN"; // fallback to anchor
 };
 
 export default function LandingPage() {
@@ -184,9 +185,9 @@ export default function LandingPage() {
                   <div className="text-xs text-green-300 mt-1">{getAnchorMultiplier().toFixed(2)}x multiplier</div>
                 </div>
                 <div className="text-center p-4 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-                  <div className="text-2xl font-bold text-emerald-400 mb-1">4</div>
+                  <div className="text-2xl font-bold text-emerald-400 mb-1">5</div>
                   <div className="text-sm text-gray-400">Heroes Powered</div>
-                  <div className="text-xs text-emerald-300 mt-1">AQUA, HEMP, VOLTRA, GRAPHENE</div>
+                  <div className="text-xs text-emerald-300 mt-1">AQUA, HEMP, VOLTRA, GRAPHENE, CARBON</div>
                 </div>
                 <div className="text-center p-4 bg-green-600/10 rounded-lg border border-green-600/20">
                   <div className="text-2xl font-bold text-green-300 mb-1">${gxcoinStake}</div>
@@ -240,7 +241,7 @@ export default function LandingPage() {
 
               {/* GXCOIN Anchor Hero - Full Width Featured */}
               {(() => {
-                const anchorHero = gameHeroes.find(hero => hero.isAnchor || hero.symbol === 'GCCT');
+                const anchorHero = gameHeroes.find(hero => hero.isAnchor || hero.symbol === 'GXCOIN');
                 if (!anchorHero) return null;
                 
                 const IconComponent = heroIcons[anchorHero.id as keyof typeof heroIcons] || Crown;
@@ -302,7 +303,7 @@ export default function LandingPage() {
                           {/* Right: NFT Badge */}
                           <div className="flex justify-center">
                             <TokenBadge
-                              tokenSymbol="GCCT"
+                              tokenSymbol="GXCOIN"
                               attributes={{
                                 power: anchorHero.stats.power,
                                 impact: anchorHero.stats.health,
@@ -332,7 +333,7 @@ export default function LandingPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {gameHeroes.filter(hero => !hero.isAnchor && hero.symbol !== 'GCCT').map((hero, index) => {
+                {gameHeroes.filter(hero => !hero.isAnchor && hero.symbol !== 'GXCOIN').map((hero, index) => {
                   const IconComponent = heroIcons[hero.id as keyof typeof heroIcons] || Zap;
                   
                   return (

@@ -58,7 +58,7 @@ export interface GameHero {
   gradient: string;
   
   // GXCOIN Anchor hierarchy fields
-  isAnchor?: boolean; // True only for GXCOIN (GCCT)
+  isAnchor?: boolean; // True only for GXCOIN anchor dNFT
   poweredBy?: string; // Token symbol that powers this hero (e.g., "GCCT")
   requireAnchor?: boolean; // Whether this hero requires GXCOIN anchor to unlock
   powersHeroes?: string[]; // For anchor only - list of heroes it powers
