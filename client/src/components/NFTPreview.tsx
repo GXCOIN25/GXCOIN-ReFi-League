@@ -17,16 +17,22 @@ export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
   const { heroes, nftBadges, unlockNFTBadge } = useHeroes();
   const { currentRank, impactMetrics } = useContribution();
 
-  // Helper function to map hero symbols to token symbols for the TokenBadge
-  const getTokenSymbol = (heroSymbol: string): TokenSymbol => {
-    switch (heroSymbol) {
-      case "$GCCT": return "GCCT";
-      case "$WTR": return "WTR";
-      case "$GPWR": return "GPWR";
-      case "$BATT": return "BATT";
-      case "$HEMP": return "HEMP";
-      default: return "GCCT"; // fallback
+  // Helper function to validate token symbol for TokenBadge
+  const getValidTokenSymbol = (heroSymbol: string): TokenSymbol => {
+    if (['WTR', 'HEMP', 'GPWR', 'BATT', 'GCCT'].includes(heroSymbol)) {
+      return heroSymbol as TokenSymbol;
     }
+    return "GCCT"; // fallback
+  };
+
+  // Helper function to get NFT badge name from hero
+  const getNFTBadgeName = (heroName: string): string => {
+    if (heroName.includes("AQUA")) return "Water Guardian Badge";
+    if (heroName.includes("HEMP")) return "Green Builder Badge";
+    if (heroName.includes("VOLTRA")) return "Energy Warrior Badge";
+    if (heroName.includes("GRAPHENE")) return "Tech Titan Badge";
+    if (heroName.includes("TRADER")) return "Market Master Badge";
+    return "Eco-Warrior Badge";
   };
 
   // Generate dynamic NFT previews based on rank and impact
@@ -168,7 +174,7 @@ export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
                     <div className="w-full h-44 rounded-lg mb-3 flex items-center justify-center relative overflow-hidden bg-gray-900/50">
                       <div className="flex flex-col items-center gap-2">
                         <TokenBadge
-                          tokenSymbol={getTokenSymbol(nft.hero.symbol)}
+                          tokenSymbol={getValidTokenSymbol(nft.hero.symbol)}
                           attributes={nft.attributes}
                           rarity={nft.rarity}
                           level={nft.level}
@@ -181,7 +187,7 @@ export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
                             {nft.hero.name}
                           </div>
                           <div className="text-xs text-gray-400">
-                            {nft.hero.nftBadge}
+                            {getNFTBadgeName(nft.hero.name)}
                           </div>
                         </div>
                       </div>
