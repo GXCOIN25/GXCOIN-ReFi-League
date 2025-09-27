@@ -78,10 +78,12 @@ app.use((req, res, next) => {
       await storage.getUserByUsername('__health_check_user__');
       
       console.log('✅ Database connection verified');
+      return true;
     } catch (error) {
       console.error('❌ Database verification failed:', error);
       console.error('🚨 Ensure DATABASE_URL is correct and database is accessible');
-      process.exit(1);
+      console.warn('⚠️  Continuing without database - some features may be limited');
+      return false;
     }
   }
   
@@ -89,12 +91,16 @@ app.use((req, res, next) => {
   validateProductionConfig();
   
   // Step 2: Verify database connectivity  
-  await verifyDatabaseConnection();
+  const dbConnected = await verifyDatabaseConnection();
   
-  // Step 3: Initialize patents data
-  console.log('🔬 Initializing patent registry...');
-  await initializePatents();
-  console.log('✅ Patent registry initialized');
+  // Step 3: Initialize patents data (only if database is connected)
+  if (dbConnected) {
+    console.log('🔬 Initializing patent registry...');
+    await initializePatents();
+    console.log('✅ Patent registry initialized');
+  } else {
+    console.log('⚠️  Skipping patent registry initialization - database not available');
+  }
   
   const server = await registerRoutes(app);
 
