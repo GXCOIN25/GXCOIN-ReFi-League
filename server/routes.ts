@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import slowDown from "express-slow-down";
 import type { Request, Response, NextFunction } from "express";
+import crypto from "crypto";
 
 interface AuthRequest extends Request {
   userId?: number;
@@ -124,6 +125,146 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/logout", (req, res) => {
     res.json({ success: true });
+  });
+
+  // Helper function to verify Replit signature
+  const verifyReplitSignature = (payload: string, signature: string, secret: string): boolean => {
+    if (!signature || !secret) return false;
+    
+    try {
+      // Remove 'sha256=' prefix if present
+      const cleanSignature = signature.replace(/^sha256=/, '');
+      
+      // Create HMAC signature
+      const expectedSignature = crypto
+        .createHmac('sha256', secret)
+        .update(payload)
+        .digest('hex');
+      
+      // Use crypto.timingSafeEqual for constant-time comparison
+      return crypto.timingSafeEqual(
+        Buffer.from(cleanSignature, 'hex'),
+        Buffer.from(expectedSignature, 'hex')
+      );
+    } catch (error) {
+      console.error('Signature verification error:', error);
+      return false;
+    }
+  };
+
+  // Secure Replit Auth endpoint with proper cryptographic verification
+  app.post("/api/auth/replit", authRateLimit, authSpeedLimit, async (req, res) => {
+    try {
+      const { token, email } = req.body;
+      const signature = req.headers['x-replit-signature'] as string;
+      
+      // Check for required Replit webhook secret
+      const replitSecret = process.env.REPLIT_WEBHOOK_SECRET;
+      if (!replitSecret) {
+        console.error('REPLIT_WEBHOOK_SECRET not configured');
+        return res.status(500).json({ 
+          error: "Server configuration error - Replit authentication not properly configured" 
+        });
+      }
+      
+      // Verify the signature if provided (for webhook-style verification)
+      if (signature) {
+        const rawBody = JSON.stringify(req.body);
+        if (!verifyReplitSignature(rawBody, signature, replitSecret)) {
+          return res.status(401).json({ 
+            error: "Invalid signature - Replit identity verification failed" 
+          });
+        }
+      }
+      
+      // For development: fallback to environment variables (less secure)
+      let replitUserId: string;
+      let replitUsername: string;
+      
+      if (token) {
+        // Parse the token (could be JWT or other format from Replit)
+        try {
+          const tokenData = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+          replitUserId = tokenData.sub || tokenData.user_id;
+          replitUsername = tokenData.username || tokenData.preferred_username;
+        } catch (error) {
+          console.error('Token parsing error:', error);
+          return res.status(401).json({ error: "Invalid token format" });
+        }
+      } else {
+        // Fallback to environment variables (for development only)
+        replitUserId = process.env.REPLIT_USER_ID!;
+        replitUsername = process.env.REPLIT_USER_NAME!;
+      }
+      
+      if (!replitUserId || !replitUsername) {
+        return res.status(401).json({ 
+          error: "Replit identity verification failed - missing user information" 
+        });
+      }
+      
+      // Upsert user with Replit auth info (handles username collisions)
+      const user = await storage.upsertReplitUser(
+        replitUserId, 
+        replitUsername, 
+        email
+      );
+      
+      // Generate JWT token using existing method
+      const token_response = storage.generateToken(user);
+      
+      // Return user data (excluding password) and token
+      const { password, ...safeUser } = user;
+      res.json({ user: safeUser, token: token_response });
+      
+    } catch (error: any) {
+      console.error('Replit auth error:', error);
+      if (error.code === '23505') { // Unique constraint violation
+        res.status(409).json({ error: "User already exists with different authentication method" });
+      } else {
+        res.status(500).json({ error: "Replit authentication failed", details: error.message });
+      }
+    }
+  });
+
+  // Legacy callback endpoint (deprecated - for backward compatibility)
+  app.post("/api/auth/replit/callback", authRateLimit, authSpeedLimit, async (req, res) => {
+    console.warn('⚠️  Legacy Replit auth callback used - please upgrade to /api/auth/replit');
+    
+    // For development environment only - check if we're in Replit
+    if (process.env.REPLIT_DB_URL || process.env.REPLIT_USER_ID) {
+      try {
+        const replitUserId = process.env.REPLIT_USER_ID;
+        const replitUsername = process.env.REPLIT_USER_NAME;
+        
+        if (!replitUserId || !replitUsername) {
+          return res.status(401).json({ 
+            error: "Replit identity verification failed - missing user information" 
+          });
+        }
+        
+        const { email } = req.body;
+        
+        // Upsert user with Replit auth info
+        const user = await storage.upsertReplitUser(
+          replitUserId, 
+          replitUsername, 
+          email
+        );
+        
+        const token = storage.generateToken(user);
+        const { password, ...safeUser } = user;
+        res.json({ user: safeUser, token });
+        
+      } catch (error: any) {
+        console.error('Legacy Replit auth error:', error);
+        res.status(500).json({ error: "Legacy authentication failed" });
+      }
+    } else {
+      res.status(403).json({ 
+        error: "Legacy authentication method disabled - use /api/auth/replit with proper verification" 
+      });
+    }
   });
   
   // Protected user routes

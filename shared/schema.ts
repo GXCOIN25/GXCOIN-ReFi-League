@@ -5,8 +5,11 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  password: text("password"), // Nullable for SSO users (Replit auth)
   walletAddress: text("wallet_address"),
+  replitUserId: text("replit_user_id").unique(),
+  replitUsername: text("replit_username"),
+  email: text("email"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -47,8 +50,15 @@ export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
   walletAddress: true,
+  replitUserId: true,
+  replitUsername: true,
+  email: true,
 }).extend({
+  password: z.string().optional().nullable(), // Allow null for SSO users
   walletAddress: z.string().optional().nullable(),
+  replitUserId: z.string().optional().nullable(),
+  replitUsername: z.string().optional().nullable(),
+  email: z.string().optional().nullable(),
 });
 
 export const insertContributionSchema = createInsertSchema(contributions).pick({

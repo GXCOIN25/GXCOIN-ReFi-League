@@ -13,6 +13,17 @@ import { eq, desc, sum, and } from "drizzle-orm";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+// Interface for environmental impact structure
+interface EnvironmentalImpact {
+  co2Sequestered?: number;
+  plasticConverted?: number;
+  energyGenerated?: number;
+  waterPurified?: number;
+  wasteReduction?: number;
+  carbonStorage?: number;
+  oceanCleanup?: number;
+}
+
 // Initialize PostgreSQL client and Drizzle
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL environment variable is not set');
@@ -25,7 +36,9 @@ export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByReplitUserId(replitUserId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  upsertReplitUser(replitUserId: string, replitUsername: string, email?: string): Promise<User>;
   authenticateUser(username: string, password: string): Promise<User | null>;
   generateToken(user: User): string;
   verifyToken(token: string): { userId: number } | null;
@@ -79,17 +92,94 @@ export class PostgresStorage implements IStorage {
     return result[0];
   }
 
+  async getUserByReplitUserId(replitUserId: string): Promise<User | undefined> {
+    const result = await db.select().from(users).where(eq(users.replitUserId, replitUserId)).limit(1);
+    return result[0];
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
-    const hashedPassword = await bcrypt.hash(insertUser.password, 10);
+    let hashedPassword = null;
+    
+    // Only hash password if provided (for traditional username/password auth)
+    if (insertUser.password && insertUser.password.trim() !== '') {
+      hashedPassword = await bcrypt.hash(insertUser.password, 10);
+    }
+    
     const userData = { ...insertUser, password: hashedPassword };
     const result = await db.insert(users).values(userData).returning();
     return result[0];
+  }
+
+  async upsertReplitUser(replitUserId: string, replitUsername: string, email?: string): Promise<User> {
+    // Check if user already exists by Replit ID
+    const existingUser = await this.getUserByReplitUserId(replitUserId);
+    
+    if (existingUser) {
+      // Update existing user with latest Replit info
+      const result = await db.update(users)
+        .set({ 
+          replitUsername, 
+          email: email || existingUser.email,
+        })
+        .where(eq(users.replitUserId, replitUserId))
+        .returning();
+      return result[0];
+    } else {
+      // Handle username collisions for new users
+      const baseUsername = replitUsername;
+      let uniqueUsername = baseUsername;
+      let counter = 1;
+      
+      // Check for username conflicts and generate unique username
+      while (await this.getUserByUsername(uniqueUsername)) {
+        uniqueUsername = `${baseUsername}_replit_${counter}`;
+        counter++;
+        
+        // Prevent infinite loops
+        if (counter > 100) {
+          uniqueUsername = `${baseUsername}_${replitUserId.slice(-8)}`;
+          break;
+        }
+      }
+      
+      // Create new user with Replit auth and unique username
+      const userData = {
+        username: uniqueUsername, // Use unique username to avoid conflicts
+        password: null, // No password needed for Replit auth users
+        replitUserId,
+        replitUsername: baseUsername, // Keep original Replit username for reference
+        email: email || null,
+        walletAddress: null,
+      };
+      
+      try {
+        const result = await db.insert(users).values(userData).returning();
+        return result[0];
+      } catch (error: any) {
+        // Handle any remaining unique constraint violations
+        if (error.code === '23505') {
+          // Generate a truly unique username using timestamp
+          const timestampUsername = `${baseUsername}_${Date.now()}`;
+          const fallbackData = { ...userData, username: timestampUsername };
+          const result = await db.insert(users).values(fallbackData).returning();
+          return result[0];
+        }
+        throw error;
+      }
+    }
   }
 
   async authenticateUser(username: string, password: string): Promise<User | null> {
     const user = await this.getUserByUsername(username);
     if (!user) return null;
     
+    // Handle SSO users (Replit auth) who don't have passwords
+    if (!user.password) {
+      // SSO users should not authenticate via username/password
+      return null;
+    }
+    
+    // Traditional password authentication
     const isValid = await bcrypt.compare(password, user.password);
     return isValid ? user : null;
   }
@@ -383,9 +473,9 @@ export async function initializePatents() {
         avg: Math.round(finalPatents.reduce((sum, p) => sum + p.economicValue, 0) / finalPatents.length)
       });
       console.log('🌍 Total environmental impact potential:', {
-        maxCO2Sequestration: Math.max(...finalPatents.map(p => p.environmentalImpact.co2Sequestered || 0)),
-        maxPlasticConversion: Math.max(...finalPatents.map(p => p.environmentalImpact.plasticConverted || 0)),
-        maxEnergyGeneration: Math.max(...finalPatents.map(p => p.environmentalImpact.energyGenerated || 0))
+        maxCO2Sequestration: Math.max(...finalPatents.map(p => (p.environmentalImpact as EnvironmentalImpact).co2Sequestered || 0)),
+        maxPlasticConversion: Math.max(...finalPatents.map(p => (p.environmentalImpact as EnvironmentalImpact).plasticConverted || 0)),
+        maxEnergyGeneration: Math.max(...finalPatents.map(p => (p.environmentalImpact as EnvironmentalImpact).energyGenerated || 0))
       });
       
     } else {
@@ -402,6 +492,6 @@ export async function initializePatents() {
     return patents;
   } catch (error) {
     console.error('❌ CRITICAL ERROR during patent initialization:', error);
-    throw new Error(`Patent initialization failed: ${error.message}`);
+    throw new Error(`Patent initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

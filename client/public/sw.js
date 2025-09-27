@@ -1,8 +1,8 @@
 // GXCOIN PWA Service Worker
-// Version 1.0.0
+// Version 1.1.0
 
-const CACHE_NAME = 'gxcoin-pwa-v1.0.0';
-const OFFLINE_CACHE = 'gxcoin-offline-v1.0.0';
+const CACHE_NAME = 'gxcoin-pwa-v1.1.0';
+const OFFLINE_CACHE = 'gxcoin-offline-v1.1.0';
 
 // Essential files to cache for offline functionality
 const CORE_CACHE_FILES = [
@@ -12,8 +12,20 @@ const CORE_CACHE_FILES = [
   '/src/index.css',
   '/src/App.tsx',
   '/manifest.json',
+  // GXCOIN logo assets
+  '/icons/gxcoin-logo.png',
+  '/images/gxcoin-hero-promo.jpg',
+  // PWA icons - all sizes for robust caching
+  '/icons/icon-72x72.png',
+  '/icons/icon-96x96.png',
+  '/icons/icon-128x128.png',
+  '/icons/icon-144x144.png',
+  '/icons/icon-152x152.png',
   '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/icons/icon-384x384.png',
+  '/icons/icon-512x512.png',
+  '/icons/icon-maskable-192x192.png',
+  '/icons/icon-maskable-512x512.png'
 ];
 
 // Static assets to cache
@@ -62,7 +74,7 @@ const API_CACHE_PATTERNS = [
 
 // Install event - cache core files
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing GXCOIN PWA Service Worker v1.0.0');
+  console.log('[SW] Installing GXCOIN PWA Service Worker v1.1.0');
   
   event.waitUntil(
     Promise.all([
@@ -317,4 +329,4 @@ self.addEventListener('notificationclick', (event) => {
   }
 });
 
-console.log('[SW] GXCOIN PWA Service Worker loaded and ready');
+console.log('[SW] GXCOIN PWA Service Worker v1.1.0 loaded and ready');
