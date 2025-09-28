@@ -90,19 +90,33 @@ export default function BlackCard() {
             <CardContent className="h-full flex flex-col justify-center items-center text-center p-6 relative">
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 via-transparent to-purple-500/10" />
               
+              {/* GXCOIN Visa Card Image */}
               <motion.div
-                whileHover={{ scale: 1.1 }}
-                className="relative z-10"
+                whileHover={{ scale: 1.05 }}
+                className="relative z-10 mb-4"
               >
-                <CreditCard className="h-12 w-12 text-yellow-400 mb-4" />
+                <img 
+                  src="/gxcoin-visa-card.jpg" 
+                  alt="GXCOIN Premium Member Platinum Visa Card" 
+                  className="w-48 h-30 object-cover rounded-lg shadow-2xl border border-yellow-500/30"
+                  onError={(e) => {
+                    // Fallback to icon if image fails to load
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const parent = target.parentElement;
+                    if (parent) {
+                      parent.innerHTML = '<CreditCard className="h-12 w-12 text-yellow-400" />';
+                    }
+                  }}
+                />
               </motion.div>
               
-              <h3 className="text-xl font-bold text-white mb-2">
-                GXCOIN PLATINUM BLACK CARD
+              <h3 className="text-lg font-bold text-white mb-2">
+                GXCOIN PREMIUM VISA CARD
               </h3>
               <div className="mb-4 space-y-1">
                 <p className="text-gray-400 text-sm">
-                  Patent-powered crypto BLACK CARD for eco-warriors
+                  Patent-powered crypto card for eco-warriors
                 </p>
                 <div className="flex items-center justify-center gap-2 text-green-400 text-xs font-medium">
                   <Crown className="h-3 w-3" />
@@ -119,7 +133,7 @@ export default function BlackCard() {
                 }}
                 className="bg-gradient-to-r from-yellow-600 to-yellow-400 hover:from-yellow-500 hover:to-yellow-300 min-h-[44px] min-w-[160px] touch-manipulation"
               >
-                Reveal Card Features
+                View Program Details
               </Button>
             </CardContent>
           </Card>
