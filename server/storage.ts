@@ -336,10 +336,21 @@ export class PostgresStorage implements IStorage {
   }
   
   async updatePatentUsage(userId: number, patentId: number, newUsageCount: number): Promise<void> {
+    // Get the patent to use its actual economic value
+    const patent = await this.getPatentById(patentId);
+    if (!patent) {
+      throw new Error(`Patent ${patentId} not found`);
+    }
+    
+    // Calculate total value using actual patent economic value with diminishing returns
+    const baseValue = patent.economicValue;
+    const scalingFactor = Math.max(0.1, 1 - (newUsageCount * 0.05)); // 5% reduction per use, minimum 10%
+    const totalValueGenerated = baseValue * newUsageCount * scalingFactor;
+    
     await db.update(userPatentAccess)
       .set({ 
         usageCount: newUsageCount,
-        totalValueGenerated: newUsageCount * 10 // Simple calculation, can be enhanced
+        totalValueGenerated: Math.round(totalValueGenerated * 100) / 100 // Round to 2 decimal places
       })
       .where(and(eq(userPatentAccess.userId, userId), eq(userPatentAccess.patentId, patentId)));
   }
