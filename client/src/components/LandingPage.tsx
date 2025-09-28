@@ -542,9 +542,28 @@ export default function LandingPage() {
                         <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 via-transparent to-purple-500/10" />
                         
                         <div className="relative z-10">
-                          <CreditCard className="h-16 w-16 text-yellow-400 mx-auto mb-6" />
+                          {/* GXCOIN Visa Card Image */}
+                          <div className="mb-6">
+                            <img 
+                              src="/gxcoin-visa-card.jpg" 
+                              alt="GXCOIN Visa BLACK CARD - Premium crypto card with patent-powered rewards" 
+                              className="w-full max-w-xs mx-auto rounded-xl shadow-2xl border border-yellow-500/30 hover:border-yellow-400/50 transition-all duration-300"
+                              loading="lazy"
+                              onError={(e) => {
+                                console.warn('Failed to load GXCOIN Visa card image');
+                                // Fallback to CreditCard icon if image fails to load
+                                const target = e.currentTarget as HTMLImageElement;
+                                target.style.display = 'none';
+                                const fallback = target.nextElementSibling as HTMLElement;
+                                if (fallback) fallback.style.display = 'block';
+                              }}
+                            />
+                            {/* Fallback CreditCard icon (hidden by default) */}
+                            <CreditCard className="h-16 w-16 text-yellow-400 mx-auto" style={{ display: 'none' }} />
+                          </div>
+                          
                           <h3 className="text-2xl font-bold text-white mb-4">
-                            GXCOIN BLACK CARD
+                            GXCOIN VISA BLACK CARD
                           </h3>
                           <p className="text-gray-400 mb-6">
                             Patent-powered crypto BLACK CARD
@@ -604,6 +623,32 @@ export default function LandingPage() {
                     </div>
                   </motion.div>
                 </div>
+
+                {/* Premium Visa Card Program Information */}
+                <motion.div 
+                  className="mt-8 mb-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  <div className="text-center mb-6">
+                    <h3 className="text-xl font-bold text-white mb-4">
+                      Premium Visa Card Program
+                    </h3>
+                    <div className="max-w-md mx-auto">
+                      <img 
+                        src="/gxcoin-visa-program.jpg" 
+                        alt="GXCOIN Premium Visa Card Program - Exclusive benefits and rewards for eco-warriors" 
+                        className="w-full rounded-lg shadow-xl border border-yellow-500/20 hover:border-yellow-400/40 transition-all duration-300"
+                        loading="lazy"
+                        onError={(e) => {
+                          console.warn('Failed to load GXCOIN Visa program image');
+                          (e.currentTarget as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  </div>
+                </motion.div>
 
                 <motion.div 
                   className="text-center mt-8"
