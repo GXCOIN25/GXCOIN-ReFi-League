@@ -18,7 +18,6 @@ interface UserState {
   // Actions
   register: (userData: { username: string; password: string; walletAddress?: string }) => Promise<void>;
   login: (credentials: { username: string; password: string }) => Promise<void>;
-  loginWithReplit: (email?: string) => Promise<void>;
   logout: () => Promise<void>;
   initializeAuth: () => Promise<void>;
   setError: (error: string | null) => void;
