@@ -378,6 +378,27 @@ export const PATENTS_DATABASE: Patent[] = [
     dailyUsageLimit: 1,
     realWorldApplication: "Next-generation energy systems harvesting power from all available atmospheric sources",
     scientificBasis: "Los Alamos National Laboratory quantum dot research achieving multi-spectral energy harvesting with 45% efficiency"
+  },
+
+  // REAL USER PATENTS - User's Actual Patent Portfolio
+  {
+    id: 19,
+    patentNumber: "US10883052B2",
+    title: "Biochar Kiln",
+    description: "Advanced biochar production system with steel drum construction, multi-zone combustion control, and recipe-driven automation. Features semi-independent combustion cells, negative pressure management, and optimized processing for diverse biomass feedstock including beetle-kill and fire-damaged trees.",
+    category: "biochar",
+    economicValue: 275,
+    environmentalImpact: {
+      co2Sequestered: 1.5,
+      carbonStorage: 1.2,
+      wasteReduction: 75
+    },
+    accessLevel: 1,
+    heroAssociation: "graphene_batt",
+    unlockCost: 150,
+    dailyUsageLimit: 5,
+    realWorldApplication: "Commercial-scale biochar production from agricultural and forestry waste, providing carbon sequestration while creating valuable soil amendment products for agriculture and carbon credit markets",
+    scientificBasis: "BIOCHAR NOW LLC patented technology featuring controlled pyrolysis in oxygen-deprived environment with electronic valve systems achieving consistent biochar quality and ~$90/ton CO2 sequestration cost"
   }
 ];
 
