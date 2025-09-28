@@ -1757,8 +1757,8 @@ export default function LandingPage() {
                   whileHover={{ scale: 1.02 }}
                 >
                   <img 
-                    src="/avengers-style-heroes.jpg" 
-                    alt="GXCOIN Avengers-Style Heroes" 
+                    src="/gxcoin-heroes-main.jpg" 
+                    alt="GXCOIN ReFi League Superhero Team" 
                     className="w-full h-auto object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
