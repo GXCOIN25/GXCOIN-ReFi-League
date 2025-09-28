@@ -234,7 +234,46 @@ export default function BlackCard() {
         </motion.div>
       </motion.div>
 
-      {/* Card Actions */}
+      {/* GXCOIN Visa Program Details */}
+      <motion.div 
+        className="mt-6 bg-gray-900/50 rounded-lg p-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.5 }}
+      >
+        <h4 className="text-white font-bold text-sm mb-3 text-center">Premium Visa Card Program</h4>
+        <div className="mb-4">
+          <img 
+            src="/gxcoin-visa-program.jpg" 
+            alt="GXCOIN Premium Visa Card Program Details" 
+            className="w-full object-cover rounded-lg shadow-lg border border-yellow-500/30"
+            onError={(e) => {
+              // Fallback if image fails to load
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+            }}
+          />
+        </div>
+        <div className="space-y-2 text-xs text-gray-300">
+          <div className="flex justify-between">
+            <span>💳 Debit Card:</span>
+            <span className="text-green-400">$500 - $500,000 USD</span>
+          </div>
+          <div className="flex justify-between">
+            <span>💎 Credit Card:</span>
+            <span className="text-blue-400">$5,000 - $500,000 USD</span>
+          </div>
+          <div className="flex justify-between">
+            <span>⚡ Token Rewards:</span>
+            <span className="text-yellow-400">$WTR • Direct crypto deposits</span>
+          </div>
+          <div className="flex justify-between">
+            <span>🌍 Global Access:</span>
+            <span className="text-purple-400">Visa/Mastercard accepted</span>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Hero Rank Progression */}
       <motion.div 
         className="mt-6 bg-gray-900/50 rounded-lg p-4"
