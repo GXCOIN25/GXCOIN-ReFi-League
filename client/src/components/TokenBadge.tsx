@@ -261,15 +261,17 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
         style={{ 
           width: sizeConfig.container, 
           height: sizeConfig.container,
-          ...rarityStyles
+          ...rarityStyles,
+          isolation: 'isolate', // Creates new stacking context
+          contain: 'layout style' // Contains layout and style changes
         }}
         initial={shouldAnimate ? { scale: 0.8, opacity: 0 } : undefined}
         animate={shouldAnimate ? { scale: 1, opacity: 1 } : undefined}
         transition={{ duration: 0.5, ease: "easeOut" }}
         whileHover={shouldAnimate ? { scale: 1.05 } : undefined}
       >
-        {/* Main NFT card image */}
-        <div className="absolute inset-0">
+        {/* Main NFT card image - constrained within container */}
+        <div className="absolute inset-0 overflow-hidden">
           {!imageLoaded && !imageError && (
             <div className="w-full h-full bg-gray-800 flex items-center justify-center">
               <div className="text-white text-xs animate-pulse">Loading...</div>
@@ -282,7 +284,9 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
               imageLoaded ? 'opacity-100' : 'opacity-0'
             }`}
             style={{
-              filter: `brightness(1.1) contrast(1.1) saturate(1.2)`
+              filter: `brightness(1.1) contrast(1.1) saturate(1.2)`,
+              maxWidth: '100%',
+              maxHeight: '100%'
             }}
             onLoad={() => {
               if (process.env.NODE_ENV !== 'production') {
