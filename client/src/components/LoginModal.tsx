@@ -20,7 +20,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const [password, setPassword] = useState("");
   const [walletAddress, setWalletAddress] = useState("");
   
-  const { register, login, loginWithReplit, isLoading, error, setError } = useUser();
+  const { register, login, isLoading, error, setError } = useUser();
   const { loadUserData } = useContribution();
   const { loadUserNFTs } = useHeroes();
 
@@ -65,32 +65,6 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     }
   };
 
-  const handleReplitLogin = async () => {
-    setError(null);
-    try {
-      // Detect if running in Replit environment
-      const isReplit = window.location.hostname.includes('replit') || 
-                      window.location.hostname.includes('repl.co');
-      
-      if (isReplit) {
-        // Use secure Replit authentication
-        await loginWithReplit();
-      } else {
-        // For local development, use callback method
-        console.log('Development environment detected, using legacy Replit auth');
-        await loginWithReplit();
-      }
-      
-      // Load user data after successful login
-      await loadUserData();
-      await loadUserNFTs();
-      
-      onClose();
-    } catch (err) {
-      console.error('Replit login failed:', err);
-      setError(err instanceof Error ? err.message : 'Replit authentication failed');
-    }
-  };
 
   if (!isOpen) return null;
 
@@ -188,16 +162,6 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
                   <span className="text-gray-400">or</span>
                 </div>
                 
-                <Button 
-                  onClick={handleReplitLogin}
-                  variant="outline" 
-                  className="w-full border-purple-500 text-purple-400 hover:bg-purple-500/10"
-                  disabled={isLoading}
-                >
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Continue with Replit
-                </Button>
-
                 <Button 
                   onClick={handleDemoLogin}
                   variant="outline" 

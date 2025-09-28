@@ -80,22 +80,6 @@ export const useUser = create<UserState>()(
       }
     },
     
-    loginWithReplit: async (email?) => {
-      set({ isLoading: true, error: null });
-      try {
-        const result = await GXCoinAPI.loginWithReplit(email);
-        set({ 
-          currentUser: result.user, 
-          isLoggedIn: true, 
-          isLoading: false 
-        });
-      } catch (error) {
-        set({ 
-          error: error instanceof Error ? error.message : 'Failed to login with Replit', 
-          isLoading: false 
-        });
-      }
-    },
     
     logout: async () => {
       try {
