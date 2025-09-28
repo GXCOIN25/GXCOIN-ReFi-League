@@ -245,15 +245,17 @@ export default function LandingPage() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.3 }}
+                style={{ isolation: 'isolate' }}
               >
-                <div className="w-full max-w-5xl mx-auto aspect-[5/2] sm:aspect-[16/9] lg:aspect-[5/2]">
+                <div className="w-full max-w-5xl mx-auto aspect-[5/2] sm:aspect-[16/9] lg:aspect-[5/2] overflow-hidden rounded-lg sm:rounded-2xl">
                   <img 
                     src="/images/gxcoin-hero-promo.jpg" 
                     alt="GXCOIN Eco-Warrior Limited Edition dNFTs - WTR, GPWR, BATT, HEMP, GCCT Platinum Series featuring all five superhero warriors" 
-                    className="w-full h-full object-contain rounded-lg sm:rounded-2xl shadow-xl sm:shadow-2xl border border-green-500/20"
+                    className="w-full h-full object-contain shadow-xl sm:shadow-2xl border border-green-500/20"
                     loading="lazy"
                     width="1200"
                     height="480"
+                    style={{ maxWidth: '100%', maxHeight: '100%' }}
                   />
                 </div>
               </motion.div>
@@ -320,7 +322,7 @@ export default function LandingPage() {
                           </div>
                           
                           {/* Right: NFT Badge */}
-                          <div className="flex justify-center">
+                          <div className="flex justify-center" style={{ isolation: 'isolate', contain: 'layout style' }}>
                             <TokenBadge
                               tokenSymbol="GXCOIN"
                               attributes={{
@@ -402,7 +404,7 @@ export default function LandingPage() {
 
                         <CardContent className="space-y-4">
                           {/* NFT Badge Display */}
-                          <div className="flex justify-center">
+                          <div className="flex justify-center" style={{ isolation: 'isolate', contain: 'layout style' }}>
                             <TokenBadge
                               tokenSymbol={(() => {
                                 const symbol = getValidTokenSymbol(hero.symbol);
@@ -689,11 +691,13 @@ export default function LandingPage() {
                     className="relative rounded-lg overflow-hidden shadow-2xl"
                     whileHover={{ scale: 1.05 }}
                     transition={{ duration: 0.3 }}
+                    style={{ isolation: 'isolate', contain: 'layout style' }}
                   >
                     <img 
                       src="/hero-collection-promo.jpg" 
                       alt="GXCOIN ECO-WARRIOR LIMITED EDITION dNFTs" 
                       className="w-full h-auto max-w-md object-cover"
+                      style={{ maxWidth: '100%', maxHeight: '100%' }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                   </motion.div>
