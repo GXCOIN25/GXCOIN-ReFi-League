@@ -9,7 +9,7 @@ const TOKEN_IMAGES = {
   GPWR: "/gpwr-badge.jpg", // VOLTRA ($GPWR) - Green Power energy warrior badge (CORRECT)
   BATT: "/graphene-batt-correct.jpg", // GRAPHENE ($BATT) - using user's correct tech warrior image
   HEMP: "/hemp-correct.jpg", // HEMP ($HEMP) - using user's correct hemp warrior image
-  GXCOIN: "/heroes-group.jpg" // GXCOIN Anchor badge (using heroes group as anchor image)
+  GXCOIN: "/gxcoin-refi-league-promo.jpg" // GXCOIN Anchor badge - ReFi League promotional image
 } as const;
 
 // Token-specific color themes for progress rings and accents
