@@ -28,7 +28,7 @@ export default function HeroShowcase() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[80] flex items-center justify-center p-4"
         onClick={(e) => {
           if (e.target === e.currentTarget) clearSelection();
         }}
@@ -87,11 +87,11 @@ export default function HeroShowcase() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-white">Powers & Abilities</h4>
+                  <h4 className="text-lg font-semibold text-white">Abilities</h4>
                   <div className="space-y-2">
-                    {selectedHero.powers.map((power, index) => (
+                    {selectedHero.abilities.slice(0, 3).map((ability, index) => (
                       <motion.div
-                        key={power}
+                        key={ability.name}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
@@ -101,30 +101,34 @@ export default function HeroShowcase() {
                           className="w-2 h-2 rounded-full"
                           style={{ backgroundColor: selectedHero.color }}
                         />
-                        <span className="text-gray-300">{power}</span>
+                        <span className="text-gray-300">{ability.name}</span>
                       </motion.div>
                     ))}
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="text-lg font-semibold text-white">Impact Metrics</h4>
+                  <h4 className="text-lg font-semibold text-white">Battle Stats</h4>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Asset Value:</span>
-                      <span className="text-white font-medium">{selectedHero.assetValue}</span>
+                      <span className="text-gray-400">Power:</span>
+                      <span className="text-white font-medium">{selectedHero.stats.power}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Primary Impact:</span>
-                      <span className="text-white font-medium">{selectedHero.impact}</span>
+                      <span className="text-gray-400">Health:</span>
+                      <span className="text-white font-medium">{selectedHero.stats.health}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-400">NFT Badge:</span>
+                      <span className="text-gray-400">Speed:</span>
+                      <span className="text-white font-medium">{selectedHero.stats.speed}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Level:</span>
                       <Badge 
                         variant="outline"
                         style={{ color: selectedHero.color, borderColor: selectedHero.color }}
                       >
-                        {selectedHero.nftBadge}
+                        Level {selectedHero.level}
                       </Badge>
                     </div>
                   </div>

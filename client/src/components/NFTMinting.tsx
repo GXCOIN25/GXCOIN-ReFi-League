@@ -108,7 +108,7 @@ export const NFTMinting: React.FC<NFTMintingProps> = ({ heroId, level, onClose }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
       <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-purple-500/30 p-6 max-w-md w-full">
         {mintingStage === 'prepare' && (
           <>

@@ -27,7 +27,7 @@ export default function SuperheroUI() {
 
   if (!isLoggedIn) {
     return (
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 left-4 z-[40]">
         <Card className="bg-black/60 border-gray-500/30 backdrop-blur-sm">
           <CardContent className="p-4 text-center">
             <User className="h-8 w-8 mx-auto mb-2 text-gray-400" />
@@ -40,7 +40,7 @@ export default function SuperheroUI() {
   }
 
   return (
-    <div className="fixed top-4 left-4 z-50 space-y-4 max-w-sm">
+    <div className="fixed top-4 left-4 z-[40] space-y-4 max-w-sm">
       {/* User Info */}
       <motion.div
         initial={{ opacity: 0, x: -50 }}
