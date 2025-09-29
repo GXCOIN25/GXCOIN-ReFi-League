@@ -159,6 +159,18 @@ function MainExperience() {
   const { isLoggedIn } = useUser();
   const { heroes, selectHero } = useHeroes();
   
+  // Hero image mapping
+  const getHeroImage = (heroId: string) => {
+    const imageMap: Record<string, string> = {
+      "aqua_wtr": "/agua-wtr-correct.jpg",
+      "hemp_builder": "/hemp-correct.jpg", 
+      "voltra_gpwr": "/gpwr-badge.jpg",
+      "graphene_batt": "/graphene-batt-correct.jpg",
+      "trader_gcct": "/gcct-correct.jpg"
+    };
+    return imageMap[heroId] || "/hero-collection-promo.jpg";
+  };
+  
   // Mobile tab state management for conditional background display
 
   // Remove automatic login modal - let users explore freely
@@ -181,11 +193,24 @@ function MainExperience() {
               {heroes.map((hero) => (
                 <div key={hero.id} className="text-center space-y-2">
                   <div 
-                    className="w-16 h-16 mx-auto rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform pointer-events-auto"
+                    className="w-16 h-16 mx-auto rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform pointer-events-auto overflow-hidden"
                     style={{ backgroundColor: hero.color + '30', border: `2px solid ${hero.color}`, minWidth: '44px', minHeight: '44px' }}
                     onClick={() => selectHero && selectHero(hero.id)}
                   >
-                    <span className="text-2xl font-bold text-white">{hero.symbol.charAt(1)}</span>
+                    <img 
+                      src={getHeroImage(hero.id)}
+                      alt={hero.name}
+                      className="w-full h-full object-cover rounded-full"
+                      onError={(e) => {
+                        // Fallback to text if image fails to load
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const fallback = document.createElement('span');
+                        fallback.className = 'text-2xl font-bold text-white';
+                        fallback.textContent = hero.symbol.charAt(1);
+                        target.parentNode?.appendChild(fallback);
+                      }}
+                    />
                   </div>
                   <div className="text-xs text-white font-medium">{hero.name}</div>
                   <div className="text-xs" style={{ color: hero.color }}>{hero.symbol}</div>
