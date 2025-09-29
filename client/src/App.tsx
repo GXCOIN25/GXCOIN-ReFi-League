@@ -173,7 +173,7 @@ function MainExperience() {
     <div className="min-h-[100dvh] bg-gradient-to-br from-gray-900 via-black to-blue-900 relative overflow-y-auto">
       {/* Background with Hero Visualization - Hidden on mobile when showing main content */}
       <div className={`absolute inset-0 z-0 bg-gradient-to-br from-gray-900 via-black to-blue-900 pointer-events-none transition-opacity duration-300 ${
-        currentTab === "home" ? "md:opacity-100 opacity-0" : "opacity-100"
+        currentTab === "home" ? "md:opacity-100 opacity-0" : "opacity-0"
       }`}>
         <div className="w-full h-full flex items-center justify-center">
           <div className="text-center space-y-8">
