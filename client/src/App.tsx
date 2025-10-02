@@ -253,45 +253,45 @@ function MainExperience() {
         <div className="max-w-7xl mx-auto px-4">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
             <div className="flex justify-center mb-8">
-              <TabsList className="mobile-tabs-list w-full max-w-6xl bg-black/80 backdrop-blur-md p-2 flex overflow-x-auto scroll-smooth gap-1 md:grid md:grid-cols-10 border border-green-500/20">
-                <TabsTrigger value="home" className="mobile-tab-trigger text-sm md:text-base flex items-center gap-1.5 cursor-pointer hover:bg-white/10 rounded flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '12px' }}>
-                  <Home className="w-4 h-4 md:w-5 md:h-5" />
+              <TabsList className="mobile-tabs-list w-full max-w-7xl bg-black/80 backdrop-blur-md p-3 flex overflow-x-auto scroll-smooth gap-2 md:grid md:grid-cols-10 border border-green-500/20">
+                <TabsTrigger value="home" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Home className="w-5 h-5 md:w-6 md:h-6" />
                   <span className="hidden sm:inline">Home</span>
                 </TabsTrigger>
-                <TabsTrigger value="heroes" className="mobile-tab-trigger text-sm md:text-base flex items-center gap-1.5 cursor-pointer hover:bg-white/10 rounded flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '12px' }}>
-                  <Shield className="w-4 h-4 md:w-5 md:h-5" />
+                <TabsTrigger value="heroes" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Shield className="w-5 h-5 md:w-6 md:h-6" />
                   <span className="hidden sm:inline">Heroes</span>
                 </TabsTrigger>
-                <TabsTrigger value="ranks" className="mobile-tab-trigger text-sm md:text-base flex items-center gap-1.5 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '12px' }}>
-                  <Trophy className="w-4 h-4 md:w-5 md:h-5" />
+                <TabsTrigger value="ranks" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Trophy className="w-5 h-5 md:w-6 md:h-6" />
                   <span className="hidden sm:inline">Ranks</span>
                 </TabsTrigger>
-                <TabsTrigger value="calculate" className="mobile-tab-trigger text-sm md:text-base flex items-center gap-1.5 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '12px' }}>
-                  <Zap className="w-4 h-4 md:w-5 md:h-5" />
+                <TabsTrigger value="calculate" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Zap className="w-5 h-5 md:w-6 md:h-6" />
                   <span className="hidden sm:inline">Calculate</span>
                 </TabsTrigger>
-                <TabsTrigger value="nfts" className="mobile-tab-trigger text-sm md:text-base flex items-center gap-1.5 cursor-pointer hover:bg-white/10 rounded flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '12px' }}>
-                  <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
+                <TabsTrigger value="nfts" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
                   <span className="hidden sm:inline">NFTs</span>
                 </TabsTrigger>
-                <TabsTrigger value="impact" className="mobile-tab-trigger text-sm md:text-base flex items-center gap-1.5 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '12px' }}>
-                  <Globe className="w-4 h-4 md:w-5 md:h-5" />
+                <TabsTrigger value="impact" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Globe className="w-5 h-5 md:w-6 md:h-6" />
                   <span className="hidden sm:inline">Impact</span>
                 </TabsTrigger>
-                <TabsTrigger value="community" className="mobile-tab-trigger text-sm md:text-base flex items-center gap-1.5 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '12px' }}>
-                  <Users className="w-4 h-4 md:w-5 md:h-5" />
+                <TabsTrigger value="community" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Users className="w-5 h-5 md:w-6 md:h-6" />
                   <span className="hidden sm:inline">Community</span>
                 </TabsTrigger>
-                <TabsTrigger value="tokens" className="mobile-tab-trigger text-sm md:text-base flex items-center gap-1.5 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '12px' }}>
-                  <Coins className="w-4 h-4 md:w-5 md:h-5" />
+                <TabsTrigger value="tokens" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Coins className="w-5 h-5 md:w-6 md:h-6" />
                   <span className="hidden sm:inline">Tokens</span>
                 </TabsTrigger>
-                <TabsTrigger value="wallet" className="mobile-tab-trigger text-sm md:text-base flex items-center gap-1.5 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '12px' }}>
-                  <Wallet className="w-4 h-4 md:w-5 md:h-5" />
+                <TabsTrigger value="wallet" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Wallet className="w-5 h-5 md:w-6 md:h-6" />
                   <span className="hidden sm:inline">Wallet</span>
                 </TabsTrigger>
-                <TabsTrigger value="game" className="mobile-tab-trigger text-sm md:text-base flex items-center gap-1.5 flex-shrink-0" style={{ minWidth: '44px', minHeight: '44px', padding: '12px' }}>
-                  <Gamepad2 className="w-4 h-4 md:w-5 md:h-5" />
+                <TabsTrigger value="game" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Gamepad2 className="w-5 h-5 md:w-6 md:h-6" />
                   <span className="hidden sm:inline">Arena</span>
                 </TabsTrigger>
               </TabsList>
