@@ -252,46 +252,46 @@ function MainExperience() {
       <div className="relative z-10 pt-20">
         <div className="max-w-7xl mx-auto px-4">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-            <div className="flex justify-center mb-8">
-              <TabsList className="mobile-tabs-list w-full max-w-7xl bg-black/80 backdrop-blur-md p-3 flex overflow-x-auto scroll-smooth gap-2 md:grid md:grid-cols-10 border border-green-500/20">
-                <TabsTrigger value="home" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
-                  <Home className="w-5 h-5 md:w-6 md:h-6" />
+            <div className="flex justify-center mb-8 overflow-x-auto">
+              <TabsList className="mobile-tabs-list w-full max-w-7xl bg-black/80 backdrop-blur-md p-3 flex overflow-x-auto scroll-smooth gap-2 border border-green-500/20">
+                <TabsTrigger value="home" className="mobile-tab-trigger text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Home className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="hidden sm:inline">Home</span>
                 </TabsTrigger>
-                <TabsTrigger value="heroes" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
-                  <Shield className="w-5 h-5 md:w-6 md:h-6" />
+                <TabsTrigger value="heroes" className="mobile-tab-trigger text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Shield className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="hidden sm:inline">Heroes</span>
                 </TabsTrigger>
-                <TabsTrigger value="ranks" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
-                  <Trophy className="w-5 h-5 md:w-6 md:h-6" />
+                <TabsTrigger value="ranks" className="mobile-tab-trigger text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Trophy className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="hidden sm:inline">Ranks</span>
                 </TabsTrigger>
-                <TabsTrigger value="calculate" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
-                  <Zap className="w-5 h-5 md:w-6 md:h-6" />
+                <TabsTrigger value="calculate" className="mobile-tab-trigger text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Zap className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="hidden sm:inline">Calculate</span>
                 </TabsTrigger>
-                <TabsTrigger value="nfts" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
-                  <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
+                <TabsTrigger value="nfts" className="mobile-tab-trigger text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="hidden sm:inline">NFTs</span>
                 </TabsTrigger>
-                <TabsTrigger value="impact" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
-                  <Globe className="w-5 h-5 md:w-6 md:h-6" />
+                <TabsTrigger value="impact" className="mobile-tab-trigger text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Globe className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="hidden sm:inline">Impact</span>
                 </TabsTrigger>
-                <TabsTrigger value="community" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
-                  <Users className="w-5 h-5 md:w-6 md:h-6" />
+                <TabsTrigger value="community" className="mobile-tab-trigger text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Users className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="hidden sm:inline">Community</span>
                 </TabsTrigger>
-                <TabsTrigger value="tokens" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
-                  <Coins className="w-5 h-5 md:w-6 md:h-6" />
+                <TabsTrigger value="tokens" className="mobile-tab-trigger text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Coins className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="hidden sm:inline">Tokens</span>
                 </TabsTrigger>
-                <TabsTrigger value="wallet" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
-                  <Wallet className="w-5 h-5 md:w-6 md:h-6" />
+                <TabsTrigger value="wallet" className="mobile-tab-trigger text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Wallet className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="hidden sm:inline">Wallet</span>
                 </TabsTrigger>
-                <TabsTrigger value="game" className="mobile-tab-trigger text-base md:text-lg xl:text-xl 2xl:text-2xl flex items-center gap-2 flex-shrink-0 px-4 py-3" style={{ minWidth: '44px', minHeight: '44px' }}>
-                  <Gamepad2 className="w-5 h-5 md:w-6 md:h-6" />
+                <TabsTrigger value="game" className="mobile-tab-trigger text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Gamepad2 className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="hidden sm:inline">Arena</span>
                 </TabsTrigger>
               </TabsList>
@@ -312,9 +312,93 @@ function MainExperience() {
                     Meet Your <span className="text-green-400">Eco-Warriors</span>
                   </h1>
                   <p className="text-gray-300 max-w-2xl mx-auto">
-                    Click on the hero symbols above to discover their unique powers and impact on regenerative finance.
+                    Select your heroes below to discover their unique powers and impact on regenerative finance.
                   </p>
                 </motion.div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-8">
+                  {heroes.filter(h => h.id !== "gxcoin_anchor").map((hero) => (
+                    <motion.div
+                      key={hero.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <Card 
+                        className="cursor-pointer overflow-hidden border-2 transition-all duration-300 hover:shadow-2xl"
+                        style={{ 
+                          borderColor: hero.color + '60',
+                          background: `linear-gradient(135deg, ${hero.color}20, transparent)`
+                        }}
+                        onClick={() => selectHero && selectHero(hero.id)}
+                      >
+                        <CardContent className="p-6 space-y-4">
+                          <div className="flex items-center gap-4">
+                            <div 
+                              className="w-20 h-20 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
+                              style={{ 
+                                backgroundColor: hero.color + '30', 
+                                border: `3px solid ${hero.color}`,
+                                minWidth: '80px',
+                                minHeight: '80px'
+                              }}
+                            >
+                              <img 
+                                src={getHeroImage(hero.id)}
+                                alt={hero.name}
+                                className="w-full h-full object-cover rounded-full"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                  const fallback = document.createElement('span');
+                                  fallback.className = 'text-3xl';
+                                  fallback.textContent = hero.avatar || hero.symbol.charAt(0);
+                                  target.parentNode?.appendChild(fallback);
+                                }}
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="text-xl font-bold text-white">{hero.name}</h3>
+                              <p className="text-sm" style={{ color: hero.color }}>{hero.symbol}</p>
+                              <p className="text-xs text-gray-400 mt-1">{hero.title}</p>
+                            </div>
+                          </div>
+                          
+                          <p className="text-sm text-gray-300 line-clamp-3">{hero.description}</p>
+                          
+                          <div className="grid grid-cols-3 gap-2 text-xs">
+                            <div className="bg-black/40 rounded p-2 text-center">
+                              <div className="text-gray-400">Power</div>
+                              <div className="text-white font-bold">{hero.stats.power}</div>
+                            </div>
+                            <div className="bg-black/40 rounded p-2 text-center">
+                              <div className="text-gray-400">Health</div>
+                              <div className="text-white font-bold">{hero.stats.health}</div>
+                            </div>
+                            <div className="bg-black/40 rounded p-2 text-center">
+                              <div className="text-gray-400">Speed</div>
+                              <div className="text-white font-bold">{hero.stats.speed}</div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-2">
+                            <span className="text-xs px-2 py-1 rounded" style={{ 
+                              backgroundColor: hero.color + '30',
+                              color: hero.color 
+                            }}>
+                              {hero.rarity}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              Level {hero.level}
+                            </span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+
                 <BlackCard />
               </TabsContent>
 
