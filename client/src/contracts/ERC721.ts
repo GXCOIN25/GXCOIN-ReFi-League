@@ -176,7 +176,7 @@ export class HeroNFTContract {
     level: number, 
     metadata: HeroNFTMetadata
   ): Promise<ethers.ContractTransactionResponse> {
-    const contractWithSigner = await this.getContractWithSigner();
+    const contractWithSigner = await this.getContractWithSigner() as any;
     const heroTypeId = HERO_TYPES[heroType];
     const cost = await this.getHeroMintCost(heroTypeId, level);
     
@@ -193,7 +193,7 @@ export class HeroNFTContract {
   }
   
   async safeMint(uri: string): Promise<ethers.ContractTransactionResponse> {
-    const contractWithSigner = await this.getContractWithSigner();
+    const contractWithSigner = await this.getContractWithSigner() as any;
     const mintPrice = await this.getMintPrice();
     
     return await contractWithSigner.safeMint(
@@ -204,7 +204,7 @@ export class HeroNFTContract {
   }
   
   async upgradeHero(tokenId: number, newLevel: number): Promise<ethers.ContractTransactionResponse> {
-    const contractWithSigner = await this.getContractWithSigner();
+    const contractWithSigner = await this.getContractWithSigner() as any;
     
     return await contractWithSigner.upgradeHero(tokenId, newLevel);
   }
