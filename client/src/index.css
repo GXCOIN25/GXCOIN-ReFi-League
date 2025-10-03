@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-size: 16px;
+  }
+
+  /* Responsive font scaling for high-DPI displays */
+  @media (min-width: 1280px) {
+    html {
+      font-size: 17px;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    html {
+      font-size: 18px;
+    }
+  }
+
+  @media (min-width: 1920px) {
+    html {
+      font-size: 19px;
+    }
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    /* Add safe area padding for mobile devices */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    /* Fix mobile webkit scrolling issues */
+    -webkit-overflow-scrolling: touch;
+    /* Prevent zoom on input focus */
+    touch-action: manipulation;
+  }
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  overflow-y: auto;
+  /* Improve mobile performance */
+  -webkit-overflow-scrolling: touch;
+  transform: translateZ(0);
+  will-change: scroll-position;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+  touch-action: auto;
+  pointer-events: auto;
+}
+
+/* Mobile-specific styles */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Horizontal scrolling tabs for mobile */
+.mobile-tabs-list {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mobile-tabs-list::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-tab-trigger {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Card flip animation styles for better mobile support */
+.perspective-1000 {
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Improve touch responsiveness on mobile */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
