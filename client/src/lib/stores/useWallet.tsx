@@ -245,7 +245,7 @@ export const useWallet = create<WalletState>((set, get) => ({
       const updatedTx: TransactionStatus = {
         ...existingTx,
         status: receipt ? 'confirmed' : 'pending',
-        blockNumber: receipt?.blockNumber?.toString(),
+        blockNumber: receipt?.blockNumber,
         gasUsed: receipt?.gasUsed?.toString(),
         timestamp: existingTx.timestamp
       };

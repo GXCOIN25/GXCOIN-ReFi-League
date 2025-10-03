@@ -183,21 +183,21 @@ export class ERC20Contract {
   
   // Write functions
   async transfer(to: string, amount: string): Promise<ethers.ContractTransactionResponse> {
-    const contractWithSigner = await this.getContractWithSigner();
+    const contractWithSigner = await this.getContractWithSigner() as any;
     const parsedAmount = ethers.parseUnits(amount, this.tokenInfo.decimals);
     
     return await contractWithSigner.transfer(to, parsedAmount);
   }
   
   async approve(spender: string, amount: string): Promise<ethers.ContractTransactionResponse> {
-    const contractWithSigner = await this.getContractWithSigner();
+    const contractWithSigner = await this.getContractWithSigner() as any;
     const parsedAmount = ethers.parseUnits(amount, this.tokenInfo.decimals);
     
     return await contractWithSigner.approve(spender, parsedAmount);
   }
   
   async transferFrom(from: string, to: string, amount: string): Promise<ethers.ContractTransactionResponse> {
-    const contractWithSigner = await this.getContractWithSigner();
+    const contractWithSigner = await this.getContractWithSigner() as any;
     const parsedAmount = ethers.parseUnits(amount, this.tokenInfo.decimals);
     
     return await contractWithSigner.transferFrom(from, to, parsedAmount);
@@ -209,7 +209,7 @@ export class ERC20Contract {
       throw new Error('Staking only available for GXCOIN');
     }
     
-    const contractWithSigner = await this.getContractWithSigner();
+    const contractWithSigner = await this.getContractWithSigner() as any;
     const parsedAmount = ethers.parseUnits(amount, this.tokenInfo.decimals);
     
     return await contractWithSigner.stake(parsedAmount);
@@ -220,7 +220,7 @@ export class ERC20Contract {
       throw new Error('Unstaking only available for GXCOIN');
     }
     
-    const contractWithSigner = await this.getContractWithSigner();
+    const contractWithSigner = await this.getContractWithSigner() as any;
     const parsedAmount = ethers.parseUnits(amount, this.tokenInfo.decimals);
     
     return await contractWithSigner.unstake(parsedAmount);
@@ -231,7 +231,7 @@ export class ERC20Contract {
       throw new Error('Rewards only available for GXCOIN');
     }
     
-    const contractWithSigner = await this.getContractWithSigner();
+    const contractWithSigner = await this.getContractWithSigner() as any;
     return await contractWithSigner.getRewards();
   }
 }
@@ -338,7 +338,7 @@ export class TokenManager {
   async getAllBalances(address: string): Promise<Record<string, string>> {
     const balances: Record<string, string> = {};
     
-    for (const [symbol, contract] of this.providers) {
+    for (const [symbol, contract] of Array.from(this.providers.entries())) {
       try {
         balances[symbol] = await contract.getBalance(address);
       } catch (error) {
