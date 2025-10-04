@@ -8,11 +8,20 @@ import { useContribution } from "@/lib/stores/useContribution";
 import { useUser } from "@/lib/stores/useUser";
 import { Zap, Shield, Crown, Star, Award, User, LogOut } from "lucide-react";
 
-export default function SuperheroUI() {
+interface SuperheroUIProps {
+  currentTab?: string;
+}
+
+export default function SuperheroUI({ currentTab = "home" }: SuperheroUIProps) {
   const { currentRank, totalContribution, getProgressToNext, getNextRank } = useContribution();
   const { currentUser, isLoggedIn, logout } = useUser();
   const nextRank = getNextRank();
   const progress = getProgressToNext();
+
+  // Hide overlay when on Heroes tab to avoid blocking hero grid
+  if (currentTab === "heroes") {
+    return null;
+  }
 
   const getRankIcon = (tier: string) => {
     switch (tier.toLowerCase()) {

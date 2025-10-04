@@ -235,7 +235,7 @@ function MainExperience() {
       </div>
 
       {/* UI Overlay */}
-      <SuperheroUI />
+      <SuperheroUI currentTab={currentTab} />
       <HeroShowcase />
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
       
