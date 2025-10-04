@@ -234,6 +234,11 @@ function MainExperience() {
         </div>
       </div>
 
+      {/* Version indicator for cache verification */}
+      <div className="fixed bottom-2 left-2 z-[100] bg-green-600 text-white px-2 py-1 rounded text-xs font-mono">
+        v2.0.0-overlay-fixed | {new Date().toLocaleTimeString()}
+      </div>
+      
       {/* UI Overlay - TEMPORARILY DISABLED */}
       <SuperheroUI currentTab={currentTab} />
       <HeroShowcase />

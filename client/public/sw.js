@@ -1,8 +1,8 @@
-// GXCOIN PWA Service Worker
-// Version 1.1.0
+// GXCOIN PWA Service Worker  
+// Version 2.0.0 - FORCE REFRESH (Fixed overlay blocking)
 
-const CACHE_NAME = 'gxcoin-pwa-v1.1.0';
-const OFFLINE_CACHE = 'gxcoin-offline-v1.1.0';
+const CACHE_NAME = 'gxcoin-pwa-v2.0.0-no-overlay';
+const OFFLINE_CACHE = 'gxcoin-offline-v2.0.0';
 
 // Essential files to cache for offline functionality
 const CORE_CACHE_FILES = [
@@ -74,7 +74,7 @@ const API_CACHE_PATTERNS = [
 
 // Install event - cache core files
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing GXCOIN PWA Service Worker v1.1.0');
+  console.log('[SW] Installing GXCOIN PWA Service Worker v2.0.0 (FORCE UPDATE)');
   
   event.waitUntil(
     Promise.all([
@@ -329,4 +329,4 @@ self.addEventListener('notificationclick', (event) => {
   }
 });
 
-console.log('[SW] GXCOIN PWA Service Worker v1.1.0 loaded and ready');
+console.log('[SW] GXCOIN PWA Service Worker v2.0.0 loaded (Overlay Fix Applied)');
