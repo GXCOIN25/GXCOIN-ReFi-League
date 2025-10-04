@@ -18,10 +18,8 @@ export default function SuperheroUI({ currentTab = "home" }: SuperheroUIProps) {
   const nextRank = getNextRank();
   const progress = getProgressToNext();
 
-  // Only show overlay on Home tab to avoid blocking any content
-  if (currentTab !== "home") {
-    return null;
-  }
+  // TEMPORARILY DISABLED - overlay completely hidden to fix blocking issue
+  return null;
 
   const getRankIcon = (tier: string) => {
     switch (tier.toLowerCase()) {

@@ -234,12 +234,7 @@ function MainExperience() {
         </div>
       </div>
 
-      {/* Debug indicator - shows current tab */}
-      <div className="fixed top-2 right-2 z-[100] bg-yellow-500 text-black px-3 py-1 rounded font-bold text-sm">
-        TAB: {currentTab.toUpperCase()}
-      </div>
-      
-      {/* UI Overlay */}
+      {/* UI Overlay - TEMPORARILY DISABLED */}
       <SuperheroUI currentTab={currentTab} />
       <HeroShowcase />
       <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
