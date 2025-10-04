@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Zap, Star, Award, Gem, Shield, CheckCircle, AlertCircle, ExternalLink, Clock } from 'lucide-react';
+import { Zap, Star, Award, Gem, Shield, CheckCircle, AlertCircle, ExternalLink, Clock, Info, Database, Coins } from 'lucide-react';
 import { useWallet } from '../lib/stores/useWallet';
 import { useUser } from '../lib/stores/useUser';
 import { useHeroes } from '../lib/stores/useHeroes';
 import { HeroType, getHeroTypeFromSymbol } from '../contracts/ERC721';
 import { gameHeroes } from '../data/gameHeroes';
+import { isDemoMode, getModeDescription, nftConfig } from '../config/nftConfig';
 
 interface NFTMintingProps {
   heroId: string;
@@ -201,6 +202,41 @@ export const NFTMinting: React.FC<NFTMintingProps> = ({ heroId, level, onClose }
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
       <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-purple-500/30 p-6 max-w-md w-full">
+        {isDemoMode() && (
+          <div className="bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-yellow-500/20 border-2 border-yellow-500/50 rounded-xl p-4 mb-6 animate-pulse">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <Database className="w-6 h-6 text-yellow-400" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center space-x-2 mb-2">
+                  <h3 className="text-yellow-300 font-bold text-lg">🎮 DEMO MODE</h3>
+                  <span className="px-2 py-0.5 bg-yellow-500/30 text-yellow-200 text-xs rounded-full border border-yellow-500/50">
+                    TEST ONLY
+                  </span>
+                </div>
+                <p className="text-yellow-200/90 text-sm leading-relaxed mb-2">
+                  {getModeDescription()}
+                </p>
+                <div className="bg-black/30 rounded-lg p-3 space-y-1.5">
+                  <div className="flex items-center space-x-2 text-xs">
+                    <Database className="w-3.5 h-3.5 text-yellow-400" />
+                    <span className="text-yellow-100">Stored in database, not blockchain</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-xs">
+                    <Coins className="w-3.5 h-3.5 text-green-400" />
+                    <span className="text-green-100">Free to mint (no real ETH required)</span>
+                  </div>
+                  <div className="flex items-center space-x-2 text-xs">
+                    <Info className="w-3.5 h-3.5 text-blue-400" />
+                    <span className="text-blue-100">Use testnet for blockchain simulation</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {mintingStage === 'prepare' && (
           <>
             <div className="text-center mb-6">
@@ -324,9 +360,16 @@ export const NFTMinting: React.FC<NFTMintingProps> = ({ heroId, level, onClose }
               <button
                 onClick={handleMint}
                 disabled={!isConnected || isMinting || !isTestnet()}
-                className={`flex-1 py-3 px-4 bg-gradient-to-r ${isTestnet() ? 'from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700' : 'from-gray-600 to-gray-700'} disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-200 font-bold`}
+                className={`flex-1 py-3 px-4 bg-gradient-to-r ${isTestnet() ? 'from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700' : 'from-gray-600 to-gray-700'} disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-200 font-bold relative`}
               >
-                {!isConnected ? 'Connect Wallet' : !isTestnet() ? 'Switch to Testnet' : `Mint ${getHeroName()} NFT`}
+                <div className="flex items-center justify-center space-x-2">
+                  <span>{!isConnected ? 'Connect Wallet' : !isTestnet() ? 'Switch to Testnet' : `Mint ${getHeroName()} NFT`}</span>
+                  {isDemoMode() && isConnected && isTestnet() && (
+                    <span className="px-2 py-0.5 bg-yellow-500/30 text-yellow-200 text-xs rounded-full border border-yellow-500/50">
+                      DEMO
+                    </span>
+                  )}
+                </div>
               </button>
             </div>
           </>

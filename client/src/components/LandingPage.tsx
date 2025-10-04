@@ -20,8 +20,16 @@ import {
   Battery,
   TrendingUp,
   Crown,
-  Star
+  Star,
+  Database,
+  Coins,
+  Link2,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Info
 } from "lucide-react";
+import { getFeatureComparison, isDemoMode } from "@/config/nftConfig";
 
 const heroIcons = {
   "aqua_wtr": Droplets,
@@ -148,6 +156,176 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
           </motion.div>
         </div>
       </motion.section>
+
+      {/* NFT Minting Mode Comparison */}
+      {isDemoMode() && (
+        <motion.section 
+          className="px-2 sm:px-4 pb-8 sm:pb-12"
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.8 }}
+        >
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3">
+                NFT Minting Options
+              </h2>
+              <p className="text-gray-400 text-sm sm:text-base max-w-2xl mx-auto">
+                Choose between demo mode for testing or production mode for real blockchain NFTs
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              {/* Demo Mode Card */}
+              <Card className="bg-gradient-to-br from-yellow-900/30 via-orange-900/20 to-yellow-800/30 backdrop-blur-sm border-yellow-500/40 relative overflow-hidden">
+                <div className="absolute top-4 right-4">
+                  <Badge className="bg-yellow-500/30 text-yellow-200 border-yellow-500/50">
+                    CURRENT MODE
+                  </Badge>
+                </div>
+                <CardHeader>
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="p-3 rounded-full bg-yellow-500/20">
+                      <Database className="h-6 w-6 text-yellow-400" />
+                    </div>
+                    <CardTitle className="text-xl sm:text-2xl text-white">Demo Mode</CardTitle>
+                  </div>
+                  <p className="text-yellow-200/80 text-sm">
+                    Free testing with database storage
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start space-x-3">
+                      <Coins className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">Free to Mint</p>
+                        <p className="text-gray-400 text-xs">No real ETH required</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Clock className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">Instant</p>
+                        <p className="text-gray-400 text-xs">Mints immediately</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Database className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">Database Storage</p>
+                        <p className="text-gray-400 text-xs">Stored in platform database</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <XCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">Not Transferable</p>
+                        <p className="text-gray-400 text-xs">Cannot be traded or sold</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 border-t border-yellow-500/20">
+                    <p className="text-xs text-yellow-200/70 mb-2 font-medium">Best For:</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline" className="text-xs bg-yellow-500/10 border-yellow-500/30 text-yellow-200">
+                        Testing
+                      </Badge>
+                      <Badge variant="outline" className="text-xs bg-yellow-500/10 border-yellow-500/30 text-yellow-200">
+                        Learning
+                      </Badge>
+                      <Badge variant="outline" className="text-xs bg-yellow-500/10 border-yellow-500/30 text-yellow-200">
+                        Free Play
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Production Mode Card */}
+              <Card className="bg-gradient-to-br from-purple-900/30 via-blue-900/20 to-purple-800/30 backdrop-blur-sm border-purple-500/40 relative overflow-hidden">
+                <div className="absolute top-4 right-4">
+                  <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
+                    COMING SOON
+                  </Badge>
+                </div>
+                <CardHeader>
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="p-3 rounded-full bg-purple-500/20">
+                      <Link2 className="h-6 w-6 text-purple-400" />
+                    </div>
+                    <CardTitle className="text-xl sm:text-2xl text-white">Production Mode</CardTitle>
+                  </div>
+                  <p className="text-purple-200/80 text-sm">
+                    Real blockchain NFTs with true ownership
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start space-x-3">
+                      <Coins className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">Costs ETH/MATIC/BNB</p>
+                        <p className="text-gray-400 text-xs">Gas fees apply</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Clock className="w-5 h-5 text-orange-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">1-5 Minutes</p>
+                        <p className="text-gray-400 text-xs">Blockchain confirmation time</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Link2 className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">On-Chain Storage</p>
+                        <p className="text-gray-400 text-xs">Permanent blockchain record</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">Fully Transferable</p>
+                        <p className="text-gray-400 text-xs">Trade on OpenSea & other marketplaces</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 border-t border-purple-500/20">
+                    <p className="text-xs text-purple-200/70 mb-2 font-medium">Best For:</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant="outline" className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-200">
+                        Real Ownership
+                      </Badge>
+                      <Badge variant="outline" className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-200">
+                        Trading
+                      </Badge>
+                      <Badge variant="outline" className="text-xs bg-purple-500/10 border-purple-500/30 text-purple-200">
+                        Collection
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+              <div className="flex items-start space-x-3">
+                <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-blue-200 text-sm font-medium mb-1">How It Works</p>
+                  <p className="text-blue-100/80 text-xs">
+                    In demo mode, your NFT badges are stored in our database for instant access and testing. 
+                    When production mode is enabled, you'll be able to mint real NFTs on Ethereum, Polygon, or BSC that you truly own and can trade.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.section>
+      )}
 
       {/* GXCOIN Anchor Centerpiece */}
       <motion.section 
