@@ -18,8 +18,8 @@ export default function SuperheroUI({ currentTab = "home" }: SuperheroUIProps) {
   const nextRank = getNextRank();
   const progress = getProgressToNext();
 
-  // Hide overlay when on Heroes tab to avoid blocking hero grid
-  if (currentTab === "heroes") {
+  // Only show overlay on Home tab to avoid blocking any content
+  if (currentTab !== "home") {
     return null;
   }
 
