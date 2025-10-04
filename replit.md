@@ -10,6 +10,28 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (October 4, 2025)
 
+### Landing Page Button Functionality (Latest)
+All landing page buttons now have proper functionality and security:
+
+1. **"Visit gxcoin.world" Button**
+   - Opens https://gxcoin.world in new tab
+   - Includes security parameters (noopener, noreferrer) to prevent reverse tabnabbing
+
+2. **"Activate AQUA dNFT" Button**
+   - Smart conditional logic: navigates to Heroes tab if user is logged in
+   - Opens login modal if user is not logged in
+   - Provides smooth onboarding flow
+
+3. **"Assemble Your Heroes" Button**
+   - Navigates to Heroes tab when clicked
+   - Allows users to view and select eco-warrior heroes
+
+4. **Additional Buttons**
+   - "Subscribe Updates" - Opens gxcoin.world in new tab with security parameters
+   - "Learn More" - Navigates to Heroes tab for more information
+
+All button handlers follow security best practices with noopener/noreferrer parameters on external links.
+
 ### Frontend-Backend Integration Completed
 Successfully integrated all landing page features with backend APIs:
 
