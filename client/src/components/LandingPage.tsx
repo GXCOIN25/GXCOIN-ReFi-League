@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHeroes } from "@/lib/stores/useHeroes";
 import { gameHeroes } from "@/data/gameHeroes";
 import { useContribution } from "@/lib/stores/useContribution";
+import { useUser } from "@/lib/stores/useUser";
 import TokenBadge, { TokenSymbol } from "./TokenBadge";
 import { 
   Sparkles, 
@@ -50,6 +51,7 @@ const getValidTokenSymbol = (heroSymbol: string): TokenSymbol => {
 export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void }) {
   const [activeTab, setActiveTab] = useState("heroes");
   const { currentRank, impactMetrics, anchorPower, gxcoinStake, getAnchorMultiplier } = useContribution();
+  const { isLoggedIn } = useUser();
 
   const rankTiers = [
     { 
@@ -1680,6 +1682,13 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                   >
                     <Button 
                       size="lg"
+                      onClick={() => {
+                        if (isLoggedIn) {
+                          setActiveTab('heroes');
+                        } else {
+                          onOpenLogin?.();
+                        }
+                      }}
                       className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       <Droplets className="h-5 w-5 mr-2" />
@@ -1688,6 +1697,7 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                     <Button 
                       size="lg"
                       variant="outline"
+                      onClick={() => setActiveTab('heroes')}
                       className="border-blue-500/50 text-blue-300 hover:bg-blue-500/10 px-6 py-3"
                     >
                       Learn More
@@ -1944,6 +1954,7 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                   >
                     <Button 
                       size="lg"
+                      onClick={() => window.open('https://gxcoin.world', '_blank', 'noopener,noreferrer')}
                       className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-bold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       <Crown className="h-5 w-5 mr-2" />
@@ -1952,6 +1963,7 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                     <Button 
                       size="lg"
                       variant="outline"
+                      onClick={() => window.open('https://gxcoin.world', '_blank', 'noopener,noreferrer')}
                       className="border-violet-500/50 text-violet-300 hover:bg-violet-500/10 px-6 py-3"
                     >
                       Subscribe Updates
@@ -2051,6 +2063,7 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                   >
                     <Button 
                       size="lg"
+                      onClick={() => setActiveTab('heroes')}
                       className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:from-indigo-700 hover:via-blue-700 hover:to-purple-700 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       <Sparkles className="h-5 w-5 mr-2" />
