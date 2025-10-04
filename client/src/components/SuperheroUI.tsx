@@ -27,7 +27,7 @@ export default function SuperheroUI() {
 
   if (!isLoggedIn) {
     return (
-      <div className="fixed top-4 left-4 z-[40]">
+      <div className="fixed top-24 left-4 z-[20]">
         <Card className="bg-black/60 border-gray-500/30 backdrop-blur-sm">
           <CardContent className="p-4 text-center">
             <User className="h-8 w-8 mx-auto mb-2 text-gray-400" />
