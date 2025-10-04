@@ -299,7 +299,7 @@ function MainExperience() {
 
             <div className="space-y-8 min-h-screen overflow-y-auto px-2">
               <TabsContent value="home" className="mt-0 relative z-20 bg-gradient-to-br from-gray-900/95 via-black/95 to-blue-900/95 backdrop-blur-sm rounded-lg">
-                <LandingPage />
+                <LandingPage onOpenLogin={() => setShowLoginModal(true)} />
               </TabsContent>
 
               <TabsContent value="heroes" className="space-y-8 mt-0">

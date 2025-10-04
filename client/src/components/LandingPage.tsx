@@ -39,7 +39,7 @@ const getValidTokenSymbol = (heroSymbol: string): TokenSymbol => {
   return "GXCOIN"; // fallback to anchor
 };
 
-export default function LandingPage() {
+export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void }) {
   const [activeTab, setActiveTab] = useState("heroes");
   const { currentRank, impactMetrics, anchorPower, gxcoinStake, getAnchorMultiplier } = useContribution();
 
@@ -198,6 +198,7 @@ export default function LandingPage() {
 
               <div className="flex justify-center">
                 <Button 
+                  onClick={onOpenLogin}
                   className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold px-4 sm:px-6 md:px-8 py-2 sm:py-3 text-sm sm:text-base md:text-lg"
                 >
                   <Zap className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
@@ -765,6 +766,7 @@ export default function LandingPage() {
                     transition={{ delay: 1.8 }}
                   >
                     <Button 
+                      onClick={onOpenLogin}
                       size="lg"
                       className="bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 hover:from-purple-700 hover:via-blue-700 hover:to-green-700 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                     >
