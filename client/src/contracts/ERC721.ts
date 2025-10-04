@@ -45,29 +45,82 @@ export const HERO_NFT_ABI = [
   "event HeroEvolved(uint256 indexed tokenId, uint256 evolutionStage)"
 ];
 
-// Contract addresses for different networks (testnet addresses for demo)
-export const CONTRACT_ADDRESSES = {
+// Demo contract addresses (fallback when environment variables not set)
+const DEMO_ADDRESSES = {
   // Ethereum Sepolia testnet
   11155111: {
-    HERO_NFT: "0x1234567890123456789012345678901234567890", // Demo address
-    GXCOIN_TOKEN: "0x2345678901234567890123456789012345678901" // Demo address
+    HERO_NFT: "0x1234567890123456789012345678901234567890",
+    GXCOIN_TOKEN: "0x2345678901234567890123456789012345678901"
   },
   // Ethereum Goerli testnet
   5: {
-    HERO_NFT: "0x3456789012345678901234567890123456789012", // Demo address
-    GXCOIN_TOKEN: "0x4567890123456789012345678901234567890123" // Demo address
+    HERO_NFT: "0x3456789012345678901234567890123456789012",
+    GXCOIN_TOKEN: "0x4567890123456789012345678901234567890123"
   },
   // Polygon Mumbai testnet
   80001: {
-    HERO_NFT: "0x5678901234567890123456789012345678901234", // Demo address
-    GXCOIN_TOKEN: "0x6789012345678901234567890123456789012345" // Demo address
+    HERO_NFT: "0x5678901234567890123456789012345678901234",
+    GXCOIN_TOKEN: "0x6789012345678901234567890123456789012345"
   },
   // BSC Testnet
   97: {
-    HERO_NFT: "0x7890123456789012345678901234567890123456", // Demo address
-    GXCOIN_TOKEN: "0x8901234567890123456789012345678901234567" // Demo address
+    HERO_NFT: "0x7890123456789012345678901234567890123456",
+    GXCOIN_TOKEN: "0x8901234567890123456789012345678901234567"
   }
 };
+
+// Production contract addresses from environment variables
+const PRODUCTION_ADDRESSES = {
+  // Ethereum Sepolia testnet
+  11155111: {
+    HERO_NFT: import.meta.env.VITE_HERO_NFT_CONTRACT_SEPOLIA,
+    GXCOIN_TOKEN: import.meta.env.VITE_GXCOIN_TOKEN_SEPOLIA
+  },
+  // Ethereum Goerli testnet
+  5: {
+    HERO_NFT: import.meta.env.VITE_HERO_NFT_CONTRACT_GOERLI,
+    GXCOIN_TOKEN: import.meta.env.VITE_GXCOIN_TOKEN_GOERLI
+  },
+  // Polygon Mumbai testnet
+  80001: {
+    HERO_NFT: import.meta.env.VITE_HERO_NFT_CONTRACT_MUMBAI,
+    GXCOIN_TOKEN: import.meta.env.VITE_GXCOIN_TOKEN_MUMBAI
+  },
+  // BSC Testnet
+  97: {
+    HERO_NFT: import.meta.env.VITE_HERO_NFT_CONTRACT_BSC_TESTNET,
+    GXCOIN_TOKEN: import.meta.env.VITE_GXCOIN_TOKEN_BSC_TESTNET
+  },
+  // Ethereum Mainnet
+  1: {
+    HERO_NFT: import.meta.env.VITE_HERO_NFT_CONTRACT_ETHEREUM,
+    GXCOIN_TOKEN: import.meta.env.VITE_GXCOIN_TOKEN_ETHEREUM
+  },
+  // Polygon Mainnet
+  137: {
+    HERO_NFT: import.meta.env.VITE_HERO_NFT_CONTRACT_POLYGON,
+    GXCOIN_TOKEN: import.meta.env.VITE_GXCOIN_TOKEN_POLYGON
+  },
+  // BSC Mainnet
+  56: {
+    HERO_NFT: import.meta.env.VITE_HERO_NFT_CONTRACT_BSC,
+    GXCOIN_TOKEN: import.meta.env.VITE_GXCOIN_TOKEN_BSC
+  }
+};
+
+// Contract addresses - uses production addresses if set, falls back to demo
+export const CONTRACT_ADDRESSES = Object.keys(DEMO_ADDRESSES).reduce((acc, chainId) => {
+  const id = Number(chainId);
+  const prodAddresses = PRODUCTION_ADDRESSES[id as keyof typeof PRODUCTION_ADDRESSES];
+  const demoAddresses = DEMO_ADDRESSES[id as keyof typeof DEMO_ADDRESSES];
+  
+  acc[id] = {
+    HERO_NFT: prodAddresses?.HERO_NFT || demoAddresses.HERO_NFT,
+    GXCOIN_TOKEN: prodAddresses?.GXCOIN_TOKEN || demoAddresses.GXCOIN_TOKEN
+  };
+  
+  return acc;
+}, {} as Record<number, { HERO_NFT: string; GXCOIN_TOKEN: string }>);
 
 // Hero type mappings
 export const HERO_TYPES = {
@@ -208,6 +261,22 @@ export class HeroNFTContract {
     
     return await contractWithSigner.upgradeHero(tokenId, newLevel);
   }
+}
+
+// Helper functions for production mode detection
+export function isProduction(): boolean {
+  const mode = import.meta.env.VITE_NFT_MODE;
+  const enableRealMinting = import.meta.env.VITE_ENABLE_REAL_MINTING === 'true';
+  return mode === 'production' && enableRealMinting;
+}
+
+export function hasProductionContract(chainId: number): boolean {
+  const prodAddresses = PRODUCTION_ADDRESSES[chainId as keyof typeof PRODUCTION_ADDRESSES];
+  return !!(prodAddresses?.HERO_NFT && prodAddresses?.GXCOIN_TOKEN);
+}
+
+export function getContractAddressForChain(chainId: number, contractType: 'HERO_NFT' | 'GXCOIN_TOKEN'): string | undefined {
+  return CONTRACT_ADDRESSES[chainId]?.[contractType];
 }
 
 // Utility functions
