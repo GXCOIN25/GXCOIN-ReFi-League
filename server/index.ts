@@ -181,6 +181,11 @@ app.use((req, res, next) => {
     console.log('🔬 Initializing patent registry...');
     await initializePatents();
     console.log('✅ Patent registry initialized');
+    
+    // Initialize token prices
+    console.log('💰 Initializing token prices...');
+    await storage.seedTokens();
+    console.log('✅ Token prices initialized');
   } else {
     console.log('⚠️  Skipping patent registry initialization - database not available');
   }

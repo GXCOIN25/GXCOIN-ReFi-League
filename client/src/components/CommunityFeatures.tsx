@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Trophy, Target, Clock, Star, Crown } from 'lucide-react';
 import { useUser } from '../lib/stores/useUser';
+import { GXCoinAPI } from '../lib/api';
 
 interface TeamMission {
   id: string;
@@ -28,58 +29,45 @@ export const CommunityFeatures: React.FC = () => {
   const [teamMissions, setTeamMissions] = useState<TeamMission[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [userRank, setUserRank] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate team missions data
-    setTeamMissions([
-      {
-        id: '1',
-        title: 'Ocean Cleanup Challenge',
-        description: 'Collectively remove 10,000 kg of plastic from oceans worldwide',
-        goal: 10000,
-        current: 7234,
-        participants: 156,
-        timeLeft: '2d 14h',
-        reward: '500 AQUA tokens',
-        difficulty: 'Hard'
-      },
-      {
-        id: '2',
-        title: 'Renewable Energy Sprint',
-        description: 'Generate 50,000 kWh of clean energy this week',
-        goal: 50000,
-        current: 32100,
-        participants: 89,
-        timeLeft: '4d 8h',
-        reward: '300 VOLTRA tokens',
-        difficulty: 'Medium'
-      },
-      {
-        id: '3',
-        title: 'Carbon Offset Marathon',
-        description: 'Offset 25 tons of CO₂ through verified projects',
-        goal: 25000,
-        current: 18750,
-        participants: 203,
-        timeLeft: '1d 2h',
-        reward: '1000 GXCOIN',
-        difficulty: 'Legendary'
+    const fetchData = async () => {
+      if (!currentUser) return;
+      
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const [missions, leaderboardData] = await Promise.all([
+          GXCoinAPI.getTeamMissions(),
+          GXCoinAPI.getLeaderboard(10)
+        ]);
+        
+        setTeamMissions(missions);
+        setLeaderboard(leaderboardData);
+        
+        const userPosition = leaderboardData.findIndex(entry => entry.username === currentUser.username);
+        if (userPosition >= 0) {
+          setUserRank(userPosition + 1);
+        } else {
+          const totalContribution = await GXCoinAPI.getTotalContribution();
+          if (totalContribution > 0) {
+            setUserRank(leaderboardData.length + 1);
+          } else {
+            setUserRank(0);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch data:', err);
+        setError('Failed to load community data');
+      } finally {
+        setIsLoading(false);
       }
-    ]);
+    };
 
-    // Simulate leaderboard data
-    setLeaderboard([
-      { rank: 1, username: 'EcoWarrior2025', contribution: 15750, rank_title: 'Diamond Legend', avatar: '🏆' },
-      { rank: 2, username: 'GreenGuardian', contribution: 14200, rank_title: 'Diamond Legend', avatar: '🌟' },
-      { rank: 3, username: 'ClimateChampion', contribution: 12890, rank_title: 'Platinum Hero', avatar: '⚡' },
-      { rank: 4, username: 'OceanSaver', contribution: 11500, rank_title: 'Platinum Hero', avatar: '🌊' },
-      { rank: 5, username: 'SolarPioneer', contribution: 10200, rank_title: 'Gold Guardian', avatar: '☀️' },
-      { rank: 6, username: 'WindWhisperer', contribution: 9800, rank_title: 'Gold Guardian', avatar: '💨' },
-      { rank: 7, username: 'EarthProtector', contribution: 8900, rank_title: 'Gold Guardian', avatar: '🌍' },
-      { rank: 8, username: 'RecycleMaster', contribution: 7600, rank_title: 'Silver Defender', avatar: '♻️' },
-    ]);
-
-    setUserRank(currentUser ? Math.floor(Math.random() * 50) + 15 : 0);
+    fetchData();
   }, [currentUser]);
 
   const getDifficultyColor = (difficulty: string) => {
@@ -132,15 +120,30 @@ export const CommunityFeatures: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-white font-bold text-lg">Active Team Missions</h3>
               <div className="flex items-center space-x-2">
-                <div className="bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 px-2 py-1 rounded text-xs font-medium">
-                  📊 DEMO
-                </div>
                 <div className="text-green-400 text-sm font-medium">Join the Fight!</div>
               </div>
             </div>
 
+            {isLoading && (
+              <div className="text-center py-8">
+                <div className="text-gray-400">Loading team missions...</div>
+              </div>
+            )}
+
+            {error && (
+              <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4 mb-4">
+                <p className="text-red-300">{error}</p>
+              </div>
+            )}
+
+            {!isLoading && !error && teamMissions.length === 0 && (
+              <div className="text-center py-8">
+                <div className="text-gray-400">No active team missions at the moment</div>
+              </div>
+            )}
+
             <div className="space-y-4">
-              {teamMissions.map((mission) => (
+              {!isLoading && !error && teamMissions.map((mission) => (
                 <div key={mission.id} className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
                   <div className="flex items-start justify-between mb-3">
                     <div>
@@ -203,12 +206,7 @@ export const CommunityFeatures: React.FC = () => {
         <div className="bg-black/80 backdrop-blur-sm rounded-xl border border-yellow-500/30 p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-white font-bold text-lg">Global Leaderboard</h3>
-            <div className="flex items-center space-x-2">
-              <div className="bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 px-2 py-1 rounded text-xs font-medium">
-                📊 DEMO
-              </div>
-              <div className="text-yellow-400 text-sm">This Week</div>
-            </div>
+            <div className="text-yellow-400 text-sm">All Time</div>
           </div>
 
           {currentUser && userRank > 0 && (

@@ -613,6 +613,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/leaderboard", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      
+      if (limit < 1 || limit > 100) {
+        return res.status(400).json({ error: "Limit must be between 1 and 100" });
+      }
+      
+      const leaderboard = await storage.getLeaderboard(limit);
+      res.json(leaderboard);
+    } catch (error) {
+      console.error('Failed to fetch leaderboard:', error);
+      res.status(500).json({ error: "Failed to fetch leaderboard" });
+    }
+  });
+
   // Protected NFT Badge routes
   app.get("/api/nft-badges", authenticate, async (req: AuthRequest, res) => {
     const badges = await storage.getUserNFTBadges(req.userId!);
@@ -642,6 +658,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/missions", authenticate, async (req: AuthRequest, res) => {
     const missions = await storage.getUserMissionProgress(req.userId!);
     res.json(missions);
+  });
+
+  app.get("/api/missions/team", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const teamMissions = await storage.getTeamMissions();
+      res.json(teamMissions);
+    } catch (error) {
+      console.error('Failed to fetch team missions:', error);
+      res.status(500).json({ error: "Failed to fetch team missions" });
+    }
   });
 
   app.put("/api/missions/:missionId", authenticate, async (req: AuthRequest, res) => {
@@ -859,6 +885,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Failed to get economic stats:', error);
       res.status(500).json({ error: "Failed to retrieve economic stats" });
+    }
+  });
+
+  // Token endpoints
+  app.get("/api/tokens/prices", async (req, res) => {
+    try {
+      const tokens = await storage.getTokenPrices();
+      res.json(tokens);
+    } catch (error) {
+      console.error('Failed to get token prices:', error);
+      res.status(500).json({ error: "Failed to retrieve token prices" });
+    }
+  });
+
+  app.get("/api/tokens/balances", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const balances = await storage.getUserTokenBalances(req.userId!);
+      res.json(balances);
+    } catch (error) {
+      console.error('Failed to get token balances:', error);
+      res.status(500).json({ error: "Failed to retrieve token balances" });
     }
   });
 
