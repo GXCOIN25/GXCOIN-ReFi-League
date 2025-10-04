@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TrendingUp, TrendingDown, RefreshCw, Zap, Droplet, Leaf, Cpu, DollarSign } from 'lucide-react';
+import { GXCoinAPI } from '../lib/api';
 
 interface TokenData {
   symbol: string;
@@ -18,92 +19,70 @@ interface TokenBalance {
   value: number;
 }
 
+const TOKEN_CONFIG: Record<string, { icon: React.ReactNode; color: string }> = {
+  AQUA: { icon: <Droplet className="w-5 h-5" />, color: 'text-blue-400' },
+  HEMP: { icon: <Leaf className="w-5 h-5" />, color: 'text-green-400' },
+  VOLTRA: { icon: <Zap className="w-5 h-5" />, color: 'text-yellow-400' },
+  GRAPHENE: { icon: <Cpu className="w-5 h-5" />, color: 'text-purple-400' },
+  TRADER: { icon: <DollarSign className="w-5 h-5" />, color: 'text-orange-400' }
+};
+
 export const TokenIntegration: React.FC = () => {
   const [tokens, setTokens] = useState<TokenData[]>([]);
   const [balances, setBalances] = useState<TokenBalance[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
-  useEffect(() => {
-    // Simulate real token data
-    const initializeTokens = () => {
-      setTokens([
-        {
-          symbol: 'AQUA',
-          name: 'Aqua Ocean Token',
-          price: 0.45,
-          change24h: 5.67,
-          marketCap: 12500000,
-          volume24h: 890000,
-          icon: <Droplet className="w-5 h-5" />,
-          color: 'text-blue-400'
-        },
-        {
-          symbol: 'HEMP',
-          name: 'Hemp Earth Token',
-          price: 0.32,
-          change24h: -2.14,
-          marketCap: 8900000,
-          volume24h: 560000,
-          icon: <Leaf className="w-5 h-5" />,
-          color: 'text-green-400'
-        },
-        {
-          symbol: 'VOLTRA',
-          name: 'Voltra Energy Token',
-          price: 0.67,
-          change24h: 8.91,
-          marketCap: 18750000,
-          volume24h: 1200000,
-          icon: <Zap className="w-5 h-5" />,
-          color: 'text-yellow-400'
-        },
-        {
-          symbol: 'GRAPHENE',
-          name: 'Graphene Tech Token',
-          price: 1.23,
-          change24h: 12.45,
-          marketCap: 25600000,
-          volume24h: 1800000,
-          icon: <Cpu className="w-5 h-5" />,
-          color: 'text-purple-400'
-        },
-        {
-          symbol: 'TRADER',
-          name: 'Trader Market Token',
-          price: 2.14,
-          change24h: -4.67,
-          marketCap: 34200000,
-          volume24h: 2100000,
-          icon: <DollarSign className="w-5 h-5" />,
-          color: 'text-orange-400'
-        }
-      ]);
-
-      setBalances([
-        { symbol: 'AQUA', balance: 150.25, value: 67.61 },
-        { symbol: 'HEMP', balance: 89.50, value: 28.64 },
-        { symbol: 'VOLTRA', balance: 45.75, value: 30.65 },
-        { symbol: 'GRAPHENE', balance: 23.10, value: 28.41 },
-        { symbol: 'TRADER', balance: 12.80, value: 27.39 }
-      ]);
-
-      setIsLoading(false);
-      setLastUpdate(new Date());
-    };
-
-    // Initialize with delay
-    setTimeout(initializeTokens, 1000);
-
-    // Update prices every 10 seconds
-    const interval = setInterval(() => {
-      setTokens(prev => prev.map(token => ({
+  const fetchTokenPrices = async () => {
+    try {
+      const tokenPrices = await GXCoinAPI.getTokenPrices();
+      
+      const tokensWithUI = tokenPrices.map(token => ({
         ...token,
-        price: token.price * (1 + (Math.random() - 0.5) * 0.02), // ±1% random change
-        change24h: token.change24h + (Math.random() - 0.5) * 0.5
-      })));
+        icon: TOKEN_CONFIG[token.symbol]?.icon || <DollarSign className="w-5 h-5" />,
+        color: TOKEN_CONFIG[token.symbol]?.color || 'text-gray-400'
+      }));
+      
+      setTokens(tokensWithUI);
       setLastUpdate(new Date());
-    }, 10000);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to fetch token prices:', err);
+      setError('Failed to load token prices');
+    }
+  };
+
+  const fetchUserBalances = async () => {
+    try {
+      const token = localStorage.getItem('gxcoin_token');
+      if (!token) {
+        setBalances([]);
+        return;
+      }
+
+      const userBalances = await GXCoinAPI.getUserTokenBalances();
+      setBalances(userBalances);
+    } catch (err) {
+      console.error('Failed to fetch user balances:', err);
+      setBalances([]);
+    }
+  };
+
+  const loadAllData = async () => {
+    setIsLoading(true);
+    await Promise.all([fetchTokenPrices(), fetchUserBalances()]);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    loadAllData();
+
+    // Update prices every 30 seconds
+    const interval = setInterval(() => {
+      fetchTokenPrices();
+      fetchUserBalances();
+    }, 30000);
 
     return () => clearInterval(interval);
   }, []);
@@ -115,17 +94,8 @@ export const TokenIntegration: React.FC = () => {
 
   const totalPortfolioValue = balances.reduce((sum, balance) => sum + balance.value, 0);
 
-  const refreshPrices = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setTokens(prev => prev.map(token => ({
-        ...token,
-        price: token.price * (1 + (Math.random() - 0.5) * 0.05), // ±2.5% change
-        change24h: (Math.random() - 0.5) * 20 // Random change between -10% and +10%
-      })));
-      setIsLoading(false);
-      setLastUpdate(new Date());
-    }, 1500);
+  const refreshPrices = async () => {
+    await loadAllData();
   };
 
   if (isLoading) {
@@ -145,18 +115,19 @@ export const TokenIntegration: React.FC = () => {
       <div className="bg-black/80 backdrop-blur-sm rounded-xl border border-purple-500/30 p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-white font-bold text-lg">Token Portfolio</h3>
-          <div className="flex items-center space-x-3">
-            <div className="bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 px-3 py-1 rounded-lg text-xs font-medium">
-              📊 DEMO DATA
-            </div>
-            <button
-              onClick={refreshPrices}
-              className="p-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/50 text-purple-300 rounded-lg transition-all duration-200"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
-          </div>
+          <button
+            onClick={refreshPrices}
+            className="p-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/50 text-purple-300 rounded-lg transition-all duration-200"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
         </div>
+        
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-2 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="text-center p-4 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-lg border border-purple-500/20">
@@ -229,7 +200,7 @@ export const TokenIntegration: React.FC = () => {
         </div>
 
         <p className="text-gray-500 text-xs mt-4 text-center">
-          Last updated: {lastUpdate.toLocaleTimeString()} (Demo data - not real market prices)
+          Last updated: {lastUpdate.toLocaleTimeString()}
         </p>
       </div>
 

@@ -243,6 +243,26 @@ export const insertGitHubOAuthStateSchema = createInsertSchema(githubOAuthStates
   expiresAt: true,
 });
 
+// Token Prices System
+export const tokens = pgTable("tokens", {
+  symbol: text("symbol").primaryKey(),
+  name: text("name").notNull(),
+  price: real("price").notNull(),
+  change24h: real("change_24h").notNull(),
+  marketCap: real("market_cap").notNull(),
+  volume24h: real("volume_24h").notNull(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertTokenSchema = createInsertSchema(tokens).pick({
+  symbol: true,
+  name: true,
+  price: true,
+  change24h: true,
+  marketCap: true,
+  volume24h: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type GitHubOAuthState = typeof githubOAuthStates.$inferSelect;
@@ -261,3 +281,5 @@ export type EnvironmentalBattle = typeof environmentalBattles.$inferSelect;
 export type InsertEnvironmentalBattle = z.infer<typeof insertEnvironmentalBattleSchema>;
 export type UserEconomicStats = typeof userEconomicStats.$inferSelect;
 export type InsertUserEconomicStats = z.infer<typeof insertUserEconomicStatsSchema>;
+export type Token = typeof tokens.$inferSelect;
+export type InsertToken = z.infer<typeof insertTokenSchema>;

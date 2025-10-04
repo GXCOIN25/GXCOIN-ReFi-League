@@ -239,6 +239,14 @@ export class GXCoinAPI {
     return response.json();
   }
 
+  static async getTeamMissions(): Promise<any[]> {
+    const response = await fetch(`${API_BASE}/missions/team`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to get team missions');
+    return response.json();
+  }
+
   static async updateMissionProgress(missionId: string, progress: number): Promise<void> {
     const response = await fetch(`${API_BASE}/missions/${missionId}`, {
       method: 'PUT',
@@ -246,6 +254,20 @@ export class GXCoinAPI {
       body: JSON.stringify({ progress }),
     });
     if (!response.ok) throw new Error('Failed to update mission progress');
+  }
+
+  static async getLeaderboard(limit: number = 10): Promise<Array<{
+    rank: number;
+    username: string;
+    contribution: number;
+    rank_title: string;
+    avatar: string;
+  }>> {
+    const response = await fetch(`${API_BASE}/leaderboard?limit=${limit}`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to get leaderboard');
+    return response.json();
   }
 
   // Patent Registry API methods
@@ -455,5 +477,26 @@ export class GXCoinAPI {
     window.history.replaceState({}, document.title, cleanUrl);
     
     return result;
+  }
+
+  // Token methods
+  static async getTokenPrices(): Promise<any[]> {
+    const response = await fetch(`${API_BASE}/tokens/prices`, {
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (!response.ok) throw new Error('Failed to get token prices');
+    return response.json();
+  }
+
+  static async getUserTokenBalances(): Promise<Array<{
+    symbol: string;
+    balance: number;
+    value: number;
+  }>> {
+    const response = await fetch(`${API_BASE}/tokens/balances`, {
+      headers: this.getAuthHeaders()
+    });
+    if (!response.ok) throw new Error('Failed to get token balances');
+    return response.json();
   }
 }
