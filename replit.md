@@ -8,9 +8,78 @@ GXCOIN is an interactive superhero-themed platform for regenerative finance (ReF
 
 Preferred communication style: Simple, everyday language.
 
-## Recent Updates (October 4, 2025)
+## Recent Updates (October 6, 2025)
 
-### Landing Page Button Functionality (Latest)
+### Stripe Integration & Crypto Onboarding System (Latest)
+Complete payment integration and beginner-friendly crypto education system for first-time users:
+
+1. **Stripe Payment Integration**
+   - Added Stripe backend with checkout and webhook endpoints
+   - Created `purchaseHistory` table to track all NFT purchases
+   - Public endpoint `/api/public/stripe/create-checkout-session` for unauthenticated users
+   - Authenticated endpoint `/api/stripe/create-checkout-session` for logged-in users
+   - Webhook handler `/api/stripe/webhook` processes successful payments and auto-mints NFTs
+   - Secure payment verification through Stripe's webhook system
+   - Added `stripeCustomerId` to users table for customer tracking
+
+2. **NFT Purchase Flow Component**
+   - Built `StripeNFTPurchase.tsx` with multiple payment options:
+     * Credit/Debit Card payment (Stripe Checkout - fully functional)
+     * Buy Crypto First (Stripe Crypto Onramp integration - functional)
+     * Direct Crypto Payment (disabled - coming soon, awaits blockchain verification)
+   - Pricing tiers by rarity: Common $9.99, Rare $24.99, Epic $49.99, Legendary $99.99, Mythic $199.99
+   - Beginner-friendly tooltips explaining NFTs, gas fees, and payment security
+   - Success animations with confetti celebration
+   - Comprehensive error handling for payment failures
+
+3. **Interactive MetaMask Setup Tutorial**
+   - Created `MetaMaskOnboarding.tsx` with 5-step wizard:
+     * Step 1: Welcome & Education (What is MetaMask, why you need a wallet)
+     * Step 2: Installation Guide (browser extension & mobile app downloads, auto-detection)
+     * Step 3: Account Setup & Security (seed phrase education, backup instructions, critical warnings)
+     * Step 4: Connect Wallet (permission explanations, success animation)
+     * Step 5: Get Started (congratulations, next steps, quick tips)
+   - Progress indicator showing completion percentage
+   - Back/Next navigation with skip option for experienced users
+   - Tooltips on all technical terms
+   - Mobile responsive with dark theme
+
+4. **Crypto Onboarding Hub**
+   - Built `CryptoOnboardingHub.tsx` as central entry point for newcomers:
+     * Tab 1: "Getting Started" - Web3 introduction and value proposition
+     * Tab 2: "Setup MetaMask" - Embedded wallet setup wizard with progress tracking
+     * Tab 3: "Buy Your First NFT" - Three payment pathways clearly explained with quiz
+     * Tab 4: "Learn & FAQ" - 13 comprehensive FAQs, glossary of 18 crypto terms, video tutorial
+     * Tab 5: "Security Tips" - Best practices, do's/don'ts, scam reporting
+   - Progress tracking with localStorage persistence
+   - Celebration animation on completion
+   - Integration with useUser store for completion status
+
+5. **App Integration & User Flow**
+   - Auto-detect first-time users (shows onboarding after 2-second delay)
+   - "Crypto Guide" navigation tab accessible from anywhere
+   - Enhanced WalletConnect with "New to crypto?" onboarding link
+   - "Purchase NFT" buttons added to all hero cards in Heroes tab
+   - Landing page buttons trigger appropriate flows based on user state
+   - Environment variables for Stripe keys documented in .env.example
+
+6. **Security & Production Readiness**
+   - Direct crypto payments disabled until blockchain verification implemented
+   - All payments verified through Stripe webhooks before NFT minting
+   - Unauthenticated users can purchase via Stripe card payment
+   - Authenticated users have full payment options (card only for now)
+   - Clear TODO documentation for future crypto payment verification
+   - No security vulnerabilities - architect-reviewed and approved
+
+**Technical Stack Added:**
+- `stripe` and `@stripe/stripe-js` packages
+- `react-confetti` for success animations
+- Additional Radix UI components (Dialog, Tooltip, Accordion, Checkbox)
+- Database schema updates via Drizzle migrations
+
+All integrations follow security best practices with proper error handling, loading states, and user feedback.
+
+### Landing Page Button Functionality (October 4, 2025)
 All landing page buttons now have proper functionality and security:
 
 1. **"Visit gxcoin.world" Button**
