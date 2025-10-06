@@ -19,9 +19,12 @@ import { RealImpactDashboard } from "@/components/RealImpactDashboard";
 import { CommunityFeatures } from "@/components/CommunityFeatures";
 import { TokenIntegration } from "@/components/TokenIntegration";
 import { NFTMinting } from "@/components/NFTMinting";
+import { StripeNFTPurchase } from "@/components/StripeNFTPurchase";
+import { CryptoOnboardingHub } from "@/components/CryptoOnboardingHub";
 import GameArena from "@/components/GameArena";
 import LandingPage from "@/components/LandingPage";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import { useWallet } from "@/lib/stores/useWallet";
 import { 
   Volume2, 
   VolumeX, 
@@ -34,7 +37,8 @@ import {
   Globe,
   Coins,
   Gamepad2,
-  Home
+  Home,
+  BookOpen
 } from "lucide-react";
 import "@fontsource/inter";
 
@@ -156,8 +160,30 @@ function MainExperience() {
   const [currentTab, setCurrentTab] = useState("home");
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showNFTMinting, setShowNFTMinting] = useState<{ heroId: string; level: number } | null>(null);
-  const { isLoggedIn } = useUser();
+  const [selectedHeroForPurchase, setSelectedHeroForPurchase] = useState<{ heroId: string; heroName: string; heroRarity: string; heroImage: string } | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingTab, setOnboardingTab] = useState<'start' | 'metamask' | 'buy' | 'learn' | 'security'>('start');
+  const { isLoggedIn, onboardingProgress } = useUser();
   const { heroes, selectHero } = useHeroes();
+  const { isConnected } = useWallet();
+
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem('hasSeenCryptoOnboarding');
+    const isFirstVisit = !hasSeenOnboarding && !onboardingProgress.completedAt;
+    
+    if (isFirstVisit && !isConnected) {
+      const timer = setTimeout(() => {
+        setShowOnboarding(true);
+        setOnboardingTab('start');
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isConnected, onboardingProgress]);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('hasSeenCryptoOnboarding', 'true');
+    setShowOnboarding(false);
+  };
   
   // Hero image mapping
   const getHeroImage = (heroId: string) => {
@@ -253,6 +279,29 @@ function MainExperience() {
         />
       )}
 
+      {/* Stripe NFT Purchase Modal */}
+      {selectedHeroForPurchase && (
+        <StripeNFTPurchase
+          heroId={selectedHeroForPurchase.heroId}
+          heroName={selectedHeroForPurchase.heroName}
+          heroRarity={selectedHeroForPurchase.heroRarity as 'Common' | 'Rare' | 'Epic' | 'Legendary' | 'Mythic'}
+          heroImage={selectedHeroForPurchase.heroImage}
+          onClose={() => setSelectedHeroForPurchase(null)}
+          onSuccess={(nftId) => {
+            setSelectedHeroForPurchase(null);
+            console.log('Purchase successful! NFT ID:', nftId);
+          }}
+        />
+      )}
+
+      {/* Crypto Onboarding Hub */}
+      <CryptoOnboardingHub
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        initialTab={onboardingTab}
+        onComplete={handleOnboardingComplete}
+      />
+
       {/* Main Content Tabs */}
       <div className="relative z-10 pt-20">
         <div className="max-w-7xl mx-auto px-4">
@@ -298,6 +347,18 @@ function MainExperience() {
                 <TabsTrigger value="game" className="mobile-tab-trigger text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
                   <Gamepad2 className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="hidden sm:inline">Arena</span>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="cryptoguide" 
+                  className="mobile-tab-trigger text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap bg-purple-600/20 hover:bg-purple-600/30" 
+                  style={{ minWidth: '44px', minHeight: '44px' }}
+                  onClick={() => {
+                    setShowOnboarding(true);
+                    setOnboardingTab('learn');
+                  }}
+                >
+                  <BookOpen className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="hidden sm:inline">Crypto Guide</span>
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -398,6 +459,23 @@ function MainExperience() {
                               Level {hero.level}
                             </span>
                           </div>
+
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedHeroForPurchase({
+                                heroId: hero.id,
+                                heroName: hero.name,
+                                heroRarity: hero.rarity,
+                                heroImage: getHeroImage(hero.id)
+                              });
+                            }}
+                            className="w-full mt-4"
+                            style={{ backgroundColor: hero.color }}
+                          >
+                            <CreditCard className="h-4 w-4 mr-2" />
+                            Purchase NFT
+                          </Button>
                         </CardContent>
                       </Card>
                     </motion.div>
@@ -493,7 +571,12 @@ function MainExperience() {
                   </p>
                 </motion.div>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                  <WalletConnect />
+                  <WalletConnect 
+                    onOpenOnboarding={() => {
+                      setShowOnboarding(true);
+                      setOnboardingTab('metamask');
+                    }}
+                  />
                   <WalletFeatures />
                 </div>
               </TabsContent>

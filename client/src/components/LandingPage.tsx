@@ -8,6 +8,8 @@ import { useHeroes } from "@/lib/stores/useHeroes";
 import { gameHeroes } from "@/data/gameHeroes";
 import { useContribution } from "@/lib/stores/useContribution";
 import { useUser } from "@/lib/stores/useUser";
+import { useWallet } from "@/lib/stores/useWallet";
+import { CryptoOnboardingHub } from "./CryptoOnboardingHub";
 import TokenBadge, { TokenSymbol } from "./TokenBadge";
 import { 
   Sparkles, 
@@ -50,8 +52,29 @@ const getValidTokenSymbol = (heroSymbol: string): TokenSymbol => {
 
 export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void }) {
   const [activeTab, setActiveTab] = useState("heroes");
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [onboardingInitialTab, setOnboardingInitialTab] = useState<'start' | 'metamask' | 'buy' | 'learn' | 'security'>('start');
   const { currentRank, impactMetrics, anchorPower, gxcoinStake, getAnchorMultiplier } = useContribution();
   const { isLoggedIn } = useUser();
+  const { isConnected } = useWallet();
+
+  const handleGetStarted = () => {
+    setOnboardingInitialTab('start');
+    setShowOnboarding(true);
+  };
+
+  const handleActivateAqua = () => {
+    if (!isConnected) {
+      setOnboardingInitialTab('metamask');
+      setShowOnboarding(true);
+    } else {
+      onOpenLogin?.();
+    }
+  };
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+  };
 
   const rankTiers = [
     { 
@@ -946,12 +969,12 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                     transition={{ delay: 1.8 }}
                   >
                     <Button 
-                      onClick={onOpenLogin}
+                      onClick={handleGetStarted}
                       size="lg"
                       className="bg-gradient-to-r from-purple-600 via-blue-600 to-green-600 hover:from-purple-700 hover:via-blue-700 hover:to-green-700 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       <Sparkles className="h-5 w-5 mr-2" />
-                      JOIN THE REFI LEAGUE TODAY!
+                      GET STARTED - JOIN THE REFI LEAGUE!
                     </Button>
                   </motion.div>
                 </div>
@@ -1682,17 +1705,11 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                   >
                     <Button 
                       size="lg"
-                      onClick={() => {
-                        if (isLoggedIn) {
-                          setActiveTab('heroes');
-                        } else {
-                          onOpenLogin?.();
-                        }
-                      }}
+                      onClick={handleActivateAqua}
                       className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       <Droplets className="h-5 w-5 mr-2" />
-                      Activate AQUA dNFT
+                      {isConnected ? 'Activate AQUA dNFT' : 'Setup Wallet & Activate AQUA'}
                     </Button>
                     <Button 
                       size="lg"
@@ -2076,6 +2093,14 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
           </Card>
         </div>
       </motion.section>
+
+      {/* Crypto Onboarding Modal */}
+      <CryptoOnboardingHub
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        initialTab={onboardingInitialTab}
+        onComplete={handleOnboardingComplete}
+      />
     </div>
   );
 }
