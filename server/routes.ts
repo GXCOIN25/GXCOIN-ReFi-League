@@ -8,6 +8,7 @@ import slowDown from "express-slow-down";
 import type { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 import { Octokit } from '@octokit/rest';
+import Stripe from 'stripe';
 
 interface AuthRequest extends Request {
   userId?: number;
@@ -36,6 +37,31 @@ const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   app.use(cookieParser());
+  
+  // Stripe Configuration
+  const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+  const STRIPE_PUBLISHABLE_KEY = process.env.STRIPE_PUBLISHABLE_KEY;
+  const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+  
+  let stripe: Stripe | null = null;
+  
+  if (STRIPE_SECRET_KEY) {
+    stripe = new Stripe(STRIPE_SECRET_KEY, {
+      apiVersion: '2025-09-30.clover',
+    });
+    console.log('✅ Stripe initialized successfully');
+  } else {
+    console.warn('⚠️  WARNING: STRIPE_SECRET_KEY not set - Stripe payments will be disabled');
+    console.warn('💡 Set STRIPE_SECRET_KEY to enable Stripe payments');
+  }
+  
+  if (!STRIPE_PUBLISHABLE_KEY) {
+    console.warn('⚠️  WARNING: STRIPE_PUBLISHABLE_KEY not set');
+  }
+  
+  if (!STRIPE_WEBHOOK_SECRET) {
+    console.warn('⚠️  WARNING: STRIPE_WEBHOOK_SECRET not set - webhooks will not be verified');
+  }
   
   // Production-ready rate limiting for auth endpoints
   const authRateLimit = rateLimit({
@@ -906,6 +932,261 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Failed to get token balances:', error);
       res.status(500).json({ error: "Failed to retrieve token balances" });
+    }
+  });
+
+  // Stripe Payment Routes
+  app.post("/api/stripe/create-onramp-session", authenticate, async (req: AuthRequest, res) => {
+    try {
+      if (!stripe) {
+        return res.status(503).json({ error: "Stripe is not configured. Please contact support." });
+      }
+
+      const { walletAddress, destinationCurrency, destinationNetwork, sourceAmount } = req.body;
+
+      if (!walletAddress || !destinationCurrency || !destinationNetwork || !sourceAmount) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Create or get Stripe customer
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email || undefined,
+          metadata: {
+            userId: user.id.toString(),
+            username: user.username,
+          },
+        });
+        customerId = customer.id;
+        await storage.updateUserStripeCustomerId(user.id, customerId);
+      }
+
+      // Note: Stripe Crypto Onramp requires special access and configuration
+      // For now, we'll create a payment session that can be used with Stripe's crypto products
+      // This would typically use stripe.crypto.onrampSessions in production with proper API access
+      
+      // Create a checkout session as a fallback for crypto purchases
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: `Crypto Purchase - ${destinationCurrency}`,
+                description: `Buy ${destinationCurrency} on ${destinationNetwork}`,
+              },
+              unit_amount: Math.round(sourceAmount * 100),
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${process.env.APP_URL || 'http://localhost:5000'}/crypto-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.APP_URL || 'http://localhost:5000'}/cancel`,
+        metadata: {
+          userId: user.id.toString(),
+          type: 'crypto_onramp',
+          walletAddress,
+          destinationCurrency,
+          destinationNetwork,
+        },
+      });
+
+      // Record purchase in database
+      await storage.createPurchase({
+        userId: user.id,
+        stripeSessionId: session.id,
+        type: 'crypto_onramp',
+        amount: sourceAmount,
+        currency: 'usd',
+        status: 'pending',
+        walletAddress,
+        destinationCurrency,
+        destinationNetwork,
+        sourceAmount,
+        metadata: { sessionDetails: session },
+      });
+
+      res.json({
+        clientSecret: session.url, // Use URL instead of client_secret for checkout sessions
+        sessionId: session.id,
+      });
+    } catch (error: any) {
+      console.error('Failed to create onramp session:', error);
+      res.status(500).json({ error: error.message || "Failed to create onramp session" });
+    }
+  });
+
+  app.post("/api/stripe/create-checkout-session", authenticate, async (req: AuthRequest, res) => {
+    try {
+      if (!stripe) {
+        return res.status(503).json({ error: "Stripe is not configured. Please contact support." });
+      }
+
+      const { heroId, amount } = req.body;
+
+      if (!heroId || !amount) {
+        return res.status(400).json({ error: "Missing required fields: heroId and amount" });
+      }
+
+      const user = await storage.getUser(req.userId!);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Create or get Stripe customer
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email || undefined,
+          metadata: {
+            userId: user.id.toString(),
+            username: user.username,
+          },
+        });
+        customerId = customer.id;
+        await storage.updateUserStripeCustomerId(user.id, customerId);
+      }
+
+      // Create checkout session for dNFT purchase
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: `GXCOIN Hero NFT - ${heroId}`,
+                description: `Purchase dynamic NFT for hero ${heroId}`,
+              },
+              unit_amount: Math.round(amount * 100), // Convert to cents
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${process.env.APP_URL || 'http://localhost:5000'}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.APP_URL || 'http://localhost:5000'}/cancel`,
+        metadata: {
+          userId: user.id.toString(),
+          heroId,
+        },
+      });
+
+      // Record purchase in database
+      await storage.createPurchase({
+        userId: user.id,
+        stripeSessionId: session.id,
+        type: 'dnft_purchase',
+        amount,
+        currency: 'usd',
+        status: 'pending',
+        heroId,
+        metadata: { sessionDetails: session },
+      });
+
+      res.json({
+        sessionId: session.id,
+        url: session.url,
+      });
+    } catch (error: any) {
+      console.error('Failed to create checkout session:', error);
+      res.status(500).json({ error: error.message || "Failed to create checkout session" });
+    }
+  });
+
+  app.post("/api/stripe/webhook", async (req, res) => {
+    try {
+      if (!stripe) {
+        return res.status(503).json({ error: "Stripe is not configured" });
+      }
+
+      const sig = req.headers['stripe-signature'] as string;
+
+      if (!sig) {
+        return res.status(400).json({ error: "Missing stripe-signature header" });
+      }
+
+      let event: Stripe.Event;
+
+      // Verify webhook signature if secret is configured
+      if (STRIPE_WEBHOOK_SECRET) {
+        try {
+          event = stripe.webhooks.constructEvent(
+            req.body,
+            sig,
+            STRIPE_WEBHOOK_SECRET
+          );
+        } catch (err: any) {
+          console.error('Webhook signature verification failed:', err.message);
+          return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+        }
+      } else {
+        // In development without webhook secret, just parse the body
+        event = req.body as Stripe.Event;
+        console.warn('⚠️  Processing webhook without signature verification (development mode)');
+      }
+
+      // Handle the event
+      switch (event.type) {
+        case 'checkout.session.completed': {
+          const session = event.data.object as Stripe.Checkout.Session;
+          console.log('Checkout session completed:', session.id);
+
+          const purchase = await storage.getPurchaseBySessionId(session.id);
+          if (purchase) {
+            // Update purchase status
+            await storage.updatePurchaseStatus(
+              session.id,
+              'completed',
+              new Date(),
+              session.payment_intent as string
+            );
+
+            // Create NFT badge for dNFT purchases
+            if (purchase.type === 'dnft_purchase') {
+              const heroId = purchase.heroId || session.metadata?.heroId;
+              if (heroId) {
+                await storage.createNFTBadge({
+                  userId: purchase.userId,
+                  heroId,
+                  level: 1,
+                  evolution: 'base',
+                  rarity: 'common',
+                  attributes: {
+                    purchasedAt: new Date().toISOString(),
+                    paymentIntentId: session.payment_intent,
+                  },
+                  minted: false,
+                });
+                console.log(`✅ Created NFT badge for user ${purchase.userId}, hero ${heroId}`);
+              }
+            } else if (purchase.type === 'crypto_onramp') {
+              // Handle crypto onramp completion
+              console.log(`✅ Crypto onramp completed for user ${purchase.userId}`);
+              // Additional logic for crypto delivery would go here
+            }
+          }
+          break;
+        }
+
+        default:
+          console.log(`Unhandled event type: ${event.type}`);
+      }
+
+      res.json({ received: true });
+    } catch (error: any) {
+      console.error('Webhook processing error:', error);
+      res.status(500).json({ error: error.message || "Webhook processing failed" });
     }
   });
 

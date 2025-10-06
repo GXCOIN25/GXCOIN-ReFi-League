@@ -19,6 +19,8 @@ export const users = pgTable("users", {
   githubRefreshToken: text("github_refresh_token"), // Encrypted OAuth refresh token
   githubTokenExpiresAt: timestamp("github_token_expires_at"),
   githubUserId: text("github_user_id"), // GitHub user ID for identity verification
+  // Stripe fields
+  stripeCustomerId: text("stripe_customer_id"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -70,6 +72,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   githubRefreshToken: true,
   githubTokenExpiresAt: true,
   githubUserId: true,
+  stripeCustomerId: true,
 }).extend({
   password: z.string().optional().nullable(), // Allow null for SSO users
   walletAddress: z.string().optional().nullable(),
@@ -84,6 +87,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   githubRefreshToken: z.string().optional().nullable(),
   githubTokenExpiresAt: z.date().optional().nullable(),
   githubUserId: z.string().optional().nullable(),
+  stripeCustomerId: z.string().optional().nullable(),
 });
 
 export const insertContributionSchema = createInsertSchema(contributions).pick({
@@ -263,6 +267,48 @@ export const insertTokenSchema = createInsertSchema(tokens).pick({
   volume24h: true,
 });
 
+// Purchase History System for Stripe transactions
+export const purchaseHistory = pgTable("purchase_history", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  stripeSessionId: text("stripe_session_id").notNull(),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  type: text("type").notNull(), // 'crypto_onramp', 'dnft_purchase'
+  amount: real("amount").notNull(), // Amount in USD
+  currency: text("currency").default('usd'),
+  status: text("status").notNull(), // 'pending', 'completed', 'failed'
+  // For crypto onramp
+  walletAddress: text("wallet_address"),
+  destinationCurrency: text("destination_currency"),
+  destinationNetwork: text("destination_network"),
+  sourceAmount: real("source_amount"),
+  // For dNFT purchases
+  heroId: text("hero_id"),
+  nftBadgeId: integer("nft_badge_id").references(() => nftBadges.id),
+  // Metadata
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+});
+
+export const insertPurchaseHistorySchema = createInsertSchema(purchaseHistory).pick({
+  userId: true,
+  stripeSessionId: true,
+  stripePaymentIntentId: true,
+  type: true,
+  amount: true,
+  currency: true,
+  status: true,
+  walletAddress: true,
+  destinationCurrency: true,
+  destinationNetwork: true,
+  sourceAmount: true,
+  heroId: true,
+  nftBadgeId: true,
+  metadata: true,
+  completedAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type GitHubOAuthState = typeof githubOAuthStates.$inferSelect;
@@ -283,3 +329,5 @@ export type UserEconomicStats = typeof userEconomicStats.$inferSelect;
 export type InsertUserEconomicStats = z.infer<typeof insertUserEconomicStatsSchema>;
 export type Token = typeof tokens.$inferSelect;
 export type InsertToken = z.infer<typeof insertTokenSchema>;
+export type PurchaseHistory = typeof purchaseHistory.$inferSelect;
+export type InsertPurchaseHistory = z.infer<typeof insertPurchaseHistorySchema>;
