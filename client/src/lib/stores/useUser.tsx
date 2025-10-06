@@ -2,6 +2,15 @@ import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { GXCoinAPI, type ApiUser, type GitHubProfile, type GitHubRepository } from "@/lib/api";
 
+interface OnboardingProgress {
+  completedTabs: string[];
+  skipped: boolean;
+  lastActiveTab: string;
+  metaMaskSetup: boolean;
+  walletConnected: boolean;
+  completedAt?: string;
+}
+
 interface UserState {
   currentUser: ApiUser | null;
   isLoggedIn: boolean;
@@ -14,6 +23,9 @@ interface UserState {
   isGitHubConnected: boolean;
   isLoadingGitHub: boolean;
   githubError: string | null;
+  
+  // Onboarding state
+  onboardingProgress: OnboardingProgress;
   
   // Actions
   register: (userData: { username: string; password: string; walletAddress?: string }) => Promise<void>;
@@ -29,7 +41,36 @@ interface UserState {
   fetchGitHubProfile: () => Promise<void>;
   fetchGitHubRepositories: () => Promise<void>;
   setGitHubError: (error: string | null) => void;
+  
+  // Onboarding actions
+  updateOnboardingProgress: (progress: Partial<OnboardingProgress>) => void;
+  completeOnboarding: () => void;
+  resetOnboarding: () => void;
 }
+
+const getInitialOnboardingProgress = (): OnboardingProgress => {
+  const stored = localStorage.getItem('gxcoin_onboarding');
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch {
+      return {
+        completedTabs: [],
+        skipped: false,
+        lastActiveTab: 'start',
+        metaMaskSetup: false,
+        walletConnected: false
+      };
+    }
+  }
+  return {
+    completedTabs: [],
+    skipped: false,
+    lastActiveTab: 'start',
+    metaMaskSetup: false,
+    walletConnected: false
+  };
+};
 
 export const useUser = create<UserState>()(
   subscribeWithSelector((set, get) => ({
@@ -44,6 +85,9 @@ export const useUser = create<UserState>()(
     isGitHubConnected: false,
     isLoadingGitHub: false,
     githubError: null,
+    
+    // Onboarding state
+    onboardingProgress: getInitialOnboardingProgress(),
     
     register: async (userData) => {
       set({ isLoading: true, error: null });
@@ -226,6 +270,39 @@ export const useUser = create<UserState>()(
     
     setGitHubError: (error) => {
       set({ githubError: error });
+    },
+    
+    // Onboarding actions
+    updateOnboardingProgress: (progress) => {
+      const currentProgress = get().onboardingProgress;
+      const newProgress = { ...currentProgress, ...progress };
+      localStorage.setItem('gxcoin_onboarding', JSON.stringify(newProgress));
+      set({ onboardingProgress: newProgress });
+    },
+    
+    completeOnboarding: () => {
+      const completedProgress: OnboardingProgress = {
+        completedTabs: ['start', 'metamask', 'buy', 'learn', 'security'],
+        skipped: false,
+        lastActiveTab: 'security',
+        metaMaskSetup: true,
+        walletConnected: true,
+        completedAt: new Date().toISOString()
+      };
+      localStorage.setItem('gxcoin_onboarding', JSON.stringify(completedProgress));
+      set({ onboardingProgress: completedProgress });
+    },
+    
+    resetOnboarding: () => {
+      const resetProgress: OnboardingProgress = {
+        completedTabs: [],
+        skipped: false,
+        lastActiveTab: 'start',
+        metaMaskSetup: false,
+        walletConnected: false
+      };
+      localStorage.setItem('gxcoin_onboarding', JSON.stringify(resetProgress));
+      set({ onboardingProgress: resetProgress });
     }
   }))
 );

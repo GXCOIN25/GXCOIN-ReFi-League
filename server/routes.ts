@@ -936,6 +936,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Stripe Payment Routes
+  
+  // Public Stripe checkout endpoint for unauthenticated users
+  app.post("/api/public/stripe/create-checkout-session", async (req: Request, res: Response) => {
+    try {
+      if (!stripe) {
+        return res.status(503).json({ error: "Stripe is not configured. Please contact support." });
+      }
+
+      const { heroId, amount, email } = req.body;
+
+      if (!heroId || !amount) {
+        return res.status(400).json({ error: "Missing required fields: heroId and amount" });
+      }
+
+      // Create checkout session for unauthenticated users
+      const session = await stripe.checkout.sessions.create({
+        customer_email: email || undefined,
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: `GXCOIN Hero NFT - ${heroId}`,
+                description: `Purchase dynamic NFT for hero ${heroId}`,
+              },
+              unit_amount: Math.round(amount * 100), // Convert to cents
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${process.env.APP_URL || 'http://localhost:5000'}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.APP_URL || 'http://localhost:5000'}/cancel`,
+        metadata: {
+          heroId,
+          type: 'public_purchase',
+          email: email || 'guest',
+        },
+      });
+
+      res.json({
+        sessionId: session.id,
+        url: session.url,
+      });
+    } catch (error: any) {
+      console.error('Failed to create public checkout session:', error);
+      res.status(500).json({ error: error.message || "Failed to create checkout session" });
+    }
+  });
+
   app.post("/api/stripe/create-onramp-session", authenticate, async (req: AuthRequest, res) => {
     try {
       if (!stripe) {
@@ -1188,6 +1239,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Webhook processing error:', error);
       res.status(500).json({ error: error.message || "Webhook processing failed" });
     }
+  });
+
+  app.post("/api/nft/mint-with-crypto", authenticate, async (req: AuthRequest, res) => {
+    console.warn('🚨 SECURITY: Crypto payment endpoint disabled - blockchain verification not implemented');
+    console.warn('TODO: Implement blockchain transaction verification before enabling:');
+    console.warn('  - Verify transactionHash exists on-chain');
+    console.warn('  - Verify amount matches expected price');
+    console.warn('  - Verify wallet address owns the transaction');
+    console.warn('  - Verify transaction is confirmed (not pending)');
+    
+    return res.status(503).json({ 
+      error: "Direct crypto payments temporarily disabled - use Stripe checkout",
+      message: "For security reasons, direct crypto payments are disabled until blockchain verification is implemented. Please use card payment or Stripe crypto onramp."
+    });
   });
 
   const httpServer = createServer(app);

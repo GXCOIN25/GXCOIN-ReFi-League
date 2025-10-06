@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '../lib/stores/useWallet';
-import { Wallet, Copy, ExternalLink, RefreshCw, AlertTriangle, CheckCircle, Globe } from 'lucide-react';
+import { Wallet, Copy, ExternalLink, RefreshCw, AlertTriangle, CheckCircle, Globe, HelpCircle } from 'lucide-react';
 
-export const WalletConnect: React.FC = () => {
+interface WalletConnectProps {
+  onOpenOnboarding?: () => void;
+}
+
+export const WalletConnect: React.FC<WalletConnectProps> = ({ onOpenOnboarding }) => {
   const {
     isConnected,
     address,
@@ -274,6 +278,19 @@ export const WalletConnect: React.FC = () => {
             🔒 Testnet-only for safety • Real impact tracking • Patent-backed heroes
           </p>
         </div>
+
+        {onOpenOnboarding && (
+          <div className="text-center pt-3 border-t border-gray-700">
+            <button
+              onClick={onOpenOnboarding}
+              className="inline-flex items-center gap-2 text-sm text-purple-400 hover:text-purple-300 transition-colors group"
+              title="Click here to learn how to set up MetaMask"
+            >
+              <HelpCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
+              <span>New to crypto? Learn how to get started</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
