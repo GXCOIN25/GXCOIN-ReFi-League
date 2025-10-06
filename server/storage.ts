@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { users, contributions, nftBadges, missions, patents, economicRewards, userPatentAccess, environmentalBattles, userEconomicStats, githubOAuthStates, tokens,
+import { users, contributions, nftBadges, missions, patents, economicRewards, userPatentAccess, environmentalBattles, userEconomicStats, githubOAuthStates, tokens, purchaseHistory,
          type User, type InsertUser, 
          type Contribution, type InsertContribution,
          type NftBadge, type InsertNftBadge,
@@ -10,7 +10,8 @@ import { users, contributions, nftBadges, missions, patents, economicRewards, us
          type EnvironmentalBattle, type InsertEnvironmentalBattle,
          type UserEconomicStats, type InsertUserEconomicStats,
          type GitHubOAuthState, type InsertGitHubOAuthState,
-         type Token, type InsertToken } from "@shared/schema";
+         type Token, type InsertToken,
+         type PurchaseHistory, type InsertPurchaseHistory } from "@shared/schema";
 import { eq, desc, sum, and, sql, lt } from "drizzle-orm";
 import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -180,6 +181,13 @@ export interface IStorage {
     balance: number;
     value: number;
   }>>;
+  
+  // Purchase History methods (Stripe)
+  createPurchase(purchase: InsertPurchaseHistory): Promise<PurchaseHistory>;
+  updatePurchaseStatus(sessionId: string, status: string, completedAt?: Date, paymentIntentId?: string): Promise<PurchaseHistory | undefined>;
+  getUserPurchaseHistory(userId: number): Promise<PurchaseHistory[]>;
+  getPurchaseBySessionId(sessionId: string): Promise<PurchaseHistory | undefined>;
+  updateUserStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User>;
 }
 
 export class PostgresStorage implements IStorage {
@@ -880,6 +888,61 @@ export class PostgresStorage implements IStorage {
       balance,
       value: balance * (priceMap[symbol] || 0),
     }));
+  }
+
+  // Purchase History methods (Stripe)
+  async createPurchase(purchase: InsertPurchaseHistory): Promise<PurchaseHistory> {
+    const result = await db.insert(purchaseHistory).values(purchase).returning();
+    return result[0];
+  }
+
+  async updatePurchaseStatus(
+    sessionId: string, 
+    status: string, 
+    completedAt?: Date, 
+    paymentIntentId?: string
+  ): Promise<PurchaseHistory | undefined> {
+    const updateData: any = { status };
+    if (completedAt) updateData.completedAt = completedAt;
+    if (paymentIntentId) updateData.stripePaymentIntentId = paymentIntentId;
+
+    const result = await db
+      .update(purchaseHistory)
+      .set(updateData)
+      .where(eq(purchaseHistory.stripeSessionId, sessionId))
+      .returning();
+    
+    return result[0];
+  }
+
+  async getUserPurchaseHistory(userId: number): Promise<PurchaseHistory[]> {
+    const result = await db
+      .select()
+      .from(purchaseHistory)
+      .where(eq(purchaseHistory.userId, userId))
+      .orderBy(desc(purchaseHistory.createdAt));
+    
+    return result;
+  }
+
+  async getPurchaseBySessionId(sessionId: string): Promise<PurchaseHistory | undefined> {
+    const result = await db
+      .select()
+      .from(purchaseHistory)
+      .where(eq(purchaseHistory.stripeSessionId, sessionId))
+      .limit(1);
+    
+    return result[0];
+  }
+
+  async updateUserStripeCustomerId(userId: number, stripeCustomerId: string): Promise<User> {
+    const result = await db
+      .update(users)
+      .set({ stripeCustomerId })
+      .where(eq(users.id, userId))
+      .returning();
+    
+    return result[0];
   }
 }
 
