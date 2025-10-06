@@ -38,7 +38,8 @@ import {
   Coins,
   Gamepad2,
   Home,
-  BookOpen
+  BookOpen,
+  CreditCard
 } from "lucide-react";
 import "@fontsource/inter";
 
