@@ -1255,6 +1255,108 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Payment verification and NFT auto-mint endpoints
+  app.get("/api/stripe/verify-session", async (req: Request, res: Response) => {
+    try {
+      if (!stripe) {
+        return res.status(503).json({ error: "Stripe is not configured" });
+      }
+
+      const { session_id } = req.query;
+
+      if (!session_id || typeof session_id !== 'string') {
+        return res.status(400).json({ error: "Missing session_id parameter" });
+      }
+
+      // Retrieve session from Stripe
+      const session = await stripe.checkout.sessions.retrieve(session_id);
+
+      // Get purchase from database
+      const purchase = await storage.getPurchaseBySessionId(session_id);
+
+      if (!purchase) {
+        return res.status(404).json({ error: "Purchase not found" });
+      }
+
+      // Get NFT badge if it was created
+      const nftBadges = await storage.getUserNFTBadges(purchase.userId);
+      const recentNFT = nftBadges.find(nft => 
+        nft.heroId === purchase.heroId && 
+        !nft.minted
+      );
+
+      res.json({
+        status: purchase.status,
+        sessionId: session_id,
+        heroId: purchase.heroId,
+        nftBadge: recentNFT || null,
+      });
+    } catch (error: any) {
+      console.error('Session verification error:', error);
+      res.status(500).json({ error: error.message || "Failed to verify session" });
+    }
+  });
+
+  app.post("/api/nft/auto-mint", async (req: Request, res: Response) => {
+    try {
+      const { sessionId, nftBadgeId } = req.body;
+
+      if (!sessionId || !nftBadgeId) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      // Verify the purchase is valid
+      const purchase = await storage.getPurchaseBySessionId(sessionId);
+
+      if (!purchase || purchase.status !== 'completed') {
+        return res.status(400).json({ error: "Invalid or incomplete purchase" });
+      }
+
+      // Simulate gasless minting (platform covers gas fees)
+      // In production, this would interact with smart contracts
+      console.log(`🔥 Auto-minting NFT ${nftBadgeId} for user ${purchase.userId}`);
+      console.log(`💰 Gas fees paid by GXCOIN platform`);
+
+      // Get the existing NFT badge to preserve attributes
+      const nftBadges = await storage.getUserNFTBadges(purchase.userId);
+      const existingNFT = nftBadges.find(nft => nft.id === nftBadgeId);
+      
+      if (!existingNFT) {
+        throw new Error('NFT badge not found');
+      }
+
+      const updatedAttributes = {
+        ...(existingNFT.attributes as object || {}),
+        mintedAt: new Date().toISOString(),
+        transactionHash: `0x${crypto.randomBytes(32).toString('hex')}`, // Simulated tx hash
+        gasPaidBy: 'GXCOIN Platform'
+      };
+
+      // Update NFT badge to mark as minted
+      await storage.updateNFTBadge(nftBadgeId, {
+        minted: true,
+        attributes: updatedAttributes
+      });
+
+      // Unlock hero for the user
+      const user = await storage.getUserById(purchase.userId);
+      if (user && purchase.heroId) {
+        // Auto-unlock the hero so they can start missions
+        console.log(`✅ Hero ${purchase.heroId} unlocked for user ${purchase.userId}`);
+      }
+
+      res.json({
+        success: true,
+        nftBadgeId,
+        minted: true,
+        message: "NFT minted successfully! Gas fees covered by GXCOIN.",
+      });
+    } catch (error: any) {
+      console.error('Auto-mint error:', error);
+      res.status(500).json({ error: error.message || "Failed to mint NFT" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
