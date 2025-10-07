@@ -40,6 +40,57 @@ export function PurchaseSuccess() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session_id');
+    const isDemoMode = urlParams.get('demo') === 'true';
+
+    // Demo mode - show the full epic journey with mock data
+    if (isDemoMode) {
+      setShareUrl(`${window.location.origin}/?ref=demo123`);
+      
+      const runDemoFlow = async () => {
+        // Stage 1: Loading with progress bar (2s)
+        const progressInterval = setInterval(() => {
+          setProgress(prev => {
+            if (prev >= 100) {
+              clearInterval(progressInterval);
+              return 100;
+            }
+            return prev + 20;
+          });
+        }, 200);
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        clearInterval(progressInterval);
+        setProgress(100);
+
+        // Stage 2: Minting animation (3s)
+        setStatus('minting');
+        setNftDetails({
+          id: 1,
+          heroId: 'aqua_wtr',
+          level: 1,
+          rarity: 'Common',
+          attributes: {
+            transactionHash: '0x1a2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890',
+            mintedAt: new Date().toISOString(),
+            gasPaidBy: 'GXCOIN Platform'
+          }
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
+        // Stage 3: Achievement unlock (2s)
+        setStatus('achievement');
+        setShowConfetti(true);
+
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Stage 4: Full success screen (10s with countdown)
+        setStatus('success');
+      };
+
+      runDemoFlow();
+      return;
+    }
 
     if (!sessionId) {
       setStatus('error');
