@@ -1,3 +1,4 @@
+import React from 'react';
 import { create } from 'zustand';
 import { ethers } from 'ethers';
 import { HeroNFTContract, HERO_TYPES, HeroType, generateHeroMetadata } from '../../contracts/ERC721';
