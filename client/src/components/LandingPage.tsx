@@ -30,7 +30,8 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Info
+  Info,
+  Rocket
 } from "lucide-react";
 import { getFeatureComparison, isDemoMode } from "@/config/nftConfig";
 
@@ -1721,6 +1722,146 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                       Learn More
                     </Button>
                   </motion.div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </motion.section>
+
+      {/* Epic Success Journey Demo Section */}
+      <motion.section 
+        className="px-4 py-16 bg-gradient-to-r from-purple-900/20 via-pink-900/20 to-purple-900/20"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2.2 }}
+      >
+        <div className="max-w-4xl mx-auto">
+          <Card className="bg-gradient-to-br from-purple-900/40 via-pink-900/30 to-purple-800/40 backdrop-blur-sm border-purple-500/40 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 via-pink-500/10 to-purple-500/10" />
+            
+            <CardContent className="p-8 relative z-10">
+              <div className="text-center mb-8">
+                <Badge className="bg-yellow-600/20 text-yellow-400 border-yellow-500/30 mb-4">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  DEMO MODE
+                </Badge>
+                <h2 className="text-3xl font-bold text-white mb-4">
+                  Experience the Epic NFT Journey
+                </h2>
+                <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-6">
+                  See exactly what happens after purchasing your AQUA dNFT! Test the complete celebration experience with confetti, animations, and success screens.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                {/* Demo Mode Card */}
+                <Card className="bg-gradient-to-br from-yellow-900/30 via-orange-900/20 to-yellow-800/30 backdrop-blur-sm border-yellow-500/40">
+                  <CardHeader>
+                    <div className="flex items-center space-x-3 mb-2">
+                      <div className="p-3 rounded-full bg-yellow-500/20">
+                        <Rocket className="h-6 w-6 text-yellow-400" />
+                      </div>
+                      <CardTitle className="text-xl text-white">Free Demo</CardTitle>
+                    </div>
+                    <p className="text-yellow-200/80 text-sm">
+                      Experience the epic journey without payment
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-start space-x-3">
+                      <Coins className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">Free to Try</p>
+                        <p className="text-gray-400 text-xs">No payment required</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Sparkles className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">Full Experience</p>
+                        <p className="text-gray-400 text-xs">All animations & effects</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Trophy className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">Achievement Unlock</p>
+                        <p className="text-gray-400 text-xs">See the celebration flow</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Real Purchase Card */}
+                <Card className="bg-gradient-to-br from-blue-900/30 via-cyan-900/20 to-blue-800/30 backdrop-blur-sm border-blue-500/40">
+                  <CardHeader>
+                    <div className="flex items-center space-x-3 mb-2">
+                      <div className="p-3 rounded-full bg-blue-500/20">
+                        <Zap className="h-6 w-6 text-blue-400" />
+                      </div>
+                      <CardTitle className="text-xl text-white">Real Purchase</CardTitle>
+                    </div>
+                    <p className="text-blue-200/80 text-sm">
+                      $25 gets you the actual AQUA dNFT
+                    </p>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-start space-x-3">
+                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">Real NFT Badge</p>
+                        <p className="text-gray-400 text-xs">Minted & ready to use</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Rocket className="w-5 h-5 text-cyan-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">Start Missions</p>
+                        <p className="text-gray-400 text-xs">Earn real impact rewards</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-3">
+                      <Zap className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-white font-medium text-sm">Gas Fees Covered</p>
+                        <p className="text-gray-400 text-xs">Platform pays minting costs</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  size="lg"
+                  onClick={() => window.open('/success?demo=true', '_blank', 'noopener,noreferrer')}
+                  className="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white font-bold px-8 py-4 shadow-lg"
+                >
+                  <Rocket className="h-5 w-5 mr-2" />
+                  Try Demo Journey (Free)
+                </Button>
+                <Button 
+                  size="lg"
+                  onClick={() => window.location.href = 'https://buy.stripe.com/28E00b0H88lF5uuaG083C08'}
+                  className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold px-8 py-4 shadow-lg"
+                >
+                  <Droplets className="h-5 w-5 mr-2" />
+                  Buy Real AQUA dNFT ($25)
+                </Button>
+              </div>
+
+              <div className="mt-6 p-4 bg-purple-500/10 border border-purple-500/30 rounded-lg">
+                <div className="flex items-start space-x-3">
+                  <Info className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-purple-200 text-sm font-medium mb-1">What You'll See</p>
+                    <p className="text-purple-100/80 text-xs">
+                      Experience the complete 4-stage epic journey: (1) Payment verification with progress bar, 
+                      (2) Dramatic minting animation with sparkles, (3) ACHIEVEMENT UNLOCKED trophy celebration with confetti, 
+                      (4) Success screen with social sharing, download certificate, and auto-redirect to missions.
+                    </p>
+                  </div>
                 </div>
               </div>
             </CardContent>
