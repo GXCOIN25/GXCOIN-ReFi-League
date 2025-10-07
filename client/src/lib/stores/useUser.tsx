@@ -1,3 +1,4 @@
+import React from 'react';
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { GXCoinAPI, type ApiUser, type GitHubProfile, type GitHubRepository } from "@/lib/api";

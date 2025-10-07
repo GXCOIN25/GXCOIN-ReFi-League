@@ -1,3 +1,4 @@
+import React from 'react';
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { GameHero, EnvironmentalBattleResult, BattleTurn, EnvironmentalThreat, Patent, EconomicReward, UserEconomicStats } from "@/types/heroes";
