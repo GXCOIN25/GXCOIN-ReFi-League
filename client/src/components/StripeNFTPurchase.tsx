@@ -67,6 +67,12 @@ export function StripeNFTPurchase({
       setLoading(true);
       setError(null);
       
+      // Use direct Stripe payment link for AQUA ($WTR) hero
+      if (heroId === 'aqua_wtr') {
+        window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+        return;
+      }
+      
       const stripe = await getStripe();
       if (!stripe) {
         throw new Error('Stripe is not configured. Please contact support.');
