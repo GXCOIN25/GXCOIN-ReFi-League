@@ -98,6 +98,7 @@ const db = drizzle(client);
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
+  getUserById(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByReplitUserId(replitUserId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
@@ -127,6 +128,7 @@ export interface IStorage {
   // NFT Badge methods
   getUserNFTBadges(userId: number): Promise<NftBadge[]>;
   createNFTBadge(badge: InsertNftBadge): Promise<NftBadge>;
+  updateNFTBadge(id: number, updates: Partial<NftBadge>): Promise<NftBadge | undefined>;
   
   // Mission methods
   getUserMissionProgress(userId: number): Promise<any[]>;
@@ -195,6 +197,10 @@ export class PostgresStorage implements IStorage {
   async getUser(id: number): Promise<User | undefined> {
     const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
     return result[0];
+  }
+
+  async getUserById(id: number): Promise<User | undefined> {
+    return this.getUser(id);
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
@@ -404,6 +410,15 @@ export class PostgresStorage implements IStorage {
 
   async createNFTBadge(badge: InsertNftBadge): Promise<NftBadge> {
     const result = await db.insert(nftBadges).values(badge).returning();
+    return result[0];
+  }
+
+  async updateNFTBadge(id: number, updates: Partial<NftBadge>): Promise<NftBadge | undefined> {
+    const result = await db
+      .update(nftBadges)
+      .set(updates)
+      .where(eq(nftBadges.id, id))
+      .returning();
     return result[0];
   }
 

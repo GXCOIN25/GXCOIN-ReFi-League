@@ -21,6 +21,7 @@ import { TokenIntegration } from "@/components/TokenIntegration";
 import { NFTMinting } from "@/components/NFTMinting";
 import { StripeNFTPurchase } from "@/components/StripeNFTPurchase";
 import { CryptoOnboardingHub } from "@/components/CryptoOnboardingHub";
+import { PurchaseSuccess } from "@/components/PurchaseSuccess";
 import GameArena from "@/components/GameArena";
 import LandingPage from "@/components/LandingPage";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
@@ -658,8 +659,16 @@ function App() {
     start();
   };
 
+  // Check if we're on the success page
+  const isSuccessPage = window.location.pathname === '/success';
+
   if (isLoading) {
     return <LoadingScreen />;
+  }
+
+  // Show purchase success page if on /success route
+  if (isSuccessPage) {
+    return <PurchaseSuccess />;
   }
 
   return (
