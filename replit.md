@@ -74,8 +74,10 @@ Complete payment integration and beginner-friendly crypto education system for f
 7. **Stripe Payment Link Integration (October 7, 2025)**
    - AQUA ($WTR) hero uses direct Stripe payment link: https://buy.stripe.com/00w14fblMdFZg98dSc83C0u
    - 200 units available as Limited Edition NFT Series
-   - When users click "Purchase NFT" on AQUA hero, they're redirected to Stripe checkout
-   - Other heroes will need similar payment links created in Stripe dashboard
+   - "Purchase NFT" button added to all hero cards in Heroes tab
+   - Clicking "Purchase NFT" on AQUA card redirects to Stripe checkout
+   - Other heroes show "Payment link coming soon" message until payment links are configured
+   - Button uses gradient blue-to-purple styling for visibility
 
 **Technical Stack Added:**
 - `stripe` and `@stripe/stripe-js` packages
