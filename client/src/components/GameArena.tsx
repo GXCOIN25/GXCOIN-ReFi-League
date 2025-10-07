@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Sword, Crown, Star, Trophy, Coins, Factory, Zap, Leaf, Recycle, DollarSign, Globe, TrendingUp, Award, Unlock, Bot, LogIn, User } from 'lucide-react';
+import { Shield, Sword, Crown, Star, Trophy, Coins, Factory, Zap, Leaf, Recycle, DollarSign, Globe, TrendingUp, Award, Unlock, Bot, LogIn, User, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -158,20 +158,38 @@ function HeroCard({ hero, onSelect, showStats = true }: HeroCardProps) {
           )}
 
           {!hero.owned && (
-            <div className="text-center py-2 bg-gray-800/50 rounded-lg">
+            <div className="text-center py-2 bg-gray-800/50 rounded-lg space-y-2">
               <p className="text-sm text-yellow-400 mb-2 font-medium">🔒 Patent Access Required</p>
               <Button 
                 size="sm" 
                 variant="outline"
                 onClick={handleUnlockPatent}
                 disabled={isLoading}
-                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white border-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white border-green-500 disabled:opacity-50 disabled:cursor-not-allowed w-full"
               >
                 <Unlock className="w-3 h-3 mr-1" />
                 {isLoading ? 'Unlocking...' : 'Unlock Patents'}
               </Button>
             </div>
           )}
+          
+          <div className="text-center pt-2">
+            <Button 
+              size="sm" 
+              onClick={(e) => {
+                e.stopPropagation();
+                if (hero.id === 'aqua_wtr') {
+                  window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+                } else {
+                  alert('Payment link coming soon! Check back later.');
+                }
+              }}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold w-full"
+            >
+              <CreditCard className="w-3 h-3 mr-1" />
+              Purchase NFT
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </motion.div>
