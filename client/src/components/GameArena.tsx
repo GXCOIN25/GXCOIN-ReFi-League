@@ -187,7 +187,7 @@ function HeroCard({ hero, onSelect, showStats = true }: HeroCardProps) {
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold w-full"
             >
               <CreditCard className="w-3 h-3 mr-1" />
-              Purchase NFT
+              Purchase dNFT
             </Button>
           </div>
         </CardContent>

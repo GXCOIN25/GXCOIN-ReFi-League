@@ -254,10 +254,16 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
     }
   }, [rarity, theme]);
 
+  const handleClick = () => {
+    if (tokenSymbol === 'WTR') {
+      window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+    }
+  };
+
   return (
     <ShimmerEffect enabled={isLegendary && shouldAnimate}>
       <motion.div
-        className={`relative rounded-xl overflow-hidden ${className}`}
+        className={`relative rounded-xl overflow-hidden ${className} ${tokenSymbol === 'WTR' ? 'cursor-pointer' : ''}`}
         style={{ 
           width: sizeConfig.container, 
           height: sizeConfig.container,
@@ -269,6 +275,7 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
         animate={shouldAnimate ? { scale: 1, opacity: 1 } : undefined}
         transition={{ duration: 0.5, ease: "easeOut" }}
         whileHover={shouldAnimate ? { scale: 1.05 } : undefined}
+        onClick={handleClick}
       >
         {/* Main NFT card image - constrained within container */}
         <div className="absolute inset-0 overflow-hidden">
