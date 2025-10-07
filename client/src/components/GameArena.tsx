@@ -179,7 +179,7 @@ function HeroCard({ hero, onSelect, showStats = true }: HeroCardProps) {
               onClick={(e) => {
                 e.stopPropagation();
                 if (hero.id === 'aqua_wtr') {
-                  window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+                  window.location.href = 'https://buy.stripe.com/28E00b0H88lF5uuaG083C08';
                 } else {
                   alert('Payment link coming soon! Check back later.');
                 }

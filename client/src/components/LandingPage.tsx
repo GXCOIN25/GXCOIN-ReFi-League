@@ -1582,7 +1582,7 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 2.0 }}
                     whileHover={{ scale: 1.05 }}
-                    onClick={() => window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u'}
+                    onClick={() => window.location.href = 'https://buy.stripe.com/28E00b0H88lF5uuaG083C08'}
                   >
                     <img 
                       src="/aqua-water-spotlight.jpg" 
