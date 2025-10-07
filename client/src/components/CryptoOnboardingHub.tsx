@@ -549,7 +549,7 @@ export const CryptoOnboardingHub: React.FC<CryptoOnboardingHubProps> = ({
                           <Button
                             size="sm"
                             className="bg-red-600 hover:bg-red-700"
-                            onClick={() => window.open('https://youtube.com', '_blank')}
+                            onClick={() => window.open('https://gxcoin.world', '_blank', 'noopener,noreferrer')}
                           >
                             <PlayCircle className="w-4 h-4 mr-2" />
                             Watch Tutorial
