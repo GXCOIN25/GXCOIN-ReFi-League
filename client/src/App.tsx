@@ -222,11 +222,17 @@ function MainExperience() {
                   <div 
                     className="w-16 h-16 mx-auto rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition-transform pointer-events-auto overflow-hidden"
                     style={{ backgroundColor: hero.color + '30', border: `2px solid ${hero.color}`, minWidth: '44px', minHeight: '44px' }}
-                    onClick={() => selectHero && selectHero(hero.id)}
+                    onClick={() => {
+                      if (hero.id === 'aqua_wtr') {
+                        window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+                      } else {
+                        selectHero && selectHero(hero.id);
+                      }
+                    }}
                   >
                     <img 
                       src={getHeroImage(hero.id)}
-                      alt={hero.name}
+                      alt={hero.id === 'aqua_wtr' ? hero.name + ' - Click to Purchase dNFT' : hero.name}
                       className="w-full h-full object-cover rounded-full"
                       onError={(e) => {
                         // Fallback to text if image fails to load
@@ -410,10 +416,16 @@ function MainExperience() {
                                 minWidth: '80px',
                                 minHeight: '80px'
                               }}
+                              onClick={(e) => {
+                                if (hero.id === 'aqua_wtr') {
+                                  e.stopPropagation();
+                                  window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+                                }
+                              }}
                             >
                               <img 
                                 src={getHeroImage(hero.id)}
-                                alt={hero.name}
+                                alt={hero.id === 'aqua_wtr' ? hero.name + ' - Click to Purchase dNFT' : hero.name}
                                 className="w-full h-full object-cover rounded-full"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;

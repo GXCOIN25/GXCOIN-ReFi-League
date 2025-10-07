@@ -1577,15 +1577,16 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                 {/* Left: AQUA Water Image */}
                 <div className="flex justify-center">
                   <motion.div
-                    className="relative rounded-lg overflow-hidden shadow-2xl"
+                    className="relative rounded-lg overflow-hidden shadow-2xl cursor-pointer"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 2.0 }}
                     whileHover={{ scale: 1.05 }}
+                    onClick={() => window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u'}
                   >
                     <img 
                       src="/aqua-water-spotlight.jpg" 
-                      alt="AQUA Water dNFT Hero Spotlight" 
+                      alt="AQUA Water dNFT Hero Spotlight - Click to Purchase" 
                       className="w-full h-auto max-w-md object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent" />
