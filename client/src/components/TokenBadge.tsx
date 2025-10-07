@@ -256,7 +256,7 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
 
   const handleClick = () => {
     if (tokenSymbol === 'WTR') {
-      window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+      window.location.href = 'https://buy.stripe.com/28E00b0H88lF5uuaG083C08';
     }
   };
 
