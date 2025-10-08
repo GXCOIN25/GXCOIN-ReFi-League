@@ -139,6 +139,13 @@ export default function HeroShowcase() {
                 <Button 
                   className="flex-1"
                   style={{ backgroundColor: selectedHero.color }}
+                  onClick={() => {
+                    if (selectedHero.id === 'aqua_wtr' || selectedHero.id.includes('aqua')) {
+                      window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+                    } else {
+                      alert(`${selectedHero.name} NFT collection coming soon! Join the AQUA mission first.`);
+                    }
+                  }}
                 >
                   Join {selectedHero.name} Mission
                 </Button>
