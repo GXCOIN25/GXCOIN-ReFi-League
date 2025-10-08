@@ -68,7 +68,7 @@ export function PurchaseSuccess() {
           id: 1,
           heroId: 'aqua_wtr',
           level: 1,
-          rarity: 'Common',
+          rarity: 'Legendary',
           attributes: {
             transactionHash: '0x1a2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890',
             mintedAt: new Date().toISOString(),
