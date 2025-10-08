@@ -225,7 +225,7 @@ function MainExperience() {
                     style={{ backgroundColor: hero.color + '30', border: `2px solid ${hero.color}`, minWidth: '44px', minHeight: '44px' }}
                     onClick={() => {
                       if (hero.id === 'aqua_wtr') {
-                        window.location.href = 'https://buy.stripe.com/28E00b0H88lF5uuaG083C08';
+                        window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
                       } else {
                         selectHero && selectHero(hero.id);
                       }
@@ -420,7 +420,7 @@ function MainExperience() {
                               onClick={(e) => {
                                 if (hero.id === 'aqua_wtr') {
                                   e.stopPropagation();
-                                  window.location.href = 'https://buy.stripe.com/28E00b0H88lF5uuaG083C08';
+                                  window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
                                 }
                               }}
                             >
