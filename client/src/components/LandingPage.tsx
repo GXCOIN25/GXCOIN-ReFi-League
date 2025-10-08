@@ -1583,7 +1583,7 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 2.0 }}
                     whileHover={{ scale: 1.05 }}
-                    onClick={() => window.location.href = 'https://buy.stripe.com/28E00b0H88lF5uuaG083C08'}
+                    onClick={() => window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u'}
                   >
                     <img 
                       src="/aqua-water-spotlight.jpg" 
@@ -1843,7 +1843,7 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                 </Button>
                 <Button 
                   size="lg"
-                  onClick={() => window.location.href = 'https://buy.stripe.com/28E00b0H88lF5uuaG083C08'}
+                  onClick={() => window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u'}
                   className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold px-8 py-4 shadow-lg"
                 >
                   <Droplets className="h-5 w-5 mr-2" />
