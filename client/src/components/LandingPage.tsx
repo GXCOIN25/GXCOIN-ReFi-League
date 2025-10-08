@@ -1803,7 +1803,7 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                       <CardTitle className="text-xl text-white">Real Purchase</CardTitle>
                     </div>
                     <p className="text-blue-200/80 text-sm">
-                      $25 gets you the actual AQUA dNFT
+                      $175+ gets you the actual AQUA dNFT
                     </p>
                   </CardHeader>
                   <CardContent className="space-y-3">
@@ -1847,7 +1847,7 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                   className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-bold px-8 py-4 shadow-lg"
                 >
                   <Droplets className="h-5 w-5 mr-2" />
-                  Buy Real AQUA dNFT ($25)
+                  Buy Real AQUA dNFT ($175+)
                 </Button>
               </div>
 
