@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useHeroes } from "@/lib/stores/useHeroes";
 import { useContribution } from "@/lib/stores/useContribution";
-import { Sparkles, Star, Zap, Award, Crown } from "lucide-react";
+import { Sparkles, Star, Zap, Award, Crown, ShoppingCart } from "lucide-react";
 import TokenBadge, { TokenSymbol } from "./TokenBadge";
 
 interface NFTPreviewProps {
@@ -268,6 +268,26 @@ export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
                   Mint NFT on Blockchain
                 </Button>
               )}
+              
+              <Button 
+                className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500"
+                size="lg"
+                onClick={() => {
+                  const aquaHero = heroes.find(hero => 
+                    hero.id.toLowerCase().includes('aqua') || 
+                    hero.id.toLowerCase().includes('wtr')
+                  );
+                  
+                  if (aquaHero) {
+                    window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+                  } else {
+                    alert('AQUA ($WTR) NFT available for purchase! Other heroes coming soon.');
+                  }
+                }}
+              >
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                Purchase dNFT
+              </Button>
             </div>
             <p className="text-xs text-gray-400">
               {onMintNFT ? 'Unlock badges in-app or mint real NFTs on blockchain' : 'Your NFTs will evolve as you make more impact'}
