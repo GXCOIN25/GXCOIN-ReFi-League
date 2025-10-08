@@ -386,6 +386,113 @@ export const CryptoOnboardingHub: React.FC<CryptoOnboardingHubProps> = ({
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
+                      {/* Epic Demo Section - Featured */}
+                      <motion.div
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        <Card className="bg-gradient-to-br from-yellow-500/30 via-orange-500/30 to-red-500/30 border-2 border-yellow-500/50 relative overflow-hidden">
+                          {/* Animated background pulse */}
+                          <motion.div
+                            className="absolute inset-0 bg-gradient-to-r from-yellow-500/20 to-orange-500/20"
+                            animate={{
+                              opacity: [0.3, 0.6, 0.3],
+                              scale: [1, 1.05, 1],
+                            }}
+                            transition={{
+                              duration: 2,
+                              repeat: Infinity,
+                              ease: "easeInOut"
+                            }}
+                          />
+                          
+                          <CardHeader className="relative z-10">
+                            <div className="flex items-center gap-3">
+                              <motion.div
+                                animate={{
+                                  rotate: [0, 15, -15, 0],
+                                  scale: [1, 1.2, 1],
+                                }}
+                                transition={{
+                                  duration: 2,
+                                  repeat: Infinity,
+                                  ease: "easeInOut"
+                                }}
+                              >
+                                <Rocket className="w-10 h-10 text-yellow-300" />
+                              </motion.div>
+                              <div className="flex-1">
+                                <CardTitle className="text-2xl text-yellow-100 flex items-center gap-2">
+                                  Preview the Epic NFT Journey!
+                                  <Sparkles className="w-6 h-6 text-yellow-300 animate-pulse" />
+                                </CardTitle>
+                                <CardDescription className="text-yellow-200 mt-1">
+                                  See the amazing celebration that awaits you after purchase - completely FREE
+                                </CardDescription>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          
+                          <CardContent className="relative z-10 space-y-4">
+                            <div className="bg-black/30 rounded-lg p-4 border border-yellow-500/30">
+                              <p className="text-yellow-100 font-medium mb-3 flex items-center gap-2">
+                                <Trophy className="w-5 h-5 text-yellow-300" />
+                                Experience includes:
+                              </p>
+                              <div className="grid grid-cols-2 gap-3 text-sm">
+                                <div className="flex items-center gap-2 text-yellow-200">
+                                  <Sparkles className="w-4 h-4 text-yellow-400" />
+                                  <span>Epic Animations</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-yellow-200">
+                                  <Trophy className="w-4 h-4 text-yellow-400" />
+                                  <span>Achievement Unlocks</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-yellow-200">
+                                  <Zap className="w-4 h-4 text-yellow-400" />
+                                  <span>Confetti Celebration</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-yellow-200">
+                                  <CheckCircle className="w-4 h-4 text-yellow-400" />
+                                  <span>Social Sharing</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            <motion.div
+                              whileHover={{ scale: 1.03 }}
+                              whileTap={{ scale: 0.98 }}
+                            >
+                              <Button
+                                asChild
+                                size="lg"
+                                className="w-full bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 hover:from-yellow-600 hover:via-orange-600 hover:to-red-600 text-white font-bold text-lg py-6 shadow-2xl shadow-yellow-500/50"
+                              >
+                                <a href="/success?demo=true" target="_blank" rel="noopener noreferrer">
+                                  <PlayCircle className="w-6 h-6 mr-3" />
+                                  🚀 Take the Epic Tour (FREE) 🚀
+                                  <ExternalLink className="w-5 h-5 ml-3" />
+                                </a>
+                              </Button>
+                            </motion.div>
+                            
+                            <p className="text-center text-xs text-yellow-200/80">
+                              No wallet required • No payment needed • Opens in new tab
+                            </p>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-gray-700"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                          <span className="px-4 bg-gray-950 text-gray-400">Or choose a payment method</span>
+                        </div>
+                      </div>
+
                       <div className="grid md:grid-cols-3 gap-4">
                         <Card className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 border-purple-500/30 hover:border-purple-400 transition-all cursor-pointer">
                           <CardHeader>
