@@ -380,16 +380,16 @@ function MainExperience() {
                 <LandingPage onOpenLogin={() => setShowLoginModal(true)} />
               </TabsContent>
 
-              <TabsContent value="heroes" className="space-y-8 mt-0">
+              <TabsContent value="heroes" className="space-y-8 mt-0 px-4 sm:px-6">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-center space-y-4"
                 >
-                  <h1 className="text-4xl font-bold text-white">
+                  <h1 className="text-2xl md:text-4xl font-bold text-white">
                     Meet Your <span className="text-green-400">Eco-Warriors</span>
                   </h1>
-                  <p className="text-gray-300 max-w-2xl mx-auto">
+                  <p className="text-sm sm:text-base text-gray-300 max-w-xs sm:max-w-2xl mx-auto px-2">
                     Select your heroes below to discover their unique powers and impact on regenerative finance.
                   </p>
                 </motion.div>
@@ -488,7 +488,8 @@ function MainExperience() {
                                 heroImage: getHeroImage(hero.id)
                               });
                             }}
-                            className="w-full mt-4"
+                            size="lg"
+                            className="w-full mt-4 min-h-[44px]"
                             style={{ backgroundColor: hero.color }}
                           >
                             <CreditCard className="h-4 w-4 mr-2" />
