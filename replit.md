@@ -6,6 +6,35 @@ GXCOIN is an interactive, superhero-themed platform for regenerative finance (Re
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Updates (October 8, 2025)
+
+### Epic Demo Button in Crypto Onboarding Hub
+- Added prominent "Take the Epic Tour" demo button in Crypto Onboarding Hub's "Buy Your First NFT" tab
+- **Visual Design**:
+  * Yellow/orange/red gradient card with animated background pulse
+  * Rocket icon with rotation and scale animation
+  * Pulsing Sparkles icon for attention
+  * Shadow effects and hover/tap animations
+- **Features Highlighted**:
+  * Epic Animations
+  * Achievement Unlocks
+  * Confetti Celebration
+  * Social Sharing
+- **Functionality**:
+  * Opens `/success?demo=true` in new tab (SSR-safe anchor element)
+  * No wallet or payment required
+  * Positioned prominently before payment options
+  * Separated by divider with "Or choose a payment method" text
+- **User Benefits**:
+  * Allows prospective buyers to preview celebration journey before purchase
+  * Reduces purchase friction by showing exact post-purchase experience
+  * Builds excitement and confidence in NFT minting journey
+- **Technical Implementation**:
+  * Uses Button asChild prop with anchor element for SSR compatibility
+  * Framer Motion animations for visual impact
+  * Maintains all accessibility features (rel="noopener noreferrer")
+- **Architect Approved**: SSR-safe implementation, no security issues, maintains all animations and styling
+
 ## System Architecture
 
 ### Frontend Architecture
