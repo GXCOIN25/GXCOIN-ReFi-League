@@ -524,14 +524,16 @@ export const CryptoOnboardingHub: React.FC<CryptoOnboardingHubProps> = ({
                           </CardHeader>
                           <CardContent className="space-y-3">
                             <p className="text-sm text-gray-300">
-                              Buy your NFT directly with credit/debit card via Stripe
+                              Buy your NFT directly with credit/debit card via Stripe - from $175+ gets you the actual AQUA dNFT
                             </p>
                             <div className="bg-blue-500/10 rounded p-3 text-xs text-blue-200">
                               <p className="font-semibold mb-1">Best For:</p>
                               <p>Crypto beginners</p>
                             </div>
-                            <Button className="w-full bg-blue-600 hover:bg-blue-700" size="sm">
-                              Buy with Card
+                            <Button asChild className="w-full bg-blue-600 hover:bg-blue-700" size="sm">
+                              <a href="https://buy.stripe.com/00w14fblMdFZg98dSc83C0u" target="_blank" rel="noopener noreferrer">
+                                Buy Real AQUA dNFT (from $175+)
+                              </a>
                             </Button>
                           </CardContent>
                         </Card>
