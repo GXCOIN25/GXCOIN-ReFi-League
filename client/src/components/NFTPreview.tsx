@@ -285,6 +285,7 @@ export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
                   );
                   const anchorHero = heroes.find(hero => hero.id === 'gxcoin_anchor');
                   const battHero = heroes.find(hero => hero.id === 'graphene_batt');
+                  const gcctHero = heroes.find(hero => hero.id === 'trader_gcct');
                   
                   if (aquaHero) {
                     window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
@@ -292,8 +293,10 @@ export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
                     window.location.href = 'https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y';
                   } else if (battHero) {
                     window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
+                  } else if (gcctHero) {
+                    window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
                   } else {
-                    alert('AQUA ($WTR), GXCOIN Anchor, and GRAPHENE ($BATT) NFTs available for purchase! Check the Heroes tab.');
+                    alert('AQUA ($WTR), GXCOIN Anchor, GRAPHENE ($BATT), and CARBON ($GCCT) NFTs available for purchase! Check the Heroes tab.');
                   }
                 }}
               >

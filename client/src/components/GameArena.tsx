@@ -184,6 +184,8 @@ function HeroCard({ hero, onSelect, showStats = true }: HeroCardProps) {
                   window.location.href = 'https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y';
                 } else if (hero.id === 'graphene_batt') {
                   window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
+                } else if (hero.id === 'trader_gcct') {
+                  window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
                 } else {
                   alert('Payment link coming soon! Check back later.');
                 }
