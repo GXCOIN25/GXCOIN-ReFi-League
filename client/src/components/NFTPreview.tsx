@@ -21,7 +21,7 @@ export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
 
   // Helper function to validate token symbol for TokenBadge
   const getValidTokenSymbol = (heroSymbol: string): TokenSymbol => {
-    if (['WTR', 'HEMP', 'GPWR', 'BATT', 'GCCT'].includes(heroSymbol)) {
+    if (['WTR', 'HEMP', 'GPWR', 'BATT', 'GCCT', 'GXCOIN'].includes(heroSymbol)) {
       return heroSymbol as TokenSymbol;
     }
     return "GCCT"; // fallback
