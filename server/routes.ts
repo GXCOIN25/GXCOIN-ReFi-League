@@ -1207,19 +1207,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (purchase.type === 'dnft_purchase') {
               const heroId = purchase.heroId || session.metadata?.heroId;
               if (heroId) {
-                await storage.createNFTBadge({
-                  userId: purchase.userId,
-                  heroId,
-                  level: 1,
-                  evolution: 'base',
-                  rarity: 'common',
-                  attributes: {
-                    purchasedAt: new Date().toISOString(),
-                    paymentIntentId: session.payment_intent,
+                // Create NFT badge with atomic edition assignment
+                const seriesName = 'Platinum Limited Edition';
+                const totalEditions = 500;
+                
+                const nftBadge = await storage.createNFTBadgeWithEdition(
+                  {
+                    userId: purchase.userId,
+                    heroId,
+                    level: 1,
+                    evolution: 'base',
+                    rarity: 'Platinum Limited Edition',
+                    attributes: {
+                      purchasedAt: new Date().toISOString(),
+                      paymentIntentId: session.payment_intent,
+                    },
+                    minted: false,
                   },
-                  minted: false,
-                });
-                console.log(`✅ Created NFT badge for user ${purchase.userId}, hero ${heroId}`);
+                  seriesName,
+                  totalEditions
+                );
+                
+                if (nftBadge === null) {
+                  // Series is SOLD OUT - return error to Stripe
+                  console.error(`🚨 PLATINUM SERIES SOLD OUT - Unable to fulfill purchase for user ${purchase.userId}`);
+                  console.error(`💰 Payment received but no NFT available - manual refund may be required`);
+                  console.error(`📧 Session ID: ${session.id}, Payment Intent: ${session.payment_intent}`);
+                  
+                  // Return error status to Stripe webhook
+                  return res.status(500).json({ 
+                    error: 'Platinum series sold out - unable to create NFT badge',
+                    sessionId: session.id,
+                    requiresRefund: true
+                  });
+                }
+                
+                console.log(`✅ Created Platinum NFT badge #${nftBadge.editionNumber}/${nftBadge.totalEditions} for user ${purchase.userId}, hero ${heroId}`);
               }
             } else if (purchase.type === 'crypto_onramp') {
               // Handle crypto onramp completion
@@ -1285,11 +1308,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         !nft.minted
       );
 
+      // Validate and sanitize NFT badge data before sending to client
+      let validatedNFTBadge = null;
+      if (recentNFT) {
+        // Validate edition metadata
+        const hasValidEditionNumber = typeof recentNFT.editionNumber === 'number' && recentNFT.editionNumber > 0;
+        const hasValidTotalEditions = typeof recentNFT.totalEditions === 'number' && recentNFT.totalEditions > 0;
+        const hasValidSeriesName = typeof recentNFT.seriesName === 'string' && recentNFT.seriesName.length > 0;
+        
+        if (!hasValidEditionNumber || !hasValidTotalEditions || !hasValidSeriesName) {
+          console.error(`⚠️  Invalid edition metadata for NFT badge ${recentNFT.id}:`, {
+            editionNumber: recentNFT.editionNumber,
+            totalEditions: recentNFT.totalEditions,
+            seriesName: recentNFT.seriesName
+          });
+          
+          // Apply server-side fallbacks for missing data
+          validatedNFTBadge = {
+            ...recentNFT,
+            editionNumber: hasValidEditionNumber ? recentNFT.editionNumber : 0,
+            totalEditions: hasValidTotalEditions ? recentNFT.totalEditions : 500,
+            seriesName: hasValidSeriesName ? recentNFT.seriesName : 'Limited Edition',
+          };
+        } else {
+          validatedNFTBadge = recentNFT;
+        }
+      }
+
       res.json({
         status: purchase.status,
         sessionId: session_id,
         heroId: purchase.heroId,
-        nftBadge: recentNFT || null,
+        nftBadge: validatedNFTBadge,
       });
     } catch (error: any) {
       console.error('Session verification error:', error);
