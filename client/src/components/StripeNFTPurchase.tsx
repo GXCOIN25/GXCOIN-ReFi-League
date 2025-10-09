@@ -67,9 +67,18 @@ export function StripeNFTPurchase({
       setLoading(true);
       setError(null);
       
-      // Use direct Stripe payment link for AQUA ($WTR) hero
+      // Use direct Stripe payment links for heroes with configured links
       if (heroId === 'aqua_wtr') {
         window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+        return;
+      } else if (heroId === 'gxcoin_anchor') {
+        window.location.href = 'https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y';
+        return;
+      } else if (heroId === 'graphene_batt') {
+        window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
+        return;
+      } else if (heroId === 'trader_gcct') {
+        window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
         return;
       }
       
