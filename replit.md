@@ -6,9 +6,29 @@ GXCOIN is an interactive, superhero-themed platform for regenerative finance (Re
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
-## Recent Updates (October 8, 2025)
+## Recent Updates
 
-### Epic Demo Button in Crypto Onboarding Hub
+### Direct Stripe Payment Links & Pricing Display (October 9, 2025)
+- **Updated All Purchase NFT Buttons** to redirect directly to Stripe checkout (bypassing modal)
+- **Added Pricing Display**: All Purchase NFT buttons now show "from $175+" text
+- **Flexible Hero ID Matching**: Implemented robust ID matching using includes() and toLowerCase()
+  * Handles variations like 'aqua_wtr', 'aqua', 'AQUA', 'wtr' all correctly routing to AQUA payment link
+  * Works for all heroes: AQUA, GXCOIN Anchor, GRAPHENE $BATT, CARBON $GCCT
+- **Payment Links Configured**:
+  * AQUA ($WTR): https://buy.stripe.com/00w14fblMdFZg98dSc83C0u
+  * GXCOIN Anchor: https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y
+  * GRAPHENE ($BATT): https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x
+  * CARBON ($GCCT): https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x (same as GRAPHENE)
+- **Components Updated**:
+  * App.tsx: Hero cards "Purchase NFT" buttons with pricing
+  * HeroShowcase.tsx: "Join Mission" buttons
+  * StripeNFTPurchase.tsx: Card payment handler
+  * TokenBadge.tsx: Token purchase CTAs
+  * GameArena.tsx: Purchase dNFT buttons
+  * NFTPreview.tsx: Purchase dNFT buttons
+- **Architect Approved**: All payment routing verified, pricing displays correctly, no security issues
+
+### Epic Demo Button in Crypto Onboarding Hub (October 8, 2025)
 - Added prominent "Take the Epic Tour" demo button in Crypto Onboarding Hub's "Buy Your First NFT" tab
 - **Visual Design**:
   * Yellow/orange/red gradient card with animated background pulse
