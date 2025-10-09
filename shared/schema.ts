@@ -42,8 +42,13 @@ export const nftBadges = pgTable("nft_badges", {
   rarity: text("rarity").notNull(),
   attributes: jsonb("attributes").notNull(),
   minted: boolean("minted").default(false),
+  editionNumber: integer("edition_number"),
+  totalEditions: integer("total_editions"),
+  seriesName: text("series_name"),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => ({
+  seriesEditionUnique: unique().on(table.seriesName, table.editionNumber),
+}));
 
 export const missions = pgTable("missions", {
   id: serial("id").primaryKey(),
@@ -105,6 +110,13 @@ export const insertNftBadgeSchema = createInsertSchema(nftBadges).pick({
   rarity: true,
   attributes: true,
   minted: true,
+  editionNumber: true,
+  totalEditions: true,
+  seriesName: true,
+}).extend({
+  editionNumber: z.number().optional().nullable(),
+  totalEditions: z.number().optional().nullable(),
+  seriesName: z.string().optional().nullable(),
 });
 
 // Patent Registry System

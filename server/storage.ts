@@ -129,6 +129,8 @@ export interface IStorage {
   getUserNFTBadges(userId: number): Promise<NftBadge[]>;
   createNFTBadge(badge: InsertNftBadge): Promise<NftBadge>;
   updateNFTBadge(id: number, updates: Partial<NftBadge>): Promise<NftBadge | undefined>;
+  getNextEditionNumber(seriesName: string, totalEditions: number): Promise<number | null>;
+  createNFTBadgeWithEdition(badge: Omit<InsertNftBadge, 'editionNumber' | 'totalEditions' | 'seriesName'>, seriesName: string, totalEditions: number): Promise<NftBadge | null>;
   
   // Mission methods
   getUserMissionProgress(userId: number): Promise<any[]>;
@@ -420,6 +422,59 @@ export class PostgresStorage implements IStorage {
       .where(eq(nftBadges.id, id))
       .returning();
     return result[0];
+  }
+
+  async getNextEditionNumber(seriesName: string, totalEditions: number): Promise<number | null> {
+    // Get the maximum edition number for this series
+    const result = await db
+      .select({ maxEdition: sql<number>`MAX(${nftBadges.editionNumber})` })
+      .from(nftBadges)
+      .where(eq(nftBadges.seriesName, seriesName));
+    
+    const maxEdition = result[0]?.maxEdition || 0;
+    const nextEdition = maxEdition + 1;
+    
+    // Check if we've reached the limit
+    if (nextEdition > totalEditions) {
+      return null; // Series is sold out
+    }
+    
+    return nextEdition;
+  }
+
+  async createNFTBadgeWithEdition(
+    badge: Omit<InsertNftBadge, 'editionNumber' | 'totalEditions' | 'seriesName'>,
+    seriesName: string,
+    totalEditions: number
+  ): Promise<NftBadge | null> {
+    return await db.transaction(async (tx) => {
+      // Lock the series row and get max edition number atomically
+      const result = await tx
+        .select({ maxEdition: sql<number>`MAX(${nftBadges.editionNumber})` })
+        .from(nftBadges)
+        .where(eq(nftBadges.seriesName, seriesName))
+        .for('update');
+      
+      const maxEdition = result[0]?.maxEdition || 0;
+      const nextEdition = maxEdition + 1;
+      
+      // Check if series is sold out
+      if (nextEdition > totalEditions) {
+        console.error(`🚫 Series "${seriesName}" is SOLD OUT! Max: ${totalEditions}, Attempted: ${nextEdition}`);
+        return null;
+      }
+      
+      // Create NFT badge with edition number in same transaction
+      const insertedBadge = await tx.insert(nftBadges).values({
+        ...badge,
+        editionNumber: nextEdition,
+        totalEditions,
+        seriesName,
+      }).returning();
+      
+      console.log(`✅ Created NFT badge #${nextEdition}/${totalEditions} for series "${seriesName}"`);
+      return insertedBadge[0];
+    });
   }
 
   // Mission methods

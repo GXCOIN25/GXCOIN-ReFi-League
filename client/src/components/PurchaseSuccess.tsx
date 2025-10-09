@@ -70,7 +70,9 @@ export function PurchaseSuccess() {
           id: 1,
           heroId: 'aqua_wtr',
           level: 1,
-          rarity: 'Legendary',
+          rarity: 'Platinum Limited Edition',
+          edition: 247,
+          totalEditions: 500,
           attributes: {
             transactionHash: '0x1a2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890',
             mintedAt: new Date().toISOString(),
@@ -129,7 +131,15 @@ export function PurchaseSuccess() {
         clearInterval(progressInterval);
         
         if (data.status === 'completed' && data.nftBadge) {
-          setNftDetails(data.nftBadge);
+          // Use backend-provided NFT details with authentic edition numbers
+          const nftData = {
+            ...data.nftBadge,
+            // Map backend field names to frontend display names
+            edition: data.nftBadge.editionNumber,
+            totalEditions: data.nftBadge.totalEditions,
+            rarity: data.nftBadge.seriesName || data.nftBadge.rarity,
+          };
+          setNftDetails(nftData);
           
           // Wait a moment before minting
           setTimeout(() => {
@@ -193,28 +203,35 @@ export function PurchaseSuccess() {
   }, [status, countdown, setLocation]);
 
   const handleDownloadCertificate = () => {
+    const editionNumber = nftDetails?.edition || 1;
+    const totalEditions = nftDetails?.totalEditions || 500;
+    
     const certificate = `
-GXCOIN ECO-WARRIOR dNFT CERTIFICATE
-═══════════════════════════════════════
+🏆 GXCOIN PLATINUM SERIES dNFT CERTIFICATE 🏆
+═══════════════════════════════════════════════
 
-🎖️ ACHIEVEMENT UNLOCKED 🎖️
+✨ EXCLUSIVE LIMITED EDITION ✨
 
 Hero: ${nftDetails?.heroId || 'AQUA ($WTR)'}
 Level: ${nftDetails?.level || 1}
-Rarity: ${nftDetails?.rarity || 'Common'}
+Rarity: ${nftDetails?.rarity || 'Platinum Limited Edition'}
+Edition: #${editionNumber} of ${totalEditions}
 Status: ✅ MINTED & ACTIVE
+
+You are now part of an exclusive group of 
+Platinum holders worldwide!
 
 Transaction Hash:
 ${nftDetails?.attributes?.transactionHash || 'Pending...'}
 
-Gas Fees: COVERED BY GXCOIN PLATFORM
+Premium Gas Coverage: GXCOIN PLATFORM
 
 Issued: ${new Date().toLocaleString()}
 
-Welcome to the Eco-Warrior Revolution! 🌍
-Start your missions at: ${window.location.origin}
+Welcome to the Elite Eco-Warrior Revolution! 🌍
+Start your exclusive missions at: ${window.location.origin}
 
-═══════════════════════════════════════
+═══════════════════════════════════════════════
     `.trim();
 
     const blob = new Blob([certificate], { type: 'text/plain' });
@@ -229,21 +246,27 @@ Start your missions at: ${window.location.origin}
   };
 
   const handleShareTwitter = () => {
-    const text = `🎉 I just unlocked my AQUA ($WTR) Eco-Warrior dNFT on @GXCOIN! Join the regenerative finance revolution and start earning while saving the planet! 🌍💧`;
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener,noreferrer');
+    const url = shareUrl || window.location.origin;
+    const editionNumber = nftDetails?.edition || 1;
+    const totalEditions = nftDetails?.totalEditions || 500;
+    const text = `🏆 I just secured my PLATINUM SERIES AQUA ($WTR) Eco-Warrior dNFT on @GXCOIN! 💎 Limited Edition #${editionNumber} of ${totalEditions}! Join the elite regenerative finance revolution! 🌍✨`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank', 'noopener,noreferrer');
   };
 
   const handleShareFacebook = () => {
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener,noreferrer');
+    const url = shareUrl || window.location.origin;
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank', 'noopener,noreferrer');
   };
 
   const handleShareLinkedIn = () => {
-    const text = `I just unlocked my AQUA Eco-Warrior dNFT on GXCOIN! Join the regenerative finance revolution.`;
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, '_blank', 'noopener,noreferrer');
+    const url = shareUrl || window.location.origin;
+    const text = `I just secured my Platinum Series AQUA Eco-Warrior dNFT on GXCOIN! Limited Edition - one of only 500 worldwide. Join the elite regenerative finance revolution.`;
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank', 'noopener,noreferrer');
   };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareUrl);
+    const url = shareUrl || window.location.origin;
+    navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -296,11 +319,11 @@ Start your missions at: ${window.location.origin}
 
   if (status === 'minting') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-purple-900 flex items-center justify-center p-4">
-        <Card className="bg-gray-900/80 backdrop-blur-sm border-purple-500/50 max-w-md w-full mx-4 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-900 flex items-center justify-center p-4">
+        <Card className="bg-gray-900/80 backdrop-blur-sm border-slate-400/50 max-w-md w-full mx-4 relative overflow-hidden shadow-2xl shadow-slate-500/30">
           {/* Animated background gradient */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-purple-500/20"
+            className="absolute inset-0 bg-gradient-to-r from-slate-500/20 via-gray-400/20 to-slate-500/20"
             animate={{ 
               backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
             }}
@@ -319,20 +342,23 @@ Start your missions at: ${window.location.origin}
                 scale: { duration: 1, repeat: Infinity, ease: "easeInOut" }
               }}
             >
-              <Zap className="w-24 h-24 text-purple-400 mx-auto drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
+              <Zap className="w-24 h-24 text-slate-300 mx-auto drop-shadow-[0_0_25px_rgba(203,213,225,0.8)]" />
             </motion.div>
             
             <div className="space-y-3">
+              <div className="inline-block bg-gradient-to-r from-slate-400 to-gray-400 text-black px-4 py-1 rounded-full text-sm font-bold mb-2">
+                ✨ PLATINUM SERIES ✨
+              </div>
               <h2 className="text-3xl font-bold text-white">
-                Minting Your dNFT...
+                Limited Edition Minting...
               </h2>
-              <p className="text-xl text-purple-300">Creating your unique digital warrior</p>
+              <p className="text-xl text-slate-300">Forging Your Exclusive Platinum Warrior</p>
               <motion.p 
-                className="text-lg text-green-400 font-semibold"
+                className="text-lg text-amber-400 font-semibold"
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               >
-                ✨ Gas fees covered by GXCOIN ✨
+                🏆 Premium Gas Coverage by GXCOIN 🏆
               </motion.p>
             </div>
 
@@ -351,7 +377,7 @@ Start your missions at: ${window.location.origin}
                     delay: i * 0.2 
                   }}
                 >
-                  <Sparkles className="w-6 h-6 text-yellow-400" />
+                  <Sparkles className="w-6 h-6 text-amber-400" />
                 </motion.div>
               ))}
             </div>
@@ -363,8 +389,8 @@ Start your missions at: ${window.location.origin}
 
   if (status === 'achievement') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-yellow-900 flex items-center justify-center p-4">
-        {showConfetti && <Confetti recycle={false} numberOfPieces={1000} />}
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-900 flex items-center justify-center p-4">
+        {showConfetti && <Confetti recycle={false} numberOfPieces={2000} />}
         
         <motion.div
           initial={{ scale: 0, rotate: -180 }}
@@ -379,25 +405,25 @@ Start your missions at: ${window.location.origin}
             }}
             transition={{ duration: 0.5, repeat: Infinity }}
           >
-            <Trophy className="w-32 h-32 text-yellow-400 mx-auto drop-shadow-[0_0_30px_rgba(250,204,21,0.8)]" />
+            <Trophy className="w-32 h-32 text-slate-300 mx-auto drop-shadow-[0_0_40px_rgba(203,213,225,1)]" />
           </motion.div>
           
           <motion.h1
-            className="text-5xl font-bold text-yellow-400 mt-6"
+            className="text-5xl font-bold bg-gradient-to-r from-slate-300 via-gray-200 to-slate-300 bg-clip-text text-transparent mt-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            🎖️ ACHIEVEMENT UNLOCKED! 🎖️
+            🏆 PLATINUM EDITION UNLOCKED! 🏆
           </motion.h1>
           
           <motion.p
-            className="text-2xl text-white mt-4"
+            className="text-2xl text-amber-400 mt-4 font-bold"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
           >
-            Eco-Warrior Status Activated!
+            Exclusive Limited Series Activated!
           </motion.p>
         </motion.div>
       </div>
@@ -406,8 +432,8 @@ Start your missions at: ${window.location.origin}
 
   if (status === 'success') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-green-900 flex items-center justify-center p-4 overflow-y-auto">
-        {showConfetti && <Confetti recycle={true} numberOfPieces={200} />}
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-900 flex items-center justify-center p-4 overflow-y-auto">
+        {showConfetti && <Confetti recycle={true} numberOfPieces={500} />}
         
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
@@ -415,7 +441,7 @@ Start your missions at: ${window.location.origin}
           transition={{ duration: 0.5 }}
           className="w-full max-w-2xl"
         >
-          <Card className="bg-gradient-to-br from-green-900/60 via-emerald-900/50 to-teal-900/60 backdrop-blur-sm border-green-500/50 shadow-2xl shadow-green-500/20">
+          <Card className="bg-gradient-to-br from-slate-900/60 via-gray-800/50 to-zinc-900/60 backdrop-blur-sm border-slate-400/50 shadow-2xl shadow-slate-400/30">
             <CardContent className="p-8 space-y-6">
               {/* Success Header */}
               <motion.div
@@ -424,12 +450,18 @@ Start your missions at: ${window.location.origin}
                 transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                 className="text-center"
               >
-                <CheckCircle className="w-24 h-24 text-green-400 mx-auto drop-shadow-[0_0_20px_rgba(74,222,128,0.5)]" />
-                <h1 className="text-4xl font-bold text-white mt-4">
-                  🎉 EPIC SUCCESS! 🎉
+                <Trophy className="w-28 h-28 text-slate-300 mx-auto drop-shadow-[0_0_30px_rgba(203,213,225,0.8)]" />
+                <div className="inline-block bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 text-black px-6 py-2 rounded-full text-sm font-bold mt-4 mb-3 shadow-lg shadow-amber-500/50">
+                  ✨ PLATINUM LIMITED EDITION ✨
+                </div>
+                <h1 className="text-5xl font-bold bg-gradient-to-r from-slate-200 via-gray-100 to-slate-200 bg-clip-text text-transparent mt-2">
+                  🏆 PLATINUM SERIES SECURED! 🏆
                 </h1>
-                <p className="text-2xl text-green-400 mt-2 font-bold">
-                  Your Eco-Warrior dNFT is Live!
+                <p className="text-2xl text-amber-400 mt-3 font-bold">
+                  Your Exclusive Limited Edition Eco-Warrior dNFT is Live!
+                </p>
+                <p className="text-sm text-slate-400 mt-2">
+                  You're now part of an exclusive group of Platinum holders
                 </p>
               </motion.div>
 
@@ -439,33 +471,49 @@ Start your missions at: ${window.location.origin}
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="bg-black/60 rounded-xl p-6 border-2 border-green-500/30 shadow-[0_0_30px_rgba(74,222,128,0.3)]"
+                  className="bg-black/60 rounded-xl p-6 border-2 border-slate-400/40 shadow-[0_0_40px_rgba(203,213,225,0.4)]"
                 >
                   <div className="flex items-center justify-center gap-2 mb-4">
-                    <Award className="w-6 h-6 text-yellow-400" />
-                    <h3 className="text-xl font-bold text-white">Your dNFT Badge</h3>
-                    <Award className="w-6 h-6 text-yellow-400" />
+                    <div className="bg-gradient-to-r from-amber-500 to-yellow-500 text-black px-4 py-1 rounded-full text-xs font-bold">
+                      PLATINUM SERIES
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Award className="w-6 h-6 text-amber-400" />
+                    <h3 className="text-xl font-bold text-white">Your Exclusive dNFT Badge</h3>
+                    <Award className="w-6 h-6 text-amber-400" />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="bg-gradient-to-br from-blue-900/40 to-cyan-900/40 rounded-lg p-3 border border-blue-500/30">
+                    <div className="bg-gradient-to-br from-slate-800/60 to-gray-800/60 rounded-lg p-3 border border-slate-500/40">
                       <p className="text-gray-400 text-xs mb-1">Hero</p>
                       <p className="text-white font-bold text-lg">{nftDetails.heroId === 'aqua_wtr' ? 'AQUA ($WTR)' : nftDetails.heroId}</p>
                     </div>
-                    <div className="bg-gradient-to-br from-purple-900/40 to-pink-900/40 rounded-lg p-3 border border-purple-500/30">
+                    <div className="bg-gradient-to-br from-amber-900/40 to-yellow-900/40 rounded-lg p-3 border border-amber-500/40">
                       <p className="text-gray-400 text-xs mb-1">Level</p>
-                      <p className="text-cyan-400 font-bold text-lg flex items-center gap-1">
+                      <p className="text-amber-400 font-bold text-lg flex items-center gap-1">
                         <Star className="w-4 h-4" /> {nftDetails.level}
                       </p>
                     </div>
-                    <div className="bg-gradient-to-br from-yellow-900/40 to-orange-900/40 rounded-lg p-3 border border-yellow-500/30">
+                    <div className="bg-gradient-to-br from-slate-900/60 to-zinc-900/60 rounded-lg p-3 border border-slate-400/40">
                       <p className="text-gray-400 text-xs mb-1">Rarity</p>
-                      <p className="text-purple-400 font-bold text-lg">{nftDetails.rarity}</p>
+                      <p className="text-slate-300 font-bold text-lg">{nftDetails.rarity}</p>
                     </div>
                     <div className="bg-gradient-to-br from-green-900/40 to-emerald-900/40 rounded-lg p-3 border border-green-500/30">
                       <p className="text-gray-400 text-xs mb-1">Status</p>
                       <p className="text-green-400 font-bold text-lg">✅ Active</p>
                     </div>
+                  </div>
+
+                  {/* Always show Platinum edition info - universal for all purchases */}
+                  <div className="mt-4 bg-gradient-to-r from-amber-900/30 to-yellow-900/30 rounded-lg p-3 border border-amber-500/30">
+                    <p className="text-center text-amber-400 font-bold text-sm">
+                      🏆 LIMITED EDITION #{nftDetails.edition || 1} of {nftDetails.totalEditions || 500} 🏆
+                    </p>
+                    <p className="text-center text-xs text-gray-400 mt-1">
+                      Exclusive worldwide collectible
+                    </p>
                   </div>
 
                   {nftDetails.attributes?.transactionHash && (
@@ -491,7 +539,7 @@ Start your missions at: ${window.location.origin}
                   <div className="space-y-3">
                     <Button
                       asChild
-                      className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white font-bold py-4 text-lg shadow-lg shadow-orange-500/50 transition-all duration-300"
+                      className="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-bold py-4 text-lg shadow-lg shadow-amber-500/50 transition-all duration-300"
                     >
                       <a 
                         href="https://buy.stripe.com/00w14fblMdFZg98dSc83C0u" 
@@ -499,18 +547,18 @@ Start your missions at: ${window.location.origin}
                         rel="noopener noreferrer"
                         className="flex items-center justify-center"
                       >
-                        🛒 Purchase Your Own AQUA dNFT (from $175+)
+                        💎 Claim Your Platinum Series AQUA dNFT (from $175+)
                       </a>
                     </Button>
-                    <p className="text-center text-sm text-yellow-400 font-medium">
-                      Ready to own this experience for real?
+                    <p className="text-center text-sm text-amber-400 font-medium">
+                      Ready to join the exclusive Platinum holders club?
                     </p>
                     <div className="relative py-3">
                       <div className="absolute inset-0 flex items-center">
                         <div className="w-full border-t border-gray-600"></div>
                       </div>
                       <div className="relative flex justify-center text-xs">
-                        <span className="bg-gradient-to-br from-green-900/60 via-emerald-900/50 to-teal-900/60 px-2 text-gray-400">
+                        <span className="bg-gradient-to-br from-slate-900/60 via-gray-800/50 to-zinc-900/60 px-2 text-gray-400">
                           or continue exploring
                         </span>
                       </div>
@@ -527,10 +575,10 @@ Start your missions at: ${window.location.origin}
                       if (gameTab) gameTab.click();
                     }, 500);
                   }}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold py-4 text-lg shadow-lg shadow-green-500/50"
+                  className="w-full bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-500 hover:to-yellow-500 text-black font-bold py-4 text-lg shadow-lg shadow-amber-500/50"
                 >
                   <Rocket className="w-6 h-6 mr-2" />
-                  Start Your Epic Mission Now!
+                  Start Your Exclusive Platinum Mission!
                 </Button>
 
                 {/* Share Buttons */}
@@ -538,15 +586,15 @@ Start your missions at: ${window.location.origin}
                   <Button
                     onClick={handleDownloadCertificate}
                     variant="outline"
-                    className="border-blue-500/50 hover:bg-blue-500/20 text-white"
+                    className="border-amber-500/50 hover:bg-amber-500/20 text-white"
                   >
                     <Download className="w-4 h-4 mr-2" />
-                    Certificate
+                    Platinum Certificate
                   </Button>
                   <Button
                     onClick={handleCopyLink}
                     variant="outline"
-                    className="border-purple-500/50 hover:bg-purple-500/20 text-white"
+                    className="border-slate-400/50 hover:bg-slate-500/20 text-white"
                   >
                     {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
                     {copied ? 'Copied!' : 'Copy Link'}
@@ -585,28 +633,28 @@ Start your missions at: ${window.location.origin}
                 </div>
 
                 {/* Email Confirmation */}
-                <div className="bg-black/40 rounded-lg p-4 border border-gray-700">
-                  <p className="text-sm text-gray-300 mb-2">📧 Get your dNFT details via email:</p>
+                <div className="bg-black/40 rounded-lg p-4 border border-slate-600">
+                  <p className="text-sm text-slate-300 mb-2">📧 Get your Platinum certificate via email:</p>
                   <div className="flex gap-2">
                     <Input
                       type="email"
                       placeholder="your@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="bg-gray-800 border-gray-600 text-white"
+                      className="bg-gray-800 border-slate-600 text-white"
                     />
                     <Button
                       onClick={handleSendEmail}
                       size="sm"
                       variant="outline"
-                      className="border-green-500/50 hover:bg-green-500/20"
+                      className="border-amber-500/50 hover:bg-amber-500/20"
                       disabled={emailSent}
                     >
                       {emailSent ? <Check className="w-4 h-4" /> : <Mail className="w-4 h-4" />}
                     </Button>
                   </div>
                   {emailSent && (
-                    <p className="text-xs text-green-400 mt-2">✅ Email sent successfully!</p>
+                    <p className="text-xs text-green-400 mt-2">✅ Certificate sent successfully!</p>
                   )}
                 </div>
               </motion.div>
@@ -618,13 +666,13 @@ Start your missions at: ${window.location.origin}
                 transition={{ delay: 0.8 }}
                 className="text-center"
               >
-                <div className="bg-gradient-to-r from-yellow-900/30 to-orange-900/30 rounded-lg p-3 border border-yellow-500/30">
-                  <p className="text-sm text-gray-300">
+                <div className="bg-gradient-to-r from-amber-900/30 to-yellow-900/30 rounded-lg p-3 border border-amber-500/30">
+                  <p className="text-sm text-slate-300">
                     <Gift className="w-4 h-4 inline mr-1" />
-                    Auto-redirecting to your missions in
+                    Auto-redirecting to your exclusive Platinum missions in
                   </p>
                   <motion.p 
-                    className="text-3xl font-bold text-yellow-400 mt-1"
+                    className="text-3xl font-bold text-amber-400 mt-1"
                     animate={{ scale: [1, 1.1, 1] }}
                     transition={{ duration: 0.5, repeat: Infinity }}
                   >
