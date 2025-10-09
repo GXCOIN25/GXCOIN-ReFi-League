@@ -257,13 +257,19 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
   const handleClick = () => {
     if (tokenSymbol === 'WTR') {
       window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+    } else if (tokenSymbol === 'GXCOIN') {
+      window.location.href = 'https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y';
+    } else if (tokenSymbol === 'BATT') {
+      window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
+    } else if (tokenSymbol === 'GCCT') {
+      window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
     }
   };
 
   return (
     <ShimmerEffect enabled={isLegendary && shouldAnimate}>
       <motion.div
-        className={`relative rounded-xl overflow-hidden ${className} ${tokenSymbol === 'WTR' ? 'cursor-pointer' : ''}`}
+        className={`relative rounded-xl overflow-hidden ${className} ${['WTR', 'GXCOIN', 'BATT', 'GCCT'].includes(tokenSymbol) ? 'cursor-pointer' : ''}`}
         style={{ 
           width: sizeConfig.container, 
           height: sizeConfig.container,

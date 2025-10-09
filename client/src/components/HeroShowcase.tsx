@@ -142,8 +142,14 @@ export default function HeroShowcase() {
                   onClick={() => {
                     if (selectedHero.id === 'aqua_wtr' || selectedHero.id.includes('aqua')) {
                       window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+                    } else if (selectedHero.id === 'gxcoin_anchor') {
+                      window.location.href = 'https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y';
+                    } else if (selectedHero.id === 'graphene_batt') {
+                      window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
+                    } else if (selectedHero.id === 'trader_gcct') {
+                      window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
                     } else {
-                      alert(`${selectedHero.name} NFT collection coming soon! Join the AQUA mission first.`);
+                      alert(`${selectedHero.name} NFT collection coming soon! Join the available missions first.`);
                     }
                   }}
                 >
