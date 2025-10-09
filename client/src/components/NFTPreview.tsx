@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ interface NFTPreviewProps {
 
 export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
   const [selectedNFT, setSelectedNFT] = useState<string | null>(null);
+  const [, setLocation] = useLocation();
   const { heroes, nftBadges, unlockNFTBadge } = useHeroes();
   const { currentRank, impactMetrics } = useContribution();
 
@@ -244,9 +246,11 @@ export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
                 className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-500 hover:to-blue-500"
                 size="lg"
                 onClick={() => {
-                  heroes.forEach(hero => {
-                    unlockNFTBadge(hero.id, Math.min(Math.floor(currentRank.impactMultiplier), 5));
-                  });
+                  setLocation('/');
+                  setTimeout(() => {
+                    const gameTab = document.querySelector('[data-value="game"]') as HTMLElement;
+                    if (gameTab) gameTab.click();
+                  }, 500);
                 }}
               >
                 <Award className="h-4 w-4 mr-2" />
