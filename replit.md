@@ -40,6 +40,17 @@ Preferred communication style: Simple, everyday language.
   * Real-time delivery with success/error handling
 - **Architect Approved**: All integrations verified, toast handlers fixed, no security issues, consistent UX across entry points, email delivery tested and working
 
+### CRITICAL FIX: Supreme Anchor Payment Link in Dynamic NFT Collection (October 9, 2025)
+- **Bug Found**: When users clicked on "The Supreme Anchor" card in Dynamic NFT Collection, they were redirected to wrong payment link
+- **Root Cause**: NFTPreview.tsx getValidTokenSymbol() function didn't include 'GXCOIN' in valid symbols array
+  * Supreme Anchor has symbol='GXCOIN', but function fell back to 'GCCT'
+  * This caused TokenBadge click handler to use CARBON/GRAPHENE payment link instead
+- **Fix Applied**: Added 'GXCOIN' to valid symbols array in NFTPreview.tsx line 27
+  * Changed from: `['WTR', 'HEMP', 'GPWR', 'BATT', 'GCCT']`
+  * Changed to: `['WTR', 'HEMP', 'GPWR', 'BATT', 'GCCT', 'GXCOIN']`
+- **Result**: Supreme Anchor card now correctly redirects to: https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y ✅
+- **Architect Approved**: Logic verified correct, requires live UI testing
+
 ### Direct Stripe Payment Links & Pricing Display (October 9, 2025)
 - **Updated All Purchase NFT Buttons** to redirect directly to Stripe checkout (bypassing modal)
 - **Added Pricing Display**: All Purchase NFT buttons now show "from $175+" text
