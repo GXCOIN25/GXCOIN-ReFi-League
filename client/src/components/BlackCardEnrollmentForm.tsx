@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { motion, AnimatePresence } from "framer-motion";
 import { Crown, Star, Shield, Zap, CreditCard, CheckCircle2, Sparkles, Award, Gem } from "lucide-react";
 import Confetti from "react-confetti";
+import { toast } from "sonner";
 
 interface CardTier {
   name: string;
@@ -158,7 +159,7 @@ export default function BlackCardEnrollmentForm({ isOpen, onClose, onSubmit }: B
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -166,9 +167,36 @@ export default function BlackCardEnrollmentForm({ isOpen, onClose, onSubmit }: B
     }
 
     setIsSubmitting(true);
-    setShowConfetti(true);
 
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/black-card-enrollment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          selectedTier: formData.selectedTier,
+          hasAnchorOwnership: formData.hasAnchorOwnership,
+          contributionLevel: formData.contributionLevel,
+          cardType: formData.cardType,
+          acceptedTerms: formData.acceptedTerms
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to submit application');
+      }
+
+      setShowConfetti(true);
+      toast.success("Application Submitted!", {
+        description: data.message || "Your Black Card application has been submitted successfully!"
+      });
+
       if (onSubmit) {
         onSubmit(formData);
       }
@@ -189,7 +217,14 @@ export default function BlackCardEnrollmentForm({ isOpen, onClose, onSubmit }: B
           acceptedTerms: false
         });
       }, 3000);
-    }, 500);
+
+    } catch (error: any) {
+      console.error('Enrollment submission error:', error);
+      setIsSubmitting(false);
+      toast.error("Submission Failed", {
+        description: error.message || "We couldn't submit your application. Please try again or contact support."
+      });
+    }
   };
 
   const selectedTierData = tiers.find(t => t.name === formData.selectedTier);

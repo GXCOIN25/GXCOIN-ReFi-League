@@ -9,6 +9,7 @@ import type { Request, Response, NextFunction } from "express";
 import crypto from "crypto";
 import { Octokit } from '@octokit/rest';
 import Stripe from 'stripe';
+import { getUncachableOutlookClient } from './outlook';
 
 interface AuthRequest extends Request {
   userId?: number;
@@ -1404,6 +1405,254 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error('Auto-mint error:', error);
       res.status(500).json({ error: error.message || "Failed to mint NFT" });
+    }
+  });
+
+  // Black Card Enrollment Email Notification
+  app.post("/api/black-card-enrollment", async (req, res) => {
+    try {
+      const { fullName, email, phoneNumber, selectedTier, hasAnchorOwnership, contributionLevel, cardType, acceptedTerms } = req.body;
+      
+      console.log('📧 Black Card Enrollment received:', { fullName, email, selectedTier });
+      
+      // Validate required fields
+      if (!fullName || !email || !selectedTier || !acceptedTerms) {
+        return res.status(400).json({ 
+          error: "Missing required fields. Please fill in all required information." 
+        });
+      }
+
+      // Get Outlook client
+      const outlookClient = await getUncachableOutlookClient();
+      
+      // Create professional HTML email
+      const emailBody = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <style>
+            body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              line-height: 1.6;
+              color: #333;
+              max-width: 800px;
+              margin: 0 auto;
+              padding: 20px;
+            }
+            .header {
+              background: linear-gradient(135deg, #FFD700, #FFA500);
+              color: white;
+              padding: 30px;
+              text-align: center;
+              border-radius: 10px 10px 0 0;
+            }
+            .header h1 {
+              margin: 0;
+              font-size: 28px;
+            }
+            .content {
+              background: #f9f9f9;
+              padding: 30px;
+              border: 1px solid #ddd;
+            }
+            .tier-highlight {
+              background: linear-gradient(135deg, #4CAF50, #45a049);
+              color: white;
+              padding: 20px;
+              border-radius: 8px;
+              margin: 20px 0;
+              text-align: center;
+            }
+            .tier-highlight h2 {
+              margin: 0;
+              font-size: 24px;
+            }
+            .info-section {
+              margin: 20px 0;
+              background: white;
+              padding: 20px;
+              border-radius: 8px;
+              border-left: 4px solid #FFD700;
+            }
+            .info-row {
+              display: flex;
+              padding: 10px 0;
+              border-bottom: 1px solid #eee;
+            }
+            .info-row:last-child {
+              border-bottom: none;
+            }
+            .info-label {
+              font-weight: bold;
+              width: 200px;
+              color: #555;
+            }
+            .info-value {
+              flex: 1;
+              color: #333;
+            }
+            .badge {
+              display: inline-block;
+              padding: 5px 15px;
+              border-radius: 20px;
+              font-size: 14px;
+              font-weight: bold;
+            }
+            .badge-yes {
+              background: #4CAF50;
+              color: white;
+            }
+            .badge-no {
+              background: #9E9E9E;
+              color: white;
+            }
+            .footer {
+              background: #333;
+              color: white;
+              padding: 20px;
+              text-align: center;
+              border-radius: 0 0 10px 10px;
+              margin-top: 0;
+            }
+            .timestamp {
+              color: #888;
+              font-size: 12px;
+              text-align: center;
+              margin-top: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>🎴 New Black Card Application</h1>
+            <p>GXCOIN Premium Visa Black Card Program</p>
+          </div>
+          
+          <div class="content">
+            <div class="tier-highlight">
+              <h2>👑 ${selectedTier}</h2>
+            </div>
+            
+            <div class="info-section">
+              <h3 style="margin-top: 0; color: #FFD700;">📋 Applicant Information</h3>
+              
+              <div class="info-row">
+                <div class="info-label">Full Name:</div>
+                <div class="info-value">${fullName}</div>
+              </div>
+              
+              <div class="info-row">
+                <div class="info-label">Email Address:</div>
+                <div class="info-value">${email}</div>
+              </div>
+              
+              ${phoneNumber ? `
+              <div class="info-row">
+                <div class="info-label">Phone Number:</div>
+                <div class="info-value">${phoneNumber}</div>
+              </div>
+              ` : ''}
+            </div>
+            
+            <div class="info-section">
+              <h3 style="margin-top: 0; color: #FFD700;">💳 Card Details</h3>
+              
+              <div class="info-row">
+                <div class="info-label">Selected Tier:</div>
+                <div class="info-value"><strong>${selectedTier}</strong></div>
+              </div>
+              
+              <div class="info-row">
+                <div class="info-label">Card Type:</div>
+                <div class="info-value">${cardType === 'debit' ? '💚 Debit Card' : '💙 Credit Card'}</div>
+              </div>
+              
+              ${contributionLevel ? `
+              <div class="info-row">
+                <div class="info-label">Contribution Level:</div>
+                <div class="info-value">${contributionLevel}</div>
+              </div>
+              ` : ''}
+              
+              <div class="info-row">
+                <div class="info-label">GXCOIN Anchor Owner:</div>
+                <div class="info-value">
+                  <span class="badge ${hasAnchorOwnership ? 'badge-yes' : 'badge-no'}">
+                    ${hasAnchorOwnership ? '✓ Yes' : '✗ No'}
+                  </span>
+                </div>
+              </div>
+              
+              <div class="info-row">
+                <div class="info-label">Terms Accepted:</div>
+                <div class="info-value">
+                  <span class="badge badge-yes">✓ Yes</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="timestamp">
+              Application submitted on: ${new Date().toLocaleString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit',
+                timeZoneName: 'short'
+              })}
+            </div>
+          </div>
+          
+          <div class="footer">
+            <p style="margin: 0;">GXCOIN - Patent-Powered Environmental Impact</p>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #aaa;">This is an automated notification from the GXCOIN Black Card enrollment system</p>
+          </div>
+        </body>
+        </html>
+      `;
+
+      // Send email via Microsoft Graph API
+      const sendMail = {
+        message: {
+          subject: `New Black Card Application - ${selectedTier}`,
+          body: {
+            contentType: 'HTML',
+            content: emailBody
+          },
+          toRecipients: [
+            {
+              emailAddress: {
+                address: 'davidvaz@gxcoin.world'
+              }
+            }
+          ]
+        },
+        saveToSentItems: true
+      };
+
+      await outlookClient.api('/me/sendMail').post(sendMail);
+      
+      console.log('✅ Black Card enrollment email sent successfully to davidvaz@gxcoin.world');
+      
+      res.json({ 
+        success: true, 
+        message: "Application submitted successfully! You'll receive a confirmation email shortly." 
+      });
+      
+    } catch (error: any) {
+      console.error('❌ Black Card enrollment email error:', error);
+      
+      // Provide helpful error messages
+      if (error.message?.includes('Outlook not connected')) {
+        return res.status(500).json({ 
+          error: "Email service not configured. Please contact support." 
+        });
+      }
+      
+      res.status(500).json({ 
+        error: "Failed to submit application. Please try again or contact support." 
+      });
     }
   });
 
