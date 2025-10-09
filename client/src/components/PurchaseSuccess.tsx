@@ -72,7 +72,7 @@ export function PurchaseSuccess() {
           level: 1,
           rarity: 'Platinum Limited Edition',
           edition: 247,
-          totalEditions: 500,
+          totalEditions: 200000,
           attributes: {
             transactionHash: '0x1a2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890',
             mintedAt: new Date().toISOString(),
@@ -204,7 +204,7 @@ export function PurchaseSuccess() {
 
   const handleDownloadCertificate = () => {
     const editionNumber = nftDetails?.edition || 1;
-    const totalEditions = nftDetails?.totalEditions || 500;
+    const totalEditions = nftDetails?.totalEditions || 200000;
     
     const certificate = `
 🏆 GXCOIN PLATINUM SERIES dNFT CERTIFICATE 🏆
@@ -215,7 +215,7 @@ export function PurchaseSuccess() {
 Hero: ${nftDetails?.heroId || 'AQUA ($WTR)'}
 Level: ${nftDetails?.level || 1}
 Rarity: ${nftDetails?.rarity || 'Platinum Limited Edition'}
-Edition: #${editionNumber} of ${totalEditions}
+Edition: #${editionNumber} of ${totalEditions.toLocaleString()}
 Status: ✅ MINTED & ACTIVE
 
 You are now part of an exclusive group of 
@@ -248,8 +248,8 @@ Start your exclusive missions at: ${window.location.origin}
   const handleShareTwitter = () => {
     const url = shareUrl || window.location.origin;
     const editionNumber = nftDetails?.edition || 1;
-    const totalEditions = nftDetails?.totalEditions || 500;
-    const text = `🏆 I just secured my PLATINUM SERIES AQUA ($WTR) Eco-Warrior dNFT on @GXCOIN! 💎 Limited Edition #${editionNumber} of ${totalEditions}! Join the elite regenerative finance revolution! 🌍✨`;
+    const totalEditions = nftDetails?.totalEditions || 200000;
+    const text = `🏆 I just secured my PLATINUM SERIES AQUA ($WTR) Eco-Warrior dNFT on @GXCOIN! 💎 Limited Edition #${editionNumber} of ${totalEditions.toLocaleString()}! Join the elite regenerative finance revolution! 🌍✨`;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank', 'noopener,noreferrer');
   };
 
@@ -260,7 +260,7 @@ Start your exclusive missions at: ${window.location.origin}
 
   const handleShareLinkedIn = () => {
     const url = shareUrl || window.location.origin;
-    const text = `I just secured my Platinum Series AQUA Eco-Warrior dNFT on GXCOIN! Limited Edition - one of only 500 worldwide. Join the elite regenerative finance revolution.`;
+    const text = `I just secured my Platinum Series AQUA Eco-Warrior dNFT on GXCOIN! Limited Edition - one of only 200,000 worldwide. Join the elite regenerative finance revolution.`;
     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank', 'noopener,noreferrer');
   };
 
@@ -509,7 +509,7 @@ Start your exclusive missions at: ${window.location.origin}
                   {/* Always show Platinum edition info - universal for all purchases */}
                   <div className="mt-4 bg-gradient-to-r from-amber-900/30 to-yellow-900/30 rounded-lg p-3 border border-amber-500/30">
                     <p className="text-center text-amber-400 font-bold text-sm">
-                      🏆 LIMITED EDITION #{nftDetails.edition || 1} of {nftDetails.totalEditions || 500} 🏆
+                      🏆 LIMITED EDITION #{nftDetails.edition || 1} of {(nftDetails.totalEditions || 200000).toLocaleString()} 🏆
                     </p>
                     <p className="text-center text-xs text-gray-400 mt-1">
                       Exclusive worldwide collectible

@@ -1209,7 +1209,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               if (heroId) {
                 // Create NFT badge with atomic edition assignment
                 const seriesName = 'Platinum Limited Edition';
-                const totalEditions = 500;
+                const totalEditions = 200000;
                 
                 const nftBadge = await storage.createNFTBadgeWithEdition(
                   {
@@ -1327,7 +1327,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           validatedNFTBadge = {
             ...recentNFT,
             editionNumber: hasValidEditionNumber ? recentNFT.editionNumber : 0,
-            totalEditions: hasValidTotalEditions ? recentNFT.totalEditions : 500,
+            totalEditions: hasValidTotalEditions ? recentNFT.totalEditions : 200000,
             seriesName: hasValidSeriesName ? recentNFT.seriesName : 'Limited Edition',
           };
         } else {
