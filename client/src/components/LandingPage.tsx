@@ -10,7 +10,9 @@ import { useContribution } from "@/lib/stores/useContribution";
 import { useUser } from "@/lib/stores/useUser";
 import { useWallet } from "@/lib/stores/useWallet";
 import { CryptoOnboardingHub } from "./CryptoOnboardingHub";
+import BlackCardEnrollmentForm from "./BlackCardEnrollmentForm";
 import TokenBadge, { TokenSymbol } from "./TokenBadge";
+import { toast } from "sonner";
 import { 
   Sparkles, 
   Shield, 
@@ -55,6 +57,7 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
   const [activeTab, setActiveTab] = useState("heroes");
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingInitialTab, setOnboardingInitialTab] = useState<'start' | 'metamask' | 'buy' | 'learn' | 'security'>('start');
+  const [showEnrollmentForm, setShowEnrollmentForm] = useState(false);
   const { currentRank, impactMetrics, anchorPower, gxcoinStake, getAnchorMultiplier } = useContribution();
   const { isLoggedIn } = useUser();
   const { isConnected } = useWallet();
@@ -75,6 +78,11 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
+  };
+
+  const handleEnrollmentSubmit = (data: any) => {
+    console.log('Black Card Enrollment:', data);
+    toast.success(`Application submitted for ${data.selectedTier}! We'll contact you soon.`);
   };
 
   const rankTiers = [
@@ -1414,6 +1422,7 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
           >
             <Button 
               size="lg"
+              onClick={() => setShowEnrollmentForm(true)}
               className="bg-gradient-to-r from-gray-600 to-slate-600 hover:from-gray-700 hover:to-slate-700 text-white font-bold px-8 py-4 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <CreditCard className="h-5 w-5 mr-2" />
@@ -2242,6 +2251,13 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
         onClose={() => setShowOnboarding(false)}
         initialTab={onboardingInitialTab}
         onComplete={handleOnboardingComplete}
+      />
+
+      {/* Black Card Enrollment Form */}
+      <BlackCardEnrollmentForm
+        isOpen={showEnrollmentForm}
+        onClose={() => setShowEnrollmentForm(false)}
+        onSubmit={handleEnrollmentSubmit}
       />
     </div>
   );

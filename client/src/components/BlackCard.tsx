@@ -5,9 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useContribution } from "@/lib/stores/useContribution";
 import { CreditCard, Star, Shield, Crown, Zap } from "lucide-react";
+import BlackCardEnrollmentForm from "@/components/BlackCardEnrollmentForm";
+import { toast } from "sonner";
 
 export default function BlackCard() {
   const [isRevealed, setIsRevealed] = useState(false);
+  const [isEnrollmentOpen, setIsEnrollmentOpen] = useState(false);
   const { currentRank, anchorPower, gxcoinStake, getAnchorMultiplier } = useContribution();
 
   const anchorMultiplier = getAnchorMultiplier();
@@ -312,7 +315,10 @@ export default function BlackCard() {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.9 }}
       >
-        <Button className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white min-h-[44px] touch-manipulation">
+        <Button 
+          onClick={() => setIsEnrollmentOpen(true)}
+          className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white min-h-[44px] touch-manipulation"
+        >
           <CreditCard className="h-4 w-4 mr-2" />
           Apply for BLACK CARD
         </Button>
@@ -325,6 +331,19 @@ export default function BlackCard() {
           </p>
         </div>
       </motion.div>
+
+      {/* Enrollment Form */}
+      <BlackCardEnrollmentForm
+        isOpen={isEnrollmentOpen}
+        onClose={() => setIsEnrollmentOpen(false)}
+        onSubmit={(data) => {
+          console.log("Black Card Enrollment Data:", data);
+          toast.success("Application Submitted!", {
+            description: `Thank you for applying for the ${data.selectedTier} tier. We'll review your application within 24-48 hours.`,
+            duration: 5000
+          });
+        }}
+      />
     </div>
   );
 }

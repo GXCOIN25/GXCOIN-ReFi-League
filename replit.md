@@ -25,7 +25,7 @@ Preferred communication style: Simple, everyday language.
   * StripeNFTPurchase.tsx: Card payment handler
   * TokenBadge.tsx: Token purchase CTAs
   * GameArena.tsx: Purchase dNFT buttons
-  * NFTPreview.tsx: Purchase dNFT buttons
+  * NFTPreview.tsx: Purchase dNFT button now redirects based on selected NFT card (fixes GXCOIN Anchor routing)
 - **Architect Approved**: All payment routing verified, pricing displays correctly, no security issues
 
 ### Epic Demo Button in Crypto Onboarding Hub (October 8, 2025)
