@@ -226,6 +226,10 @@ function MainExperience() {
                     onClick={() => {
                       if (hero.id === 'aqua_wtr') {
                         window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+                      } else if (hero.id === 'gxcoin_anchor') {
+                        window.location.href = 'https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y';
+                      } else if (hero.id === 'graphene_batt') {
+                        window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
                       } else {
                         selectHero && selectHero(hero.id);
                       }
@@ -233,7 +237,7 @@ function MainExperience() {
                   >
                     <img 
                       src={getHeroImage(hero.id)}
-                      alt={hero.id === 'aqua_wtr' ? hero.name + ' - Click to Purchase dNFT' : hero.name}
+                      alt={['aqua_wtr', 'gxcoin_anchor', 'graphene_batt'].includes(hero.id) ? hero.name + ' - Click to Purchase dNFT' : hero.name}
                       className="w-full h-full object-cover rounded-full"
                       onError={(e) => {
                         // Fallback to text if image fails to load
@@ -425,12 +429,18 @@ function MainExperience() {
                                 if (hero.id === 'aqua_wtr') {
                                   e.stopPropagation();
                                   window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+                                } else if (hero.id === 'gxcoin_anchor') {
+                                  e.stopPropagation();
+                                  window.location.href = 'https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y';
+                                } else if (hero.id === 'graphene_batt') {
+                                  e.stopPropagation();
+                                  window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
                                 }
                               }}
                             >
                               <img 
                                 src={getHeroImage(hero.id)}
-                                alt={hero.id === 'aqua_wtr' ? hero.name + ' - Click to Purchase dNFT' : hero.name}
+                                alt={['aqua_wtr', 'gxcoin_anchor', 'graphene_batt'].includes(hero.id) ? hero.name + ' - Click to Purchase dNFT' : hero.name}
                                 className="w-full h-full object-cover rounded-full"
                                 onError={(e) => {
                                   const target = e.target as HTMLImageElement;

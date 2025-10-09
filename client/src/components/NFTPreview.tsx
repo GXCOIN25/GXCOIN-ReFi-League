@@ -277,15 +277,23 @@ export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
                 className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500"
                 size="lg"
                 onClick={() => {
+                  // Check for purchasable heroes in priority order
                   const aquaHero = heroes.find(hero => 
+                    hero.id === 'aqua_wtr' || 
                     hero.id.toLowerCase().includes('aqua') || 
                     hero.id.toLowerCase().includes('wtr')
                   );
+                  const anchorHero = heroes.find(hero => hero.id === 'gxcoin_anchor');
+                  const battHero = heroes.find(hero => hero.id === 'graphene_batt');
                   
                   if (aquaHero) {
                     window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+                  } else if (anchorHero) {
+                    window.location.href = 'https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y';
+                  } else if (battHero) {
+                    window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
                   } else {
-                    alert('AQUA ($WTR) NFT available for purchase! Other heroes coming soon.');
+                    alert('AQUA ($WTR), GXCOIN Anchor, and GRAPHENE ($BATT) NFTs available for purchase! Check the Heroes tab.');
                   }
                 }}
               >
