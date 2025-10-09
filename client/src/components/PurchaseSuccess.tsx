@@ -36,14 +36,16 @@ export function PurchaseSuccess() {
   const [emailSent, setEmailSent] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState('');
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = urlParams.get('session_id');
-    const isDemoMode = urlParams.get('demo') === 'true';
+    const demoMode = urlParams.get('demo') === 'true';
+    setIsDemoMode(demoMode);
 
     // Demo mode - show the full epic journey with mock data
-    if (isDemoMode) {
+    if (demoMode) {
       setShareUrl(`${window.location.origin}/?ref=demo123`);
       
       const runDemoFlow = async () => {
@@ -484,6 +486,38 @@ Start your missions at: ${window.location.origin}
                 transition={{ delay: 0.6 }}
                 className="space-y-4"
               >
+                {/* Demo Mode Purchase CTA */}
+                {isDemoMode && (
+                  <div className="space-y-3">
+                    <Button
+                      asChild
+                      className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 text-white font-bold py-4 text-lg shadow-lg shadow-orange-500/50 transition-all duration-300"
+                    >
+                      <a 
+                        href="https://buy.stripe.com/00w14fblMdFZg98dSc83C0u" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center"
+                      >
+                        🛒 Purchase Your Own AQUA dNFT (from $175+)
+                      </a>
+                    </Button>
+                    <p className="text-center text-sm text-yellow-400 font-medium">
+                      Ready to own this experience for real?
+                    </p>
+                    <div className="relative py-3">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-gray-600"></div>
+                      </div>
+                      <div className="relative flex justify-center text-xs">
+                        <span className="bg-gradient-to-br from-green-900/60 via-emerald-900/50 to-teal-900/60 px-2 text-gray-400">
+                          or continue exploring
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Primary CTA */}
                 <Button
                   onClick={() => {
