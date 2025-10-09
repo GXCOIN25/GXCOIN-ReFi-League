@@ -8,6 +8,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates
 
+### Domain Redirect Update: gxcoin.world → ai.gxcoin.world (October 9, 2025)
+- **Updated Landing Page Domain References** - All gxcoin.world links now redirect to https://ai.gxcoin.world
+- **Changes Applied**:
+  * Official Website display text: "gxcoin.world" → "ai.gxcoin.world"
+  * "Visit gxcoin.world" CTA button → "Visit ai.gxcoin.world"
+  * Both CTAs now open https://ai.gxcoin.world in new tab with security attributes
+- **Component Updated**: LandingPage.tsx (GXCOIN Launch Q3 2025 section)
+- **Email Addresses Preserved**: davidvaz@gxcoin.world email addresses remain unchanged
+- **Architect Approved**: All domain redirects verified, security attributes preserved (noopener,noreferrer)
+
 ### Black Card Pre-Enrollment Form with Tier Selection (October 9, 2025)
 - **Created Epic Enrollment Form** - BlackCardEnrollmentForm component with comprehensive tier selection
 - **5 Card Tiers Implemented**:
