@@ -68,16 +68,18 @@ export function StripeNFTPurchase({
       setError(null);
       
       // Use direct Stripe payment links for heroes with configured links
-      if (heroId === 'aqua_wtr') {
+      const lowerHeroId = heroId.toLowerCase();
+
+      if (lowerHeroId.includes('aqua') || lowerHeroId.includes('wtr')) {
         window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
         return;
-      } else if (heroId === 'gxcoin_anchor') {
+      } else if (lowerHeroId.includes('gxcoin') || lowerHeroId.includes('anchor')) {
         window.location.href = 'https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y';
         return;
-      } else if (heroId === 'graphene_batt') {
+      } else if (lowerHeroId.includes('graphene') || lowerHeroId.includes('batt')) {
         window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
         return;
-      } else if (heroId === 'trader_gcct') {
+      } else if (lowerHeroId.includes('trader') || lowerHeroId.includes('gcct') || lowerHeroId.includes('carbon')) {
         window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
         return;
       }
