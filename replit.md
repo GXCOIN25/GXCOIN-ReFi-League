@@ -8,6 +8,32 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates
 
+### Black Card Pre-Enrollment Form with Tier Selection (October 9, 2025)
+- **Created Epic Enrollment Form** - BlackCardEnrollmentForm component with comprehensive tier selection
+- **5 Card Tiers Implemented**:
+  * Bronze Recruit ($175+, $5K limit) - Patent licensing, eco-rewards, dashboard, staking
+  * Silver Defender ($500+, $25K limit) - Bronze benefits + VIP concierge, self-custody
+  * Gold Guardian ($1K+, $100K limit) - Silver benefits + Global events, Bitcoin cashback
+  * Platinum Champion ($5K+, $500K limit) - Gold benefits + $500K spending, wealth management
+  * Diamond Legend ($10K+, Unlimited) - Platinum benefits + Unlimited spending, dedicated concierge
+- **Form Features**:
+  * Visual tier selection cards with animations and hover effects
+  * Form fields: Full Name, Email, Phone, Tier Selection, Environmental Contribution Level, Card Type (Debit/Credit), GXCOIN Anchor Ownership, Terms & Conditions
+  * Real-time validation with error clearing
+  * Confetti celebration animation on successful submission
+  * Toast notifications with tier-specific messages
+  * Responsive design with mobile optimization
+- **Integration Points**:
+  * BlackCard.tsx: "Apply for BLACK CARD" button opens enrollment form
+  * LandingPage.tsx: "Apply for Your Card Today" button opens enrollment form
+  * Both entry points correctly display selected tier in success messages
+- **Technical Implementation**:
+  * Radix UI Dialog wrapper for modal functionality
+  * Framer Motion for epic entrance animations and tier card effects
+  * Form state management with TypeScript validation
+  * Confetti animation (500 pieces) on submission success
+- **Architect Approved**: All integrations verified, toast handlers fixed, no security issues, consistent UX across entry points
+
 ### Direct Stripe Payment Links & Pricing Display (October 9, 2025)
 - **Updated All Purchase NFT Buttons** to redirect directly to Stripe checkout (bypassing modal)
 - **Added Pricing Display**: All Purchase NFT buttons now show "from $175+" text
