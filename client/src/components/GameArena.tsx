@@ -180,6 +180,8 @@ function HeroCard({ hero, onSelect, showStats = true }: HeroCardProps) {
                 e.stopPropagation();
                 if (hero.id === 'aqua_wtr') {
                   window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+                } else if (hero.id === 'gxcoin_anchor') {
+                  window.location.href = 'https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y';
                 } else {
                   alert('Payment link coming soon! Check back later.');
                 }
