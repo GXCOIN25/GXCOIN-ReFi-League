@@ -140,13 +140,15 @@ export default function HeroShowcase() {
                   className="flex-1"
                   style={{ backgroundColor: selectedHero.color }}
                   onClick={() => {
-                    if (selectedHero.id === 'aqua_wtr' || selectedHero.id.includes('aqua')) {
+                    const heroId = selectedHero.id.toLowerCase();
+                    
+                    if (heroId.includes('aqua') || heroId.includes('wtr')) {
                       window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
-                    } else if (selectedHero.id === 'gxcoin_anchor') {
+                    } else if (heroId.includes('gxcoin') || heroId.includes('anchor')) {
                       window.location.href = 'https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y';
-                    } else if (selectedHero.id === 'graphene_batt') {
+                    } else if (heroId.includes('graphene') || heroId.includes('batt')) {
                       window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
-                    } else if (selectedHero.id === 'trader_gcct') {
+                    } else if (heroId.includes('trader') || heroId.includes('gcct') || heroId.includes('carbon')) {
                       window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
                     } else {
                       alert(`${selectedHero.name} NFT collection coming soon! Join the available missions first.`);
