@@ -496,19 +496,26 @@ function MainExperience() {
                           <Button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setSelectedHeroForPurchase({
-                                heroId: hero.id,
-                                heroName: hero.name,
-                                heroRarity: hero.rarity,
-                                heroImage: getHeroImage(hero.id)
-                              });
+                              const heroId = hero.id.toLowerCase();
+                              
+                              if (heroId.includes('aqua') || heroId.includes('wtr')) {
+                                window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
+                              } else if (heroId.includes('gxcoin') || heroId.includes('anchor')) {
+                                window.location.href = 'https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y';
+                              } else if (heroId.includes('graphene') || heroId.includes('batt')) {
+                                window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
+                              } else if (heroId.includes('trader') || heroId.includes('gcct') || heroId.includes('carbon')) {
+                                window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
+                              } else {
+                                alert(`${hero.name} NFT collection coming soon! Join the available missions first.`);
+                              }
                             }}
                             size="lg"
                             className="w-full mt-4 min-h-[44px]"
                             style={{ backgroundColor: hero.color }}
                           >
                             <CreditCard className="h-4 w-4 mr-2" />
-                            Purchase NFT
+                            Purchase NFT (from $175+)
                           </Button>
                         </CardContent>
                       </Card>
