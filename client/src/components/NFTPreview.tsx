@@ -277,26 +277,23 @@ export default function NFTPreview({ onMintNFT }: NFTPreviewProps = {}) {
                 className="bg-gradient-to-r from-orange-600 to-yellow-600 hover:from-orange-500 hover:to-yellow-500"
                 size="lg"
                 onClick={() => {
-                  // Check for purchasable heroes in priority order
-                  const aquaHero = heroes.find(hero => 
-                    hero.id === 'aqua_wtr' || 
-                    hero.id.toLowerCase().includes('aqua') || 
-                    hero.id.toLowerCase().includes('wtr')
-                  );
-                  const anchorHero = heroes.find(hero => hero.id === 'gxcoin_anchor');
-                  const battHero = heroes.find(hero => hero.id === 'graphene_batt');
-                  const gcctHero = heroes.find(hero => hero.id === 'trader_gcct');
+                  if (!selectedNFT) {
+                    alert('Please select an NFT card first to purchase!');
+                    return;
+                  }
+
+                  const heroId = selectedNFT.toLowerCase();
                   
-                  if (aquaHero) {
+                  if (heroId.includes('aqua') || heroId.includes('wtr')) {
                     window.location.href = 'https://buy.stripe.com/00w14fblMdFZg98dSc83C0u';
-                  } else if (anchorHero) {
+                  } else if (heroId.includes('gxcoin') || heroId.includes('anchor')) {
                     window.location.href = 'https://buy.stripe.com/00w8wHfC2fO7g98dSc83C0y';
-                  } else if (battHero) {
+                  } else if (heroId.includes('graphene') || heroId.includes('batt')) {
                     window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
-                  } else if (gcctHero) {
+                  } else if (heroId.includes('trader') || heroId.includes('gcct') || heroId.includes('carbon')) {
                     window.location.href = 'https://buy.stripe.com/dRm4grgG6fO78GG29u83C0x';
                   } else {
-                    alert('AQUA ($WTR), GXCOIN Anchor, GRAPHENE ($BATT), and CARBON ($GCCT) NFTs available for purchase! Check the Heroes tab.');
+                    alert('This NFT is not yet available for purchase. Try AQUA ($WTR), GXCOIN Anchor, GRAPHENE ($BATT), or CARBON ($GCCT)!');
                   }
                 }}
               >
