@@ -2091,7 +2091,7 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                           <Crown className="h-5 w-5 text-violet-400" />
                           <span className="text-violet-300 font-semibold">Official Website</span>
                         </div>
-                        <p className="text-white text-lg font-bold">gxcoin.world</p>
+                        <p className="text-white text-lg font-bold">ai.gxcoin.world</p>
                       </div>
 
                       <div className="bg-purple-500/10 p-4 rounded-lg border border-purple-500/20">
@@ -2122,16 +2122,16 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                   >
                     <Button 
                       size="lg"
-                      onClick={() => window.open('https://gxcoin.world', '_blank', 'noopener,noreferrer')}
+                      onClick={() => window.open('https://ai.gxcoin.world', '_blank', 'noopener,noreferrer')}
                       className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-bold px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
                     >
                       <Crown className="h-5 w-5 mr-2" />
-                      Visit gxcoin.world
+                      Visit ai.gxcoin.world
                     </Button>
                     <Button 
                       size="lg"
                       variant="outline"
-                      onClick={() => window.open('https://gxcoin.world', '_blank', 'noopener,noreferrer')}
+                      onClick={() => window.open('https://ai.gxcoin.world', '_blank', 'noopener,noreferrer')}
                       className="border-violet-500/50 text-violet-300 hover:bg-violet-500/10 px-6 py-3"
                     >
                       Subscribe Updates
