@@ -280,8 +280,8 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
               {/* Production Mode Card */}
               <Card className="bg-gradient-to-br from-purple-900/30 via-blue-900/20 to-purple-800/30 backdrop-blur-sm border-purple-500/40 relative overflow-hidden">
                 <div className="absolute top-4 right-4">
-                  <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/30">
-                    COMING SOON
+                  <Badge className="bg-green-500/20 text-green-300 border-green-500/30 animate-pulse">
+                    NOW LIVE MAKE IT EPIC
                   </Badge>
                 </div>
                 <CardHeader>
