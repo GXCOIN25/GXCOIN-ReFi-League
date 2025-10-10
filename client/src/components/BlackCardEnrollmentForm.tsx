@@ -41,70 +41,93 @@ interface BlackCardEnrollmentFormProps {
 
 const tiers: CardTier[] = [
   {
-    name: "Bronze Recruit",
+    name: "Bronze Spark",
     color: "#cd7f32",
-    contribution: "$175+",
+    contribution: "$175/year",
     features: [
-      "Patent licensing profit sharing",
-      "Eco-warrior reward multipliers",
-      "Real-time impact dashboard",
-      "GXCOIN staking rewards"
+      "Earn 2% crypto back with blockchain benefits",
+      "All Bronze benefits",
+      "Eco-warrior educational content",
+      "Premium customer support"
     ],
-    spending: "$500 - $5,000",
-    creditLimit: "$5,000",
+    spending: "Load values available",
+    creditLimit: "Based on tier",
     icon: Shield
   },
   {
-    name: "Silver Defender",
+    name: "Silver Spark",
     color: "#c0c0c0",
-    contribution: "$500+",
+    contribution: "$199/year",
     features: [
-      "All Bronze benefits",
-      "VIP Concierge services 24/7",
-      "Self-custody security protocol"
+      "2% crypto back on all purchases",
+      "5% back on gas & EV charging (up to $300/month)",
+      "Debit: $300-$10,000 load values",
+      "Credit: $500-$100,000 limits (1:10 ratio)",
+      "All Bronze badges + Green Energy Champion",
+      "Enhanced loyalty benefits & offers",
+      "300K+ travel & retail discount network",
+      "Priority customer service & community events"
     ],
-    spending: "$5,000 - $25,000",
-    creditLimit: "$25,000",
+    spending: "$300 - $10,000",
+    creditLimit: "$500-$100,000",
     icon: Star
   },
   {
-    name: "Gold Guardian",
+    name: "Gold Spark",
     color: "#ffd700",
-    contribution: "$1,000+",
+    contribution: "$295/year",
     features: [
-      "All Silver benefits",
-      "Global premium event access",
-      "Bitcoin cashback on all purchases"
+      "3% crypto back on all purchases",
+      "5% back on gas & EV charging (up to $500/month)",
+      "Debit: $500-$250,000 load values",
+      "Credit: $1,000-$250,000 limits (1:10 ratio)",
+      "All Silver badges + Carbon Offset Hero",
+      "Exclusive member impact rewards & tracking",
+      "Premium card with superior acceptance rates",
+      "Advanced API integration & crypto fiat exchange",
+      "Travel insurance & detailed expense analytics"
     ],
-    spending: "$25,000 - $100,000",
-    creditLimit: "$100,000",
+    spending: "$500 - $250,000",
+    creditLimit: "$1,000-$250,000",
     icon: Award
   },
   {
-    name: "Platinum Champion",
+    name: "Platinum Ambassador",
     color: "#e5e4e2",
-    contribution: "$5,000+",
+    contribution: "$395/year",
     features: [
-      "All Gold benefits",
-      "$500,000 spending power limit",
-      "Private wealth management"
+      "4% crypto back on all purchases",
+      "5% back on gas & EV charging (unlimited)",
+      "Debit: $1,000-$500,000 load values",
+      "Credit: $25,000-$500,000 limits (1:10 ratio)",
+      "All Gold badges + exclusive Ambassador recognition",
+      "Custom member achievement dashboard",
+      "Premium identitate™ privacy protection suite",
+      "Crypto loans & comprehensive travel benefits",
+      "Early platform access & VIP events"
     ],
-    spending: "$100,000 - $500,000",
-    creditLimit: "$500,000",
+    spending: "$1,000 - $500,000",
+    creditLimit: "$25,000-$500,000",
     icon: Crown
   },
   {
-    name: "Diamond Legend",
+    name: "Diamond Elite BLACK CARD",
     color: "#b9f2ff",
-    contribution: "$10,000+",
+    contribution: "$595/year",
     features: [
-      "All Platinum benefits",
-      "Unlimited spending power",
-      "Dedicated wealth concierge",
-      "Exclusive patent access"
+      "5% crypto back on all purchases",
+      "6% back on gas & EV charging (unlimited)",
+      "Debit: $2,500-$500,000 load values",
+      "Credit: $50,000-$500,000 limits (1:10 ratio)",
+      "All badges + exclusive Diamond Elite recognition",
+      "Advanced member achievement analytics",
+      "Complete ViaCarte fintech suite access",
+      "Full crypto-fiat ecosystem integration",
+      "24/7 concierge & investment-grade metal card",
+      "Executive team access & elite events"
     ],
-    spending: "Unlimited",
-    creditLimit: "Unlimited",
+    spending: "$2,500 - $500,000",
+    creditLimit: "$50,000-$500,000",
     icon: Gem
   }
 ];
