@@ -1,0 +1,830 @@
+import { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { 
+  Trophy, Gift, Users, Clock, Copy, Share2, 
+  CheckCircle2, AlertCircle, Sparkles, Award,
+  TrendingUp, Zap, Crown, Star
+} from "lucide-react";
+import Confetti from "react-confetti";
+import { toast } from "sonner";
+import { useWallet } from "@/lib/stores/useWallet";
+
+// Hero-specific color themes matching TokenBadge
+const HERO_THEMES = {
+  aqua_wtr: {
+    primary: "#3b82f6",
+    gradient: ["#3b82f6", "#2563eb", "#1d4ed8"],
+    name: "AQUA",
+    symbol: "WTR",
+    icon: "💧"
+  },
+  voltra_gpwr: {
+    primary: "#f59e0b",
+    gradient: ["#f59e0b", "#d97706", "#b45309"],
+    name: "VOLTRA",
+    symbol: "GPWR",
+    icon: "⚡"
+  },
+  graphene_batt: {
+    primary: "#fb923c",
+    gradient: ["#fb923c", "#f97316", "#ea580c"],
+    name: "GRAPHENE",
+    symbol: "BATT",
+    icon: "🔋"
+  },
+  trader_gcct: {
+    primary: "#22c55e",
+    gradient: ["#22c55e", "#16a34a", "#15803d"],
+    name: "CARBON",
+    symbol: "GCCT",
+    icon: "📈"
+  },
+  hemp_builder: {
+    primary: "#84cc16",
+    gradient: ["#84cc16", "#65a30d", "#4d7c0f"],
+    name: "HEMP",
+    symbol: "HEMP",
+    icon: "🌿"
+  },
+  gxcoin_anchor: {
+    primary: "#ffd700",
+    gradient: ["#ffd700", "#ffb300", "#ff8f00"],
+    name: "GXCOIN",
+    symbol: "GXCOIN",
+    icon: "👑"
+  }
+} as const;
+
+interface Campaign {
+  id: number;
+  name: string;
+  description: string;
+  heroId: string;
+  tokenSymbol: string;
+  totalAllocation: number;
+  claimedAmount: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  eligibilityRequirement?: string;
+  claimAmount?: number;
+}
+
+interface EligibilityStatus {
+  eligible: boolean;
+  reason?: string;
+  alreadyClaimed?: boolean;
+}
+
+interface ReferralStats {
+  totalReferrals: number;
+  tier: string;
+  totalBonus: number;
+  referralCode: string | null;
+}
+
+interface LeaderboardEntry {
+  rank: number;
+  username: string;
+  totalClaimed: number;
+  referrals: number;
+}
+
+// Countdown Timer Component
+const CountdownTimer: React.FC<{ endDate: string }> = ({ endDate }) => {
+  const [timeLeft, setTimeLeft] = useState<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const difference = new Date(endDate).getTime() - new Date().getTime();
+      
+      if (difference <= 0) {
+        setTimeLeft(null);
+        return;
+      }
+
+      setTimeLeft({
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+        minutes: Math.floor((difference / 1000 / 60) % 60),
+        seconds: Math.floor((difference / 1000) % 60)
+      });
+    };
+
+    calculateTimeLeft();
+    const interval = setInterval(calculateTimeLeft, 1000);
+
+    return () => clearInterval(interval);
+  }, [endDate]);
+
+  if (!timeLeft) {
+    return <span className="text-red-400 font-semibold">Ended</span>;
+  }
+
+  return (
+    <div className="flex gap-2 items-center">
+      <Clock className="h-4 w-4" />
+      <span className="font-mono text-sm">
+        {timeLeft.days > 0 && `${timeLeft.days}d `}
+        {String(timeLeft.hours).padStart(2, '0')}:
+        {String(timeLeft.minutes).padStart(2, '0')}:
+        {String(timeLeft.seconds).padStart(2, '0')}
+      </span>
+    </div>
+  );
+};
+
+// Campaign Card Component
+const CampaignCard: React.FC<{
+  campaign: Campaign;
+  eligibility: EligibilityStatus | null;
+  onClaim: (campaignId: number) => void;
+  claiming: boolean;
+}> = ({ campaign, eligibility, onClaim, claiming }) => {
+  const theme = HERO_THEMES[campaign.heroId as keyof typeof HERO_THEMES] || HERO_THEMES.gxcoin_anchor;
+  const progressPercentage = (campaign.claimedAmount / campaign.totalAllocation) * 100;
+  const remainingAllocation = campaign.totalAllocation - campaign.claimedAmount;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ scale: 1.02 }}
+      className="h-full"
+    >
+      <Card 
+        className="relative overflow-hidden border-2 h-full"
+        style={{
+          borderColor: theme.primary + '40',
+          background: `linear-gradient(135deg, ${theme.gradient[0]}10 0%, transparent 50%, ${theme.gradient[2]}05 100%)`
+        }}
+      >
+        {/* Shimmer effect for active campaigns */}
+        {campaign.isActive && (
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full"
+            animate={{
+              translateX: ['100%', '100%', '-100%', '-100%']
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: 'easeInOut'
+            }}
+          />
+        )}
+
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div 
+                className="text-3xl p-2 rounded-lg"
+                style={{ backgroundColor: theme.primary + '20' }}
+              >
+                {theme.icon}
+              </div>
+              <div>
+                <CardTitle className="text-white text-xl">{campaign.name}</CardTitle>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge 
+                    variant="outline"
+                    style={{ color: theme.primary, borderColor: theme.primary }}
+                  >
+                    ${theme.symbol}
+                  </Badge>
+                  {campaign.isActive ? (
+                    <Badge className="bg-green-500/20 text-green-400 border-green-500">
+                      Live
+                    </Badge>
+                  ) : (
+                    <Badge className="bg-gray-500/20 text-gray-400 border-gray-500">
+                      Ended
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+            {eligibility?.eligible && !eligibility?.alreadyClaimed && (
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Gift className="h-6 w-6 text-yellow-400" />
+              </motion.div>
+            )}
+          </div>
+          <CardDescription className="text-gray-300 mt-3">
+            {campaign.description}
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          {/* Allocation Progress */}
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-400">Allocation Claimed</span>
+              <span className="text-white font-semibold">
+                {progressPercentage.toFixed(1)}%
+              </span>
+            </div>
+            <Progress 
+              value={progressPercentage} 
+              className="h-2"
+              style={{
+                backgroundColor: theme.primary + '20'
+              }}
+            />
+            <div className="flex justify-between text-xs text-gray-400">
+              <span>{campaign.claimedAmount.toLocaleString()} claimed</span>
+              <span>{remainingAllocation.toLocaleString()} remaining</span>
+            </div>
+          </div>
+
+          <Separator className="bg-white/10" />
+
+          {/* Time Remaining */}
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-400">Time Remaining:</span>
+            <CountdownTimer endDate={campaign.endDate} />
+          </div>
+
+          {/* Claim Amount */}
+          {campaign.claimAmount && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-400">Claim Amount:</span>
+              <span className="text-white font-bold">
+                {campaign.claimAmount.toLocaleString()} ${theme.symbol}
+              </span>
+            </div>
+          )}
+
+          {/* Eligibility Status */}
+          <div className="space-y-2">
+            {eligibility === null ? (
+              <div className="flex items-center gap-2 text-gray-400">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400" />
+                <span className="text-sm">Checking eligibility...</span>
+              </div>
+            ) : eligibility.alreadyClaimed ? (
+              <div className="flex items-center gap-2 text-green-400">
+                <CheckCircle2 className="h-5 w-5" />
+                <span className="text-sm font-semibold">Already Claimed!</span>
+              </div>
+            ) : eligibility.eligible ? (
+              <div className="flex items-center gap-2 text-green-400">
+                <CheckCircle2 className="h-5 w-5" />
+                <span className="text-sm font-semibold">You're Eligible!</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-yellow-400">
+                <AlertCircle className="h-5 w-5" />
+                <span className="text-sm">{eligibility.reason || 'Not eligible'}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Claim Button */}
+          <Button
+            className="w-full font-semibold"
+            style={{ 
+              backgroundColor: theme.primary,
+              opacity: eligibility?.eligible && !eligibility?.alreadyClaimed ? 1 : 0.5
+            }}
+            disabled={!eligibility?.eligible || eligibility?.alreadyClaimed || claiming || !campaign.isActive}
+            onClick={() => onClaim(campaign.id)}
+          >
+            {claiming ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                Claiming...
+              </>
+            ) : eligibility?.alreadyClaimed ? (
+              'Claimed'
+            ) : eligibility?.eligible ? (
+              <>
+                <Gift className="h-4 w-4 mr-2" />
+                Claim Tokens
+              </>
+            ) : (
+              'Not Eligible'
+            )}
+          </Button>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+};
+
+// Main Component
+export default function AirdropCampaignHub() {
+  const { isConnected } = useWallet();
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [eligibilityMap, setEligibilityMap] = useState<Map<number, EligibilityStatus>>(new Map());
+  const [loading, setLoading] = useState(true);
+  const [claiming, setClaiming] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [referralStats, setReferralStats] = useState<ReferralStats | null>(null);
+  const [referralLink, setReferralLink] = useState<string>('');
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+
+  // Fetch campaigns on mount
+  useEffect(() => {
+    fetchCampaigns();
+  }, []);
+
+  // Fetch eligibility for each campaign when user is connected
+  useEffect(() => {
+    if (isConnected && campaigns.length > 0) {
+      campaigns.forEach(campaign => {
+        checkEligibility(campaign.id);
+      });
+    }
+  }, [isConnected, campaigns.length]);
+
+  // Fetch referral stats when connected
+  useEffect(() => {
+    if (isConnected) {
+      fetchReferralStats();
+    }
+  }, [isConnected]);
+
+  const fetchCampaigns = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/airdrops/campaigns');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch campaigns');
+      }
+
+      const data = await response.json();
+      setCampaigns(data);
+    } catch (error) {
+      console.error('Error fetching campaigns:', error);
+      toast.error('Failed to load campaigns');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkEligibility = async (campaignId: number) => {
+    try {
+      const token = localStorage.getItem('gxcoin_token');
+      const response = await fetch(`/api/airdrops/eligibility/${campaignId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to check eligibility');
+      }
+
+      const data = await response.json();
+      setEligibilityMap(prev => new Map(prev).set(campaignId, data));
+    } catch (error) {
+      console.error(`Error checking eligibility for campaign ${campaignId}:`, error);
+    }
+  };
+
+  const handleClaim = async (campaignId: number) => {
+    if (!isConnected) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+
+    try {
+      setClaiming(true);
+      const token = localStorage.getItem('gxcoin_token');
+      const response = await fetch('/api/airdrops/claim', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: JSON.stringify({ campaignId })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to claim tokens');
+      }
+
+      const data = await response.json();
+      
+      // Show success
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 5000);
+      
+      toast.success(`Successfully claimed ${data.amount} tokens!`, {
+        description: `Transaction: ${data.transactionHash || 'Pending'}`
+      });
+
+      // Refresh campaign data
+      await fetchCampaigns();
+      await checkEligibility(campaignId);
+    } catch (error) {
+      console.error('Error claiming tokens:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to claim tokens');
+    } finally {
+      setClaiming(false);
+    }
+  };
+
+  const fetchReferralStats = async () => {
+    try {
+      const token = localStorage.getItem('gxcoin_token');
+      const response = await fetch('/api/referrals/stats', {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch referral stats');
+      }
+
+      const data = await response.json();
+      setReferralStats(data);
+    } catch (error) {
+      console.error('Error fetching referral stats:', error);
+    }
+  };
+
+  const generateReferralCode = async () => {
+    if (!isConnected) {
+      toast.error('Please connect your wallet first');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('gxcoin_token');
+      const response = await fetch('/api/referrals/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` })
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate referral code');
+      }
+
+      const data = await response.json();
+      setReferralLink(data.referralLink);
+      toast.success('Referral link generated!');
+    } catch (error) {
+      console.error('Error generating referral code:', error);
+      toast.error('Failed to generate referral code');
+    }
+  };
+
+  const copyReferralLink = () => {
+    if (referralLink) {
+      navigator.clipboard.writeText(referralLink);
+      toast.success('Referral link copied to clipboard!');
+    }
+  };
+
+  const shareOnTwitter = () => {
+    const text = encodeURIComponent(`🚀 Join the GXCOIN Airdrop Campaign! Claim your tokens now and help save the planet! 🌍\n\n${referralLink}`);
+    window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+  };
+
+  const getTierIcon = (tier: string) => {
+    switch (tier) {
+      case 'Gold': return <Crown className="h-5 w-5 text-yellow-400" />;
+      case 'Silver': return <Star className="h-5 w-5 text-gray-300" />;
+      default: return <Award className="h-5 w-5 text-amber-600" />;
+    }
+  };
+
+  const groupedCampaigns = useMemo(() => {
+    const groups: Record<string, Campaign[]> = {};
+    campaigns.forEach(campaign => {
+      if (!groups[campaign.heroId]) {
+        groups[campaign.heroId] = [];
+      }
+      groups[campaign.heroId].push(campaign);
+    });
+    return groups;
+  }, [campaigns]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500 mx-auto" />
+          <p className="text-white mt-4 text-lg">Loading campaigns...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+      {showConfetti && <Confetti recycle={false} numberOfPieces={500} />}
+      
+      {/* Hero Section */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center mb-12"
+      >
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <Sparkles className="h-8 w-8 text-purple-400" />
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+            Airdrop Campaign Hub
+          </h1>
+          <Sparkles className="h-8 w-8 text-purple-400" />
+        </div>
+        <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+          Claim exclusive hero tokens, earn referral bonuses, and join the movement to save the planet!
+        </p>
+      </motion.div>
+
+      {/* Campaign Cards Grid */}
+      <div className="max-w-7xl mx-auto space-y-12">
+        {Object.entries(groupedCampaigns).map(([heroId, heroCampaigns]) => {
+          const theme = HERO_THEMES[heroId as keyof typeof HERO_THEMES];
+          
+          return (
+            <motion.div
+              key={heroId}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div 
+                  className="text-2xl p-2 rounded-lg"
+                  style={{ backgroundColor: theme.primary + '20' }}
+                >
+                  {theme.icon}
+                </div>
+                <h2 className="text-3xl font-bold text-white">
+                  {theme.name} Campaigns
+                </h2>
+                <Badge 
+                  variant="outline"
+                  className="text-lg"
+                  style={{ color: theme.primary, borderColor: theme.primary }}
+                >
+                  ${theme.symbol}
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {heroCampaigns.map(campaign => (
+                  <CampaignCard
+                    key={campaign.id}
+                    campaign={campaign}
+                    eligibility={eligibilityMap.get(campaign.id) || null}
+                    onClaim={handleClaim}
+                    claiming={claiming}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          );
+        })}
+
+        {campaigns.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-20"
+          >
+            <Gift className="h-16 w-16 text-gray-500 mx-auto mb-4" />
+            <p className="text-gray-400 text-xl">No active campaigns at the moment</p>
+            <p className="text-gray-500 mt-2">Check back soon for new airdrops!</p>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Referral Section */}
+      {isConnected && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="max-w-4xl mx-auto mt-16"
+        >
+          <Card className="border-2 border-purple-500/30 bg-gradient-to-br from-purple-900/20 to-pink-900/20">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <Users className="h-6 w-6 text-purple-400" />
+                <CardTitle className="text-white text-2xl">Referral Program</CardTitle>
+              </div>
+              <CardDescription className="text-gray-300">
+                Invite friends and earn bonus tokens for every successful referral!
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Referral Stats */}
+              {referralStats && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card className="bg-purple-900/30 border-purple-500/30">
+                    <CardContent className="pt-6">
+                      <div className="text-center">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                          {getTierIcon(referralStats.tier)}
+                          <span className="text-gray-400 text-sm">Your Tier</span>
+                        </div>
+                        <p className="text-2xl font-bold text-white">{referralStats.tier}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-blue-900/30 border-blue-500/30">
+                    <CardContent className="pt-6">
+                      <div className="text-center">
+                        <Users className="h-5 w-5 text-blue-400 mx-auto mb-2" />
+                        <span className="text-gray-400 text-sm">Total Referrals</span>
+                        <p className="text-2xl font-bold text-white">{referralStats.totalReferrals}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-green-900/30 border-green-500/30">
+                    <CardContent className="pt-6">
+                      <div className="text-center">
+                        <TrendingUp className="h-5 w-5 text-green-400 mx-auto mb-2" />
+                        <span className="text-gray-400 text-sm">Bonuses Earned</span>
+                        <p className="text-2xl font-bold text-white">{referralStats.totalBonus.toLocaleString()}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
+              {/* Generate/Share Referral Link */}
+              <div className="space-y-4">
+                {!referralLink && !referralStats?.referralCode ? (
+                  <Button 
+                    onClick={generateReferralCode}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                  >
+                    <Gift className="h-4 w-4 mr-2" />
+                    Generate Referral Link
+                  </Button>
+                ) : (
+                  <>
+                    <div className="flex gap-2">
+                      <div className="flex-1 bg-slate-800 rounded-lg px-4 py-3 text-white font-mono text-sm overflow-x-auto">
+                        {referralLink || `${window.location.origin}/ref/${referralStats?.referralCode}`}
+                      </div>
+                      <Button 
+                        onClick={copyReferralLink}
+                        variant="outline"
+                        className="border-purple-500 text-purple-400 hover:bg-purple-500/20"
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={shareOnTwitter}
+                        className="flex-1 bg-blue-500 hover:bg-blue-600"
+                      >
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share on Twitter
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        className="flex-1 border-purple-500 text-purple-400 hover:bg-purple-500/20"
+                        onClick={() => {
+                          const discordUrl = `https://discord.com`;
+                          window.open(discordUrl, '_blank');
+                        }}
+                      >
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share on Discord
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Tier Progression Info */}
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardContent className="pt-6">
+                  <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                    <Zap className="h-4 w-4 text-yellow-400" />
+                    Tier Progression
+                  </h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-400">Bronze (0-10 referrals)</span>
+                      <span className="text-amber-600 font-semibold">+10 bonus/referral</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-400">Silver (11-50 referrals)</span>
+                      <span className="text-gray-300 font-semibold">+25 bonus/referral</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-400">Gold (51+ referrals)</span>
+                      <span className="text-yellow-400 font-semibold">+50 bonus/referral</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Leaderboard Section */}
+      {leaderboard.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="max-w-4xl mx-auto mt-16"
+        >
+          <Card className="border-2 border-amber-500/30 bg-gradient-to-br from-amber-900/20 to-yellow-900/20">
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <Trophy className="h-6 w-6 text-amber-400" />
+                <CardTitle className="text-white text-2xl">Leaderboard</CardTitle>
+              </div>
+              <CardDescription className="text-gray-300">
+                Top claimers and referrers this campaign
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {leaderboard.map((entry, index) => (
+                  <motion.div
+                    key={entry.rank}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex items-center justify-between p-4 rounded-lg bg-slate-800/50 hover:bg-slate-800/70 transition-colors"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`text-2xl font-bold ${
+                        entry.rank === 1 ? 'text-yellow-400' :
+                        entry.rank === 2 ? 'text-gray-300' :
+                        entry.rank === 3 ? 'text-amber-600' :
+                        'text-gray-500'
+                      }`}>
+                        #{entry.rank}
+                      </div>
+                      <div>
+                        <p className="text-white font-semibold">{entry.username}</p>
+                        <p className="text-gray-400 text-sm">{entry.referrals} referrals</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-white font-bold">{entry.totalClaimed.toLocaleString()}</p>
+                      <p className="text-gray-400 text-sm">tokens claimed</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Connect Wallet CTA */}
+      {!isConnected && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50"
+        >
+          <Card className="border-2 border-purple-500 bg-gradient-to-r from-purple-900 to-pink-900 shadow-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-4">
+                <AlertCircle className="h-6 w-6 text-yellow-400" />
+                <div>
+                  <p className="text-white font-semibold">Connect your wallet to claim airdrops</p>
+                  <p className="text-gray-300 text-sm">Sign in to participate in campaigns and earn rewards</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+    </div>
+  );
+}

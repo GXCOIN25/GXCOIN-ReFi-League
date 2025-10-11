@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import { insertUserSchema, insertContributionSchema, insertNftBadgeSchema } from "@shared/schema";
+import { storage, db } from "./storage";
+import { insertUserSchema, insertContributionSchema, insertNftBadgeSchema, airdropCampaigns, airdropClaims, referrals, insertAirdropCampaignSchema, insertAirdropClaimSchema, insertReferralSchema } from "@shared/schema";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import slowDown from "express-slow-down";
@@ -10,6 +10,7 @@ import crypto from "crypto";
 import { Octokit } from '@octokit/rest';
 import Stripe from 'stripe';
 import { getUncachableOutlookClient } from './outlook';
+import { eq, and, lte, gte, desc, count, sql } from "drizzle-orm";
 
 interface AuthRequest extends Request {
   userId?: number;
@@ -1653,6 +1654,475 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         error: "Failed to submit application. Please try again or contact support." 
       });
+    }
+  });
+
+  // ============================================================================
+  // AIRDROP CAMPAIGN ROUTES
+  // ============================================================================
+
+  // GET /api/airdrops/campaigns - List all active airdrop campaigns
+  app.get("/api/airdrops/campaigns", async (req, res) => {
+    try {
+      const { heroId } = req.query;
+      const now = new Date();
+      
+      let query = db.select().from(airdropCampaigns);
+      const conditions = [
+        eq(airdropCampaigns.isActive, true),
+        lte(airdropCampaigns.startDate, now),
+        gte(airdropCampaigns.endDate, now)
+      ];
+
+      if (heroId) {
+        conditions.push(eq(airdropCampaigns.heroId, heroId as string));
+      }
+
+      const campaigns = await query.where(and(...conditions));
+      
+      const campaignsWithRemaining = campaigns.map(campaign => ({
+        ...campaign,
+        remainingAllocation: campaign.totalAllocation - (campaign.claimedAmount || 0)
+      }));
+
+      res.json(campaignsWithRemaining);
+    } catch (error: any) {
+      console.error('Error fetching campaigns:', error);
+      res.status(500).json({ error: "Failed to fetch campaigns" });
+    }
+  });
+
+  // POST /api/airdrops/campaigns - Create new airdrop campaign (Admin only)
+  app.post("/api/airdrops/campaigns", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const campaignData = insertAirdropCampaignSchema.parse(req.body);
+      
+      const startDate = new Date(campaignData.startDate);
+      const endDate = new Date(campaignData.endDate);
+      
+      if (startDate >= endDate) {
+        return res.status(400).json({ error: "End date must be after start date" });
+      }
+      
+      if (campaignData.totalAllocation <= 0) {
+        return res.status(400).json({ error: "Total allocation must be greater than 0" });
+      }
+
+      const [campaign] = await db.insert(airdropCampaigns).values({
+        ...campaignData,
+        startDate,
+        endDate,
+        claimedAmount: 0,
+        isActive: true,
+      }).returning();
+
+      res.json(campaign);
+    } catch (error: any) {
+      console.error('Error creating campaign:', error);
+      res.status(400).json({ error: "Failed to create campaign", details: error.message });
+    }
+  });
+
+  // GET /api/airdrops/campaigns/:id - Get specific campaign details
+  app.get("/api/airdrops/campaigns/:id", async (req, res) => {
+    try {
+      const campaignId = parseInt(req.params.id);
+      
+      if (isNaN(campaignId)) {
+        return res.status(400).json({ error: "Invalid campaign ID" });
+      }
+
+      const [campaign] = await db
+        .select()
+        .from(airdropCampaigns)
+        .where(eq(airdropCampaigns.id, campaignId));
+
+      if (!campaign) {
+        return res.status(404).json({ error: "Campaign not found" });
+      }
+
+      const [claimStats] = await db
+        .select({
+          totalClaims: count(),
+          totalClaimed: sql<number>`COALESCE(SUM(${airdropClaims.amount}), 0)`
+        })
+        .from(airdropClaims)
+        .where(eq(airdropClaims.campaignId, campaignId));
+
+      res.json({
+        ...campaign,
+        remainingAllocation: campaign.totalAllocation - (campaign.claimedAmount || 0),
+        stats: {
+          totalClaims: claimStats?.totalClaims || 0,
+          totalClaimed: claimStats?.totalClaimed || 0
+        }
+      });
+    } catch (error: any) {
+      console.error('Error fetching campaign:', error);
+      res.status(500).json({ error: "Failed to fetch campaign" });
+    }
+  });
+
+  // GET /api/airdrops/eligibility/:campaignId - Check if current user is eligible
+  app.get("/api/airdrops/eligibility/:campaignId", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const campaignId = parseInt(req.params.campaignId);
+      
+      if (isNaN(campaignId)) {
+        return res.status(400).json({ error: "Invalid campaign ID" });
+      }
+
+      const [campaign] = await db
+        .select()
+        .from(airdropCampaigns)
+        .where(eq(airdropCampaigns.id, campaignId));
+
+      if (!campaign) {
+        return res.status(404).json({ error: "Campaign not found" });
+      }
+
+      const now = new Date();
+      if (!campaign.isActive || campaign.startDate > now || campaign.endDate < now) {
+        return res.json({
+          eligible: false,
+          reason: "Campaign is not active",
+          claimableAmount: 0
+        });
+      }
+
+      const user = await storage.getUser(req.userId!);
+      if (!user?.walletAddress) {
+        return res.json({
+          eligible: false,
+          reason: "Wallet not connected",
+          claimableAmount: 0
+        });
+      }
+
+      const existingClaim = await db
+        .select()
+        .from(airdropClaims)
+        .where(
+          and(
+            eq(airdropClaims.campaignId, campaignId),
+            eq(airdropClaims.userId, req.userId!)
+          )
+        );
+
+      if (existingClaim.length > 0) {
+        return res.json({
+          eligible: false,
+          reason: "Already claimed",
+          claimableAmount: 0
+        });
+      }
+
+      const remainingAllocation = campaign.totalAllocation - (campaign.claimedAmount || 0);
+      if (remainingAllocation <= 0) {
+        return res.json({
+          eligible: false,
+          reason: "No tokens remaining",
+          claimableAmount: 0
+        });
+      }
+
+      const claimableAmount = Math.min(100, remainingAllocation);
+
+      res.json({
+        eligible: true,
+        reason: "Eligible to claim",
+        claimableAmount,
+        campaign: {
+          name: campaign.name,
+          tokenSymbol: campaign.tokenSymbol,
+          remainingAllocation
+        }
+      });
+    } catch (error: any) {
+      console.error('Error checking eligibility:', error);
+      res.status(500).json({ error: "Failed to check eligibility" });
+    }
+  });
+
+  // POST /api/airdrops/claim - Claim airdrop tokens
+  app.post("/api/airdrops/claim", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const { campaignId, walletAddress } = req.body;
+
+      if (!campaignId || !walletAddress) {
+        return res.status(400).json({ error: "Campaign ID and wallet address are required" });
+      }
+
+      const [campaign] = await db
+        .select()
+        .from(airdropCampaigns)
+        .where(eq(airdropCampaigns.id, campaignId));
+
+      if (!campaign) {
+        return res.status(404).json({ error: "Campaign not found" });
+      }
+
+      const now = new Date();
+      if (!campaign.isActive || campaign.startDate > now || campaign.endDate < now) {
+        return res.status(400).json({ error: "Campaign is not active" });
+      }
+
+      const existingClaim = await db
+        .select()
+        .from(airdropClaims)
+        .where(
+          and(
+            eq(airdropClaims.campaignId, campaignId),
+            eq(airdropClaims.userId, req.userId!)
+          )
+        );
+
+      if (existingClaim.length > 0) {
+        return res.status(400).json({ error: "Already claimed this airdrop" });
+      }
+
+      const remainingAllocation = campaign.totalAllocation - (campaign.claimedAmount || 0);
+      if (remainingAllocation <= 0) {
+        return res.status(400).json({ error: "No tokens remaining in this campaign" });
+      }
+
+      const claimAmount = Math.min(100, remainingAllocation);
+
+      const [claim] = await db.insert(airdropClaims).values({
+        campaignId,
+        userId: req.userId!,
+        walletAddress,
+        amount: claimAmount,
+        status: "pending",
+        txHash: null,
+      }).returning();
+
+      await db
+        .update(airdropCampaigns)
+        .set({
+          claimedAmount: (campaign.claimedAmount || 0) + claimAmount,
+          updatedAt: new Date()
+        })
+        .where(eq(airdropCampaigns.id, campaignId));
+
+      res.json({
+        success: true,
+        claim: {
+          id: claim.id,
+          amount: claim.amount,
+          tokenSymbol: campaign.tokenSymbol,
+          status: claim.status,
+          claimedAt: claim.claimedAt
+        },
+        message: `Successfully claimed ${claimAmount} ${campaign.tokenSymbol}`
+      });
+    } catch (error: any) {
+      console.error('Error claiming airdrop:', error);
+      res.status(500).json({ error: "Failed to claim airdrop" });
+    }
+  });
+
+  // GET /api/airdrops/claims - Get current user's claim history
+  app.get("/api/airdrops/claims", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const claims = await db
+        .select({
+          id: airdropClaims.id,
+          amount: airdropClaims.amount,
+          claimedAt: airdropClaims.claimedAt,
+          status: airdropClaims.status,
+          txHash: airdropClaims.txHash,
+          walletAddress: airdropClaims.walletAddress,
+          campaign: {
+            id: airdropCampaigns.id,
+            name: airdropCampaigns.name,
+            tokenSymbol: airdropCampaigns.tokenSymbol,
+            heroId: airdropCampaigns.heroId
+          }
+        })
+        .from(airdropClaims)
+        .leftJoin(airdropCampaigns, eq(airdropClaims.campaignId, airdropCampaigns.id))
+        .where(eq(airdropClaims.userId, req.userId!))
+        .orderBy(desc(airdropClaims.claimedAt));
+
+      res.json(claims);
+    } catch (error: any) {
+      console.error('Error fetching claims:', error);
+      res.status(500).json({ error: "Failed to fetch claims" });
+    }
+  });
+
+  // ============================================================================
+  // REFERRAL ROUTES
+  // ============================================================================
+
+  // POST /api/referrals/generate - Generate unique referral code
+  app.post("/api/referrals/generate", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const existingReferral = await db
+        .select()
+        .from(referrals)
+        .where(eq(referrals.referrerId, req.userId!))
+        .limit(1);
+
+      if (existingReferral.length > 0) {
+        const referralCode = existingReferral[0].referralCode;
+        const referralLink = `${process.env.APP_URL || 'http://localhost:5000'}/ref/${referralCode}`;
+        
+        return res.json({
+          referralCode,
+          referralLink,
+          message: "Using existing referral code"
+        });
+      }
+
+      const referralCode = `REF${req.userId}${Date.now().toString(36).toUpperCase()}`;
+
+      const [newReferral] = await db.insert(referrals).values({
+        referrerId: req.userId!,
+        referredId: null,
+        referralCode,
+        tier: "bronze",
+        bonusEarned: 0
+      }).returning();
+
+      const referralLink = `${process.env.APP_URL || 'http://localhost:5000'}/ref/${referralCode}`;
+
+      res.json({
+        referralCode: newReferral.referralCode,
+        referralLink,
+        message: "Referral code generated successfully"
+      });
+    } catch (error: any) {
+      console.error('Error generating referral code:', error);
+      res.status(500).json({ error: "Failed to generate referral code" });
+    }
+  });
+
+  // GET /api/referrals/stats - Get referral statistics
+  app.get("/api/referrals/stats", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const referralStats = await db
+        .select({
+          totalReferrals: count(),
+          tier: referrals.tier,
+          totalBonus: sql<number>`COALESCE(SUM(${referrals.bonusEarned}), 0)`
+        })
+        .from(referrals)
+        .where(eq(referrals.referrerId, req.userId!))
+        .groupBy(referrals.tier);
+
+      const totalReferrals = referralStats.reduce((acc, stat) => acc + Number(stat.totalReferrals), 0);
+      const totalBonus = referralStats.reduce((acc, stat) => acc + Number(stat.totalBonus), 0);
+      
+      let tier = "bronze";
+      if (totalReferrals >= 51) {
+        tier = "gold";
+      } else if (totalReferrals >= 11) {
+        tier = "silver";
+      }
+
+      const referralCodes = await db
+        .select({ referralCode: referrals.referralCode })
+        .from(referrals)
+        .where(eq(referrals.referrerId, req.userId!))
+        .limit(1);
+
+      res.json({
+        totalReferrals,
+        tier,
+        bonusEarned: totalBonus,
+        referralCode: referralCodes[0]?.referralCode || null
+      });
+    } catch (error: any) {
+      console.error('Error fetching referral stats:', error);
+      res.status(500).json({ error: "Failed to fetch referral statistics" });
+    }
+  });
+
+  // POST /api/referrals/track - Track referral usage
+  app.post("/api/referrals/track", authenticate, async (req: AuthRequest, res) => {
+    try {
+      const { referralCode } = req.body;
+
+      if (!referralCode) {
+        return res.status(400).json({ error: "Referral code is required" });
+      }
+
+      const [referralRecord] = await db
+        .select()
+        .from(referrals)
+        .where(eq(referrals.referralCode, referralCode));
+
+      if (!referralRecord) {
+        return res.status(404).json({ error: "Invalid referral code" });
+      }
+
+      if (referralRecord.referrerId === req.userId) {
+        return res.status(400).json({ error: "Cannot use your own referral code" });
+      }
+
+      const existingUse = await db
+        .select()
+        .from(referrals)
+        .where(
+          and(
+            eq(referrals.referralCode, referralCode),
+            eq(referrals.referredId, req.userId!)
+          )
+        );
+
+      if (existingUse.length > 0) {
+        return res.status(400).json({ error: "You have already used this referral code" });
+      }
+
+      await db.insert(referrals).values({
+        referrerId: referralRecord.referrerId,
+        referredId: req.userId!,
+        referralCode,
+        tier: "bronze",
+        bonusEarned: 0
+      });
+
+      const totalReferrals = await db
+        .select({ count: count() })
+        .from(referrals)
+        .where(eq(referrals.referrerId, referralRecord.referrerId!));
+
+      const referralCount = Number(totalReferrals[0]?.count || 0);
+      let newTier = "bronze";
+      let bonus = 10;
+
+      if (referralCount >= 51) {
+        newTier = "gold";
+        bonus = 50;
+      } else if (referralCount >= 11) {
+        newTier = "silver";
+        bonus = 25;
+      }
+
+      await db
+        .update(referrals)
+        .set({
+          tier: newTier,
+          bonusEarned: sql`${referrals.bonusEarned} + ${bonus}`
+        })
+        .where(
+          and(
+            eq(referrals.referralCode, referralCode),
+            eq(referrals.referrerId, referralRecord.referrerId!)
+          )
+        );
+
+      res.json({
+        success: true,
+        message: "Referral tracked successfully",
+        bonus,
+        referrerTier: newTier
+      });
+    } catch (error: any) {
+      console.error('Error tracking referral:', error);
+      res.status(500).json({ error: "Failed to track referral" });
     }
   });
 

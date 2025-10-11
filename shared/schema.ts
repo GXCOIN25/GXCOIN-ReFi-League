@@ -359,6 +359,36 @@ export const referrals = pgTable("referrals", {
   createdAt: timestamp("created_at").defaultNow()
 });
 
+export const insertAirdropCampaignSchema = createInsertSchema(airdropCampaigns).pick({
+  name: true,
+  description: true,
+  heroId: true,
+  tokenSymbol: true,
+  totalAllocation: true,
+  claimedAmount: true,
+  startDate: true,
+  endDate: true,
+  isActive: true,
+  requirementsJson: true,
+});
+
+export const insertAirdropClaimSchema = createInsertSchema(airdropClaims).pick({
+  campaignId: true,
+  userId: true,
+  walletAddress: true,
+  amount: true,
+  txHash: true,
+  status: true,
+});
+
+export const insertReferralSchema = createInsertSchema(referrals).pick({
+  referrerId: true,
+  referredId: true,
+  referralCode: true,
+  tier: true,
+  bonusEarned: true,
+});
+
 // Battle Pass System
 export const battlePassSeasons = pgTable("battle_pass_seasons", {
   id: serial("id").primaryKey(),
@@ -502,3 +532,9 @@ export type Token = typeof tokens.$inferSelect;
 export type InsertToken = z.infer<typeof insertTokenSchema>;
 export type PurchaseHistory = typeof purchaseHistory.$inferSelect;
 export type InsertPurchaseHistory = z.infer<typeof insertPurchaseHistorySchema>;
+export type AirdropCampaign = typeof airdropCampaigns.$inferSelect;
+export type InsertAirdropCampaign = z.infer<typeof insertAirdropCampaignSchema>;
+export type AirdropClaim = typeof airdropClaims.$inferSelect;
+export type InsertAirdropClaim = z.infer<typeof insertAirdropClaimSchema>;
+export type Referral = typeof referrals.$inferSelect;
+export type InsertReferral = z.infer<typeof insertReferralSchema>;
