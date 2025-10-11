@@ -321,6 +321,165 @@ export const insertPurchaseHistorySchema = createInsertSchema(purchaseHistory).p
   completedAt: true,
 });
 
+// Airdrop Campaign System
+export const airdropCampaigns = pgTable("airdrop_campaigns", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  heroId: text("hero_id"),
+  tokenSymbol: text("token_symbol").notNull(),
+  totalAllocation: integer("total_allocation").notNull(),
+  claimedAmount: integer("claimed_amount").default(0),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  isActive: boolean("is_active").default(true),
+  requirementsJson: text("requirements_json"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const airdropClaims = pgTable("airdrop_claims", {
+  id: serial("id").primaryKey(),
+  campaignId: integer("campaign_id").references(() => airdropCampaigns.id),
+  userId: integer("user_id").references(() => users.id),
+  walletAddress: text("wallet_address").notNull(),
+  amount: integer("amount").notNull(),
+  claimedAt: timestamp("claimed_at").defaultNow(),
+  txHash: text("tx_hash"),
+  status: text("status").default("pending")
+});
+
+export const referrals = pgTable("referrals", {
+  id: serial("id").primaryKey(),
+  referrerId: integer("referrer_id").references(() => users.id),
+  referredId: integer("referred_id").references(() => users.id),
+  referralCode: text("referral_code").notNull().unique(),
+  tier: text("tier").default("bronze"),
+  bonusEarned: integer("bonus_earned").default(0),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+// Battle Pass System
+export const battlePassSeasons = pgTable("battle_pass_seasons", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  seasonNumber: integer("season_number").notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  freeTierRewardsJson: text("free_tier_rewards_json"),
+  premiumTierRewardsJson: text("premium_tier_rewards_json"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const battlePassProgress = pgTable("battle_pass_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  seasonId: integer("season_id").references(() => battlePassSeasons.id),
+  currentLevel: integer("current_level").default(1),
+  currentXp: integer("current_xp").default(0),
+  isPremium: boolean("is_premium").default(false),
+  premiumPurchasedAt: timestamp("premium_purchased_at"),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const battlePassPurchases = pgTable("battle_pass_purchases", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  seasonId: integer("season_id").references(() => battlePassSeasons.id),
+  amount: integer("amount").notNull(),
+  stripePaymentId: text("stripe_payment_id"),
+  purchasedAt: timestamp("purchased_at").defaultNow()
+});
+
+// Guild System
+export const guilds = pgTable("guilds", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  founderId: integer("founder_id").references(() => users.id),
+  memberCount: integer("member_count").default(1),
+  totalImpact: integer("total_impact").default(0),
+  level: integer("level").default(1),
+  avatarUrl: text("avatar_url"),
+  isPublic: boolean("is_public").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow()
+});
+
+export const guildMembers = pgTable("guild_members", {
+  id: serial("id").primaryKey(),
+  guildId: integer("guild_id").references(() => guilds.id),
+  userId: integer("user_id").references(() => users.id),
+  role: text("role").default("member"),
+  joinedAt: timestamp("joined_at").defaultNow(),
+  contribution: integer("contribution").default(0)
+});
+
+// Cosmetics System
+export const cosmeticItems = pgTable("cosmetic_items", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  category: text("category").notNull(),
+  rarity: text("rarity").default("common"),
+  price: integer("price").notNull(),
+  heroId: text("hero_id"),
+  imageUrl: text("image_url"),
+  isLimitedEdition: boolean("is_limited_edition").default(false),
+  stock: integer("stock"),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const cosmeticsInventory = pgTable("cosmetics_inventory", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  itemId: integer("item_id").references(() => cosmeticItems.id),
+  acquiredAt: timestamp("acquired_at").defaultNow(),
+  source: text("source")
+});
+
+export const cosmeticsPurchases = pgTable("cosmetics_purchases", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  itemId: integer("item_id").references(() => cosmeticItems.id),
+  amount: integer("amount").notNull(),
+  stripePaymentId: text("stripe_payment_id"),
+  purchasedAt: timestamp("purchased_at").defaultNow()
+});
+
+// Analytics System
+export const analyticsEvents = pgTable("analytics_events", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  eventType: text("event_type").notNull(),
+  eventData: text("event_data"),
+  sessionId: text("session_id"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const abTests = pgTable("ab_tests", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  variantA: text("variant_a").notNull(),
+  variantB: text("variant_b").notNull(),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow()
+});
+
+export const abTestAssignments = pgTable("ab_test_assignments", {
+  id: serial("id").primaryKey(),
+  testId: integer("test_id").references(() => abTests.id),
+  userId: integer("user_id").references(() => users.id),
+  variant: text("variant").notNull(),
+  assignedAt: timestamp("assigned_at").defaultNow()
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type GitHubOAuthState = typeof githubOAuthStates.$inferSelect;
