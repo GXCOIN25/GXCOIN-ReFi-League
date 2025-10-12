@@ -287,8 +287,31 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({ onOpenOnboarding }
       </div>
       
       {error && error !== 'multiple_wallets_available' && (
-        <div className="bg-red-500/20 border border-red-500/50 text-red-300 p-3 rounded-lg mb-4 text-sm">
-          {error}
+        <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg mb-4">
+          <div className="p-3">
+            <div className="flex items-start space-x-2 mb-3">
+              <AlertTriangle className="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-yellow-300 text-sm font-medium mb-1">Wallet Not Detected</p>
+                <p className="text-yellow-200 text-xs">
+                  {error.includes('install') 
+                    ? 'Wallet extensions like MetaMask don\'t work in embedded previews. Please open this app in a new browser tab.'
+                    : error
+                  }
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => window.open(window.location.href, '_blank')}
+              className="w-full py-2 px-4 bg-yellow-500/30 hover:bg-yellow-500/40 border border-yellow-500/50 text-yellow-100 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 font-medium"
+            >
+              <ExternalLink className="w-4 h-4" />
+              <span>Open in New Tab</span>
+            </button>
+            <p className="text-yellow-200/70 text-xs mt-2 text-center">
+              Your wallet extension will work there
+            </p>
+          </div>
         </div>
       )}
       
