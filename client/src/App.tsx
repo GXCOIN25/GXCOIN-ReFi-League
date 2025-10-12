@@ -289,7 +289,11 @@ function MainExperience() {
       {/* UI Overlay - TEMPORARILY DISABLED */}
       <SuperheroUI currentTab={currentTab} />
       <HeroShowcase />
-      <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <LoginModal 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)}
+        onLoginSuccess={() => setCurrentTab('airdrops')}
+      />
       
       {/* NFT Minting Modal */}
       {showNFTMinting && (

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,9 +13,10 @@ import { toast } from "sonner";
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onLoginSuccess?: () => void;
 }
 
-export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginModalProps) {
   const [isSignup, setIsSignup] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +25,6 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
   const { register, login, isLoading, error, setError } = useUser();
   const { loadUserData } = useContribution();
   const { loadUserNFTs } = useHeroes();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +51,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       
       // Redirect to airdrops page after a brief delay
       setTimeout(() => {
-        navigate('/airdrops');
+        onLoginSuccess?.();
       }, 1000);
     } catch (err) {
       console.error('Login/signup failed:', err);
@@ -83,7 +82,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       
       // Redirect to airdrops page after a brief delay
       setTimeout(() => {
-        navigate('/airdrops');
+        onLoginSuccess?.();
       }, 1000);
     } catch (err) {
       console.error('Demo login failed:', err);
