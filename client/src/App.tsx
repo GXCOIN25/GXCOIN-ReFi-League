@@ -26,6 +26,7 @@ import GameArena from "@/components/GameArena";
 import LandingPage from "@/components/LandingPage";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import AirdropCampaignHub from "@/components/AirdropCampaignHub";
+import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import { useWallet } from "@/lib/stores/useWallet";
 import { 
   Volume2, 
@@ -42,7 +43,8 @@ import {
   Home,
   BookOpen,
   CreditCard,
-  Gift
+  Gift,
+  BarChart3
 } from "lucide-react";
 import "@fontsource/inter";
 
@@ -368,6 +370,10 @@ function MainExperience() {
                   <Gift className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="text-xs sm:text-sm md:text-base">Airdrops</span>
                 </TabsTrigger>
+                <TabsTrigger value="analytics" className="mobile-tab-trigger text-xs sm:text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap bg-gradient-to-r from-blue-600/20 to-cyan-600/20 hover:from-blue-600/30 hover:to-cyan-600/30" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <BarChart3 className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-xs sm:text-sm md:text-base">Analytics</span>
+                </TabsTrigger>
                 <TabsTrigger 
                   value="cryptoguide" 
                   className="mobile-tab-trigger text-xs sm:text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap bg-purple-600/20 hover:bg-purple-600/30" 
@@ -646,6 +652,10 @@ function MainExperience() {
 
               <TabsContent value="airdrops" className="mt-0">
                 <AirdropCampaignHub />
+              </TabsContent>
+
+              <TabsContent value="analytics" className="mt-0">
+                <AnalyticsDashboard />
               </TabsContent>
             </div>
           </Tabs>
