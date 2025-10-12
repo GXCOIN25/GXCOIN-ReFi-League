@@ -83,6 +83,12 @@ export const CryptoOnboardingHub: React.FC<CryptoOnboardingHubProps> = ({
   const progress = (completedTabs.length / tabs.length) * 100;
 
   useEffect(() => {
+    if (isOpen && initialTab) {
+      setCurrentTab(initialTab);
+    }
+  }, [isOpen, initialTab]);
+
+  useEffect(() => {
     if (isOpen) {
       updateOnboardingProgress({ lastActiveTab: currentTab });
     }
