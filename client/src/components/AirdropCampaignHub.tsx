@@ -12,6 +12,7 @@ import {
   Coins, Rocket, Shield, DollarSign, UserPlus,
   ArrowRight, ChevronRight
 } from "lucide-react";
+import { FaFacebook, FaLinkedin, FaInstagram, FaTiktok } from "react-icons/fa";
 import Confetti from "react-confetti";
 import { toast } from "sonner";
 import { useWallet } from "@/lib/stores/useWallet";
@@ -531,6 +532,34 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
     window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
   };
 
+  const shareOnFacebook = () => {
+    const link = referralLink || `${window.location.origin}/ref/${referralStats?.referralCode}`;
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`, '_blank');
+  };
+
+  const shareOnLinkedIn = () => {
+    const link = referralLink || `${window.location.origin}/ref/${referralStats?.referralCode}`;
+    const title = encodeURIComponent('Join the GXCOIN Airdrop Campaign!');
+    const summary = encodeURIComponent('Claim your tokens now and help save the planet! 🌍');
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(link)}`, '_blank');
+  };
+
+  const shareOnInstagram = () => {
+    const link = referralLink || `${window.location.origin}/ref/${referralStats?.referralCode}`;
+    // Instagram doesn't have a direct share URL, so copy link and open Instagram
+    navigator.clipboard.writeText(`🚀 Join the GXCOIN Airdrop! Claim tokens & save the planet! 🌍\n\n${link}`);
+    toast.success('Link copied! Paste it in your Instagram post or story', { duration: 5000 });
+    window.open('https://www.instagram.com/', '_blank');
+  };
+
+  const shareOnTikTok = () => {
+    const link = referralLink || `${window.location.origin}/ref/${referralStats?.referralCode}`;
+    // TikTok doesn't have a direct share URL for external links, so copy and open TikTok
+    navigator.clipboard.writeText(`🚀 Join the GXCOIN Airdrop! Claim tokens & save the planet! 🌍\n\n${link}`);
+    toast.success('Link copied! Paste it in your TikTok video description', { duration: 5000 });
+    window.open('https://www.tiktok.com/', '_blank');
+  };
+
   const getTierIcon = (tier: string) => {
     switch (tier) {
       case 'Gold': return <Crown className="h-5 w-5 text-yellow-400" />;
@@ -1034,25 +1063,56 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                       </Button>
                     </div>
 
-                    <div className="flex gap-2">
-                      <Button 
-                        onClick={shareOnTwitter}
-                        className="flex-1 bg-blue-500 hover:bg-blue-600"
-                      >
-                        <Share2 className="h-4 w-4 mr-2" />
-                        Share on Twitter
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        className="flex-1 border-purple-500 text-purple-400 hover:bg-purple-500/20"
-                        onClick={() => {
-                          const discordUrl = `https://discord.com`;
-                          window.open(discordUrl, '_blank');
-                        }}
-                      >
-                        <Share2 className="h-4 w-4 mr-2" />
-                        Share on Discord
-                      </Button>
+                    <div className="space-y-3">
+                      <p className="text-gray-300 text-sm font-medium">Share on Social Media:</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button 
+                          onClick={shareOnTwitter}
+                          className="bg-blue-500 hover:bg-blue-600"
+                        >
+                          <Share2 className="h-4 w-4 mr-2" />
+                          Twitter
+                        </Button>
+                        <Button 
+                          onClick={shareOnFacebook}
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          <FaFacebook className="h-4 w-4 mr-2" />
+                          Facebook
+                        </Button>
+                        <Button 
+                          onClick={shareOnLinkedIn}
+                          className="bg-blue-700 hover:bg-blue-800"
+                        >
+                          <FaLinkedin className="h-4 w-4 mr-2" />
+                          LinkedIn
+                        </Button>
+                        <Button 
+                          onClick={shareOnInstagram}
+                          className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:from-purple-600 hover:via-pink-600 hover:to-orange-600"
+                        >
+                          <FaInstagram className="h-4 w-4 mr-2" />
+                          Instagram
+                        </Button>
+                        <Button 
+                          onClick={shareOnTikTok}
+                          className="bg-black hover:bg-gray-900 border border-cyan-400"
+                        >
+                          <FaTiktok className="h-4 w-4 mr-2" />
+                          TikTok
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          className="border-purple-500 text-purple-400 hover:bg-purple-500/20"
+                          onClick={() => {
+                            const discordUrl = `https://discord.com`;
+                            window.open(discordUrl, '_blank');
+                          }}
+                        >
+                          <Share2 className="h-4 w-4 mr-2" />
+                          Discord
+                        </Button>
+                      </div>
                     </div>
                   </>
                 )}
