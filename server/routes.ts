@@ -18,9 +18,42 @@ import {
   analyticsQueryParamsSchema,
   AnalyticsEventInput 
 } from '@shared/types';
+import { z } from 'zod';
 
 interface AuthRequest extends Request {
   userId?: number;
+}
+
+const dateStringSchema = z.string().refine((val) => {
+  const date = new Date(val);
+  return !isNaN(date.getTime());
+}, {
+  message: "Invalid date format. Please provide a valid ISO 8601 date string (e.g., '2024-01-01' or '2024-01-01T10:00:00Z')"
+});
+
+function validateDateParams(startDate?: string, endDate?: string): { error?: string; start?: Date; end?: Date } {
+  if (startDate) {
+    const result = dateStringSchema.safeParse(startDate);
+    if (!result.success) {
+      return { error: `Invalid startDate: ${result.error.errors[0].message}` };
+    }
+  }
+  
+  if (endDate) {
+    const result = dateStringSchema.safeParse(endDate);
+    if (!result.success) {
+      return { error: `Invalid endDate: ${result.error.errors[0].message}` };
+    }
+  }
+  
+  const start = startDate ? new Date(startDate) : undefined;
+  const end = endDate ? new Date(endDate) : undefined;
+  
+  if (start && end && start >= end) {
+    return { error: 'Start date must be before end date' };
+  }
+  
+  return { start, end };
 }
 
 // Authentication middleware - header-only for security
@@ -2256,6 +2289,200 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.status(500).json({ 
         error: 'Failed to query analytics events',
+        message: error.message 
+      });
+    }
+  });
+
+  // Dashboard Analytics Endpoints
+
+  // GET /api/analytics/dashboard/overview - Dashboard overview with key metrics
+  app.get('/api/analytics/dashboard/overview', authenticate, analyticsRateLimit, async (req: AuthRequest, res: Response) => {
+    try {
+      const startDate = req.query.startDate as string | undefined;
+      const endDate = req.query.endDate as string | undefined;
+
+      const validation = validateDateParams(startDate, endDate);
+      if (validation.error) {
+        return res.status(400).json({ 
+          error: 'Invalid date parameters', 
+          message: validation.error 
+        });
+      }
+
+      const overview = await analyticsService.getDashboardOverview(startDate, endDate);
+      
+      res.json({
+        success: true,
+        data: overview
+      });
+    } catch (error: any) {
+      console.error('Dashboard overview error:', error);
+      
+      if (error.message.includes('date')) {
+        return res.status(400).json({ 
+          error: 'Invalid date parameters', 
+          message: error.message 
+        });
+      }
+      
+      res.status(500).json({ 
+        error: 'Failed to get dashboard overview',
+        message: error.message 
+      });
+    }
+  });
+
+  // GET /api/analytics/dashboard/timeline - Time series data
+  app.get('/api/analytics/dashboard/timeline', authenticate, analyticsRateLimit, async (req: AuthRequest, res: Response) => {
+    try {
+      const eventType = req.query.eventType as string | undefined;
+      const startDate = req.query.startDate as string | undefined;
+      const endDate = req.query.endDate as string | undefined;
+      const interval = (req.query.interval as 'hourly' | 'daily' | 'weekly') || 'daily';
+
+      if (!['hourly', 'daily', 'weekly'].includes(interval)) {
+        return res.status(400).json({ 
+          error: 'Invalid interval', 
+          message: 'Interval must be one of: hourly, daily, weekly' 
+        });
+      }
+
+      const validation = validateDateParams(startDate, endDate);
+      if (validation.error) {
+        return res.status(400).json({ 
+          error: 'Invalid date parameters', 
+          message: validation.error 
+        });
+      }
+
+      const timeline = await analyticsService.getEventsTimeline(eventType, startDate, endDate, interval);
+      
+      res.json({
+        success: true,
+        data: timeline
+      });
+    } catch (error: any) {
+      console.error('Timeline error:', error);
+      
+      if (error.message.includes('date')) {
+        return res.status(400).json({ 
+          error: 'Invalid date parameters', 
+          message: error.message 
+        });
+      }
+      
+      res.status(500).json({ 
+        error: 'Failed to get events timeline',
+        message: error.message 
+      });
+    }
+  });
+
+  // GET /api/analytics/dashboard/top-users - Top active users
+  app.get('/api/analytics/dashboard/top-users', authenticate, analyticsRateLimit, async (req: AuthRequest, res: Response) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+      const startDate = req.query.startDate as string | undefined;
+      const endDate = req.query.endDate as string | undefined;
+
+      if (limit < 1 || limit > 100) {
+        return res.status(400).json({ 
+          error: 'Invalid limit', 
+          message: 'Limit must be between 1 and 100' 
+        });
+      }
+
+      const validation = validateDateParams(startDate, endDate);
+      if (validation.error) {
+        return res.status(400).json({ 
+          error: 'Invalid date parameters', 
+          message: validation.error 
+        });
+      }
+
+      const topUsers = await analyticsService.getTopUsers(limit, startDate, endDate);
+      
+      res.json({
+        success: true,
+        data: topUsers
+      });
+    } catch (error: any) {
+      console.error('Top users error:', error);
+      
+      if (error.message.includes('date')) {
+        return res.status(400).json({ 
+          error: 'Invalid date parameters', 
+          message: error.message 
+        });
+      }
+      
+      res.status(500).json({ 
+        error: 'Failed to get top users',
+        message: error.message 
+      });
+    }
+  });
+
+  // GET /api/analytics/dashboard/funnel - Conversion funnel analysis
+  app.get('/api/analytics/dashboard/funnel', authenticate, analyticsRateLimit, async (req: AuthRequest, res: Response) => {
+    try {
+      const type = req.query.type as 'purchase' | 'airdrop' | 'guild_join' | undefined;
+      const startDate = req.query.startDate as string | undefined;
+      const endDate = req.query.endDate as string | undefined;
+
+      if (!type || !['purchase', 'airdrop', 'guild_join'].includes(type)) {
+        return res.status(400).json({ 
+          error: 'Invalid funnel type', 
+          message: 'Type must be one of: purchase, airdrop, guild_join' 
+        });
+      }
+
+      const validation = validateDateParams(startDate, endDate);
+      if (validation.error) {
+        return res.status(400).json({ 
+          error: 'Invalid date parameters', 
+          message: validation.error 
+        });
+      }
+
+      const funnel = await analyticsService.getConversionFunnel(type, startDate, endDate);
+      
+      res.json({
+        success: true,
+        data: funnel
+      });
+    } catch (error: any) {
+      console.error('Conversion funnel error:', error);
+      
+      if (error.message.includes('date')) {
+        return res.status(400).json({ 
+          error: 'Invalid date parameters', 
+          message: error.message 
+        });
+      }
+      
+      res.status(500).json({ 
+        error: 'Failed to get conversion funnel',
+        message: error.message 
+      });
+    }
+  });
+
+  // GET /api/analytics/dashboard/realtime - Real-time metrics
+  app.get('/api/analytics/dashboard/realtime', authenticate, analyticsRateLimit, async (req: AuthRequest, res: Response) => {
+    try {
+      const metrics = await analyticsService.getRealtimeMetrics();
+      
+      res.json({
+        success: true,
+        data: metrics
+      });
+    } catch (error: any) {
+      console.error('Realtime metrics error:', error);
+      
+      res.status(500).json({ 
+        error: 'Failed to get realtime metrics',
         message: error.message 
       });
     }
