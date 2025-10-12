@@ -51,7 +51,6 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUser } from '@/lib/stores/useUser';
-import { useNavigate } from 'react-router-dom';
 import type { 
   DashboardOverview, 
   EventsTimeline, 
@@ -65,7 +64,6 @@ const API_BASE = '/api';
 
 const AnalyticsDashboard = () => {
   const { isLoggedIn } = useUser();
-  const navigate = useNavigate();
   
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [realtime, setRealtime] = useState<RealtimeMetrics | null>(null);
@@ -99,8 +97,7 @@ const AnalyticsDashboard = () => {
     toast.error('Authentication required', {
       description: 'Please login to view analytics'
     });
-    navigate('/');
-  }, [navigate]);
+  }, []);
   
   const fetchOverview = useCallback(async () => {
     try {
