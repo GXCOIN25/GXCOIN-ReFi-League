@@ -10,7 +10,7 @@ import {
   CheckCircle2, AlertCircle, Sparkles, Award,
   TrendingUp, Zap, Crown, Star, Wallet, Target,
   Coins, Rocket, Shield, DollarSign, UserPlus,
-  ArrowRight, ChevronRight
+  ArrowRight, ChevronRight, Gamepad2, Swords
 } from "lucide-react";
 import { FaFacebook, FaLinkedin, FaInstagram, FaTiktok } from "react-icons/fa";
 import Confetti from "react-confetti";
@@ -849,13 +849,117 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
 
         {campaigns.length === 0 && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-20"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-4xl mx-auto"
           >
-            <Gift className="h-16 w-16 text-gray-500 mx-auto mb-4" />
-            <p className="text-gray-400 text-xl">No active campaigns at the moment</p>
-            <p className="text-gray-500 mt-2">Check back soon for new airdrops!</p>
+            <Card className="border-4 border-purple-500/50 bg-gradient-to-br from-purple-900/40 via-pink-900/30 to-purple-900/40 shadow-2xl overflow-hidden">
+              <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+              <CardContent className="relative pt-16 pb-12">
+                <div className="text-center space-y-6">
+                  {/* Arena Icon */}
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                    className="mx-auto w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg shadow-purple-500/50"
+                  >
+                    <Swords className="h-12 w-12 text-white" />
+                  </motion.div>
+
+                  {/* Title */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <h2 className="text-4xl font-bold text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 bg-clip-text mb-3">
+                      Enter The Arena
+                    </h2>
+                    <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+                      No campaigns right now? No problem! Jump into The Arena, battle for glory, and earn exclusive dNFT rewards!
+                    </p>
+                  </motion.div>
+
+                  {/* Features Grid */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="grid md:grid-cols-3 gap-4 mt-8 mb-8"
+                  >
+                    <div className="bg-purple-900/40 rounded-lg p-4 border border-purple-500/30">
+                      <Gamepad2 className="h-8 w-8 text-purple-400 mx-auto mb-2" />
+                      <h3 className="text-white font-bold mb-1">Battle & Win</h3>
+                      <p className="text-gray-400 text-sm">Compete in epic battles</p>
+                    </div>
+                    <div className="bg-pink-900/40 rounded-lg p-4 border border-pink-500/30">
+                      <Shield className="h-8 w-8 text-pink-400 mx-auto mb-2" />
+                      <h3 className="text-white font-bold mb-1">Earn dNFTs</h3>
+                      <p className="text-gray-400 text-sm">Unlock exclusive rewards</p>
+                    </div>
+                    <div className="bg-purple-900/40 rounded-lg p-4 border border-purple-500/30">
+                      <Trophy className="h-8 w-8 text-yellow-400 mx-auto mb-2" />
+                      <h3 className="text-white font-bold mb-1">Climb Ranks</h3>
+                      <p className="text-gray-400 text-sm">Rise to the top</p>
+                    </div>
+                  </motion.div>
+
+                  {/* CTA Buttons */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="flex flex-col sm:flex-row gap-4 justify-center"
+                  >
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 hover:from-purple-600 hover:via-pink-600 hover:to-purple-700 text-white font-bold text-lg px-8 py-6 shadow-lg shadow-purple-500/50"
+                      onClick={() => {
+                        if (!isLoggedIn) {
+                          toast.info('Please login to access The Arena!');
+                          onOpenLogin?.();
+                          return;
+                        }
+                        onSwitchToTab?.('arena');
+                      }}
+                    >
+                      <Swords className="mr-2 h-6 w-6" />
+                      Enter The Arena
+                      <ArrowRight className="ml-2 h-6 w-6" />
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="border-2 border-purple-500 text-purple-400 hover:bg-purple-500/20 font-bold text-lg px-8 py-6"
+                      onClick={() => {
+                        if (!isLoggedIn) {
+                          onOpenLogin?.();
+                          return;
+                        }
+                        onSwitchToTab?.('nft');
+                      }}
+                    >
+                      <Shield className="mr-2 h-5 w-5" />
+                      View dNFT Collection
+                    </Button>
+                  </motion.div>
+
+                  {/* Info Banner */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="mt-6 p-4 bg-blue-900/30 rounded-lg border border-blue-500/30"
+                  >
+                    <p className="text-blue-300 text-sm">
+                      💎 <strong>Pro Tip:</strong> Register now and get a starter dNFT to begin your Arena journey!
+                    </p>
+                  </motion.div>
+                </div>
+              </CardContent>
+            </Card>
           </motion.div>
         )}
       </div>
