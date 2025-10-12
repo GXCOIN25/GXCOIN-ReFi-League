@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import Confetti from "react-confetti";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -58,18 +59,85 @@ const getValidTokenSymbol = (heroSymbol: string): TokenSymbol => {
   return "GXCOIN"; // fallback to anchor
 };
 
-export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void }) {
+interface LandingPageProps {
+  onOpenLogin?: () => void;
+  onSwitchToTab?: (tab: string) => void;
+}
+
+export default function LandingPage({ onOpenLogin, onSwitchToTab }: LandingPageProps) {
   const [activeTab, setActiveTab] = useState("heroes");
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingInitialTab, setOnboardingInitialTab] = useState<'start' | 'metamask' | 'buy' | 'learn' | 'security'>('start');
   const [showEnrollmentForm, setShowEnrollmentForm] = useState(false);
+  const [isStartingJourney, setIsStartingJourney] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
   const { currentRank, impactMetrics, anchorPower, gxcoinStake, getAnchorMultiplier } = useContribution();
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn, register } = useUser();
   const { isConnected, connectWallet, error: walletError } = useWallet();
 
   const handleGetStarted = () => {
     setOnboardingInitialTab('start');
     setShowOnboarding(true);
+  };
+
+  const handleEpicJourney = async () => {
+    if (isLoggedIn) {
+      // Already logged in, just go to airdrops
+      toast.success('🎉 Welcome back, Hero!', {
+        description: 'Taking you to your airdrops...',
+      });
+      onSwitchToTab?.('airdrops');
+      return;
+    }
+
+    setIsStartingJourney(true);
+    
+    try {
+      // Create instant demo account with unique credentials
+      const timestamp = Date.now();
+      const demoUsername = `hero_${timestamp}`;
+      const demoPassword = `demo_${timestamp}_${Math.random().toString(36).substr(2, 9)}`;
+      // Generate valid 40-character hex wallet address
+      const demoWallet = `0x${Array.from({length: 40}, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+      
+      await register({
+        username: demoUsername,
+        password: demoPassword,
+        walletAddress: demoWallet
+      });
+
+      // Show epic celebration with confetti
+      setShowConfetti(true);
+      
+      toast.success('🚀 Account Created - You\'re In!', {
+        description: 'Get ready to claim your free tokens...',
+        duration: 2000,
+      });
+
+      // Wait a moment for dramatic effect
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Switch to airdrops tab
+      onSwitchToTab?.('airdrops');
+
+      // Show clear call-to-action with next steps
+      setTimeout(() => {
+        toast.success('💎 Free Tokens Waiting!', {
+          description: '👉 Click "Claim Now" on any campaign below to get your tokens instantly!',
+          duration: 10000,
+        });
+        // Stop confetti after celebration
+        setTimeout(() => setShowConfetti(false), 5000);
+      }, 500);
+
+    } catch (error) {
+      console.error('Epic journey failed:', error);
+      toast.error('Oops!', {
+        description: 'Something went wrong. Please try again.',
+      });
+    } finally {
+      setIsStartingJourney(false);
+    }
   };
 
   const handleActivateAqua = async () => {
@@ -176,6 +244,17 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 p-4 md:p-0">
+      {/* Epic Confetti Celebration */}
+      {showConfetti && (
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={500}
+          gravity={0.3}
+        />
+      )}
+      
       {/* Hero Section */}
       <motion.section 
         className="relative px-2 py-8 sm:px-4 sm:py-16 md:py-20"
@@ -650,16 +729,26 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                 </div>
 
                 <Button 
-                  onClick={handleActivateAqua}
+                  onClick={handleEpicJourney}
                   size="lg"
-                  className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 text-white font-bold text-base sm:text-lg py-6"
+                  disabled={isStartingJourney}
+                  className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 text-white font-bold text-base sm:text-lg py-6 animate-pulse hover:animate-none"
                 >
-                  <Gift className="h-5 w-5 mr-2" />
-                  {isLoggedIn ? 'Connect Wallet & Claim Airdrops' : 'Create Account & Claim Free Tokens'}
+                  {isStartingJourney ? (
+                    <>
+                      <Sparkles className="h-5 w-5 mr-2 animate-spin" />
+                      Creating Your Journey...
+                    </>
+                  ) : (
+                    <>
+                      <Rocket className="h-5 w-5 mr-2" />
+                      {isLoggedIn ? 'Claim Your Free Tokens Now!' : 'Start Your Epic Journey FREE ⚡'}
+                    </>
+                  )}
                 </Button>
 
                 <p className="text-center text-purple-200/70 text-xs">
-                  💎 Most popular choice - Get started for FREE!
+                  🎉 One click to get started - No wallet needed!
                 </p>
               </CardContent>
             </Card>
