@@ -412,8 +412,9 @@ export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () =
   };
 
   const handleClaim = async (campaignId: number) => {
-    if (!isConnected) {
-      toast.error('Please connect your wallet first');
+    // Allow claims if logged in (even without wallet connection for demo users)
+    if (!isLoggedIn) {
+      toast.error('Please create an account or login first');
       return;
     }
 
@@ -477,8 +478,8 @@ export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () =
   };
 
   const generateReferralCode = async () => {
-    if (!isConnected) {
-      toast.error('Please connect your wallet first');
+    if (!isLoggedIn) {
+      toast.error('Please create an account or login first');
       return;
     }
 
