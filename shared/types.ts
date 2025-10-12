@@ -59,3 +59,76 @@ export const analyticsQueryParamsSchema = z.object({
 });
 
 export type AnalyticsQueryParams = z.infer<typeof analyticsQueryParamsSchema>;
+
+// Dashboard Analytics Types
+
+export interface EventTypeBreakdown {
+  eventType: AnalyticsEventType;
+  count: number;
+  percentage: number;
+}
+
+export interface DashboardOverview {
+  totalEvents: number;
+  uniqueUsers: number;
+  activeSessions: number;
+  eventsByType: EventTypeBreakdown[];
+  dateRange: {
+    start: string;
+    end: string;
+  };
+}
+
+export interface TimelineDataPoint {
+  timestamp: string;
+  count: number;
+  eventType?: AnalyticsEventType;
+}
+
+export interface EventsTimeline {
+  interval: 'hourly' | 'daily' | 'weekly';
+  data: TimelineDataPoint[];
+  totalEvents: number;
+  dateRange: {
+    start: string;
+    end: string;
+  };
+}
+
+export interface TopUser {
+  userId: number | null;
+  username?: string;
+  eventCount: number;
+  lastActive: string;
+  isAnonymous: boolean;
+}
+
+export interface FunnelStage {
+  stage: string;
+  eventType: AnalyticsEventType;
+  count: number;
+  conversionRate: number;
+  dropoffRate: number;
+}
+
+export interface ConversionFunnel {
+  funnelType: 'purchase' | 'airdrop' | 'guild_join';
+  stages: FunnelStage[];
+  totalEntries: number;
+  overallConversionRate: number;
+  dateRange: {
+    start: string;
+    end: string;
+  };
+}
+
+export interface RealtimeMetrics {
+  eventsLast5Minutes: number;
+  activeUsers: number;
+  eventRate: number; // events per minute
+  topEventTypes: {
+    eventType: AnalyticsEventType;
+    count: number;
+  }[];
+  timestamp: string;
+}
