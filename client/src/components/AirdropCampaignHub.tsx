@@ -907,7 +907,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                     onOpenLogin?.();
                     return;
                   }
-                  onSwitchToTab?.('arena');
+                  onSwitchToTab?.('game');
                 }}
               >
                 <div className="text-center space-y-3">
@@ -929,7 +929,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                     onOpenLogin?.();
                     return;
                   }
-                  onSwitchToTab?.('nft');
+                  onSwitchToTab?.('nfts');
                 }}
               >
                 <div className="text-center space-y-3">
@@ -951,7 +951,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                     onOpenLogin?.();
                     return;
                   }
-                  onSwitchToTab?.('nft');
+                  onSwitchToTab?.('nfts');
                 }}
               >
                 <div className="text-center space-y-3">
@@ -1117,7 +1117,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                           onOpenLogin?.();
                           return;
                         }
-                        onSwitchToTab?.('arena');
+                        onSwitchToTab?.('game');
                       }}
                     >
                       <Swords className="mr-2 h-6 w-6" />
@@ -1133,7 +1133,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                           onOpenLogin?.();
                           return;
                         }
-                        onSwitchToTab?.('nft');
+                        onSwitchToTab?.('nfts');
                       }}
                     >
                       <Shield className="mr-2 h-5 w-5" />
@@ -1197,7 +1197,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 {/* Step 1: Purchase dNFT for Arena Access - PRIMARY CTA */}
                 <Card className="bg-gradient-to-br from-pink-600/40 to-purple-600/40 border-pink-500 border-2 hover:border-pink-400 transition-all cursor-pointer shadow-lg shadow-pink-500/20" onClick={() => {
                   setShowNextSteps(false);
-                  onSwitchToTab?.('nft');
+                  onSwitchToTab?.('nfts');
                 }}>
                   <CardContent className="pt-6">
                     <div className="text-center space-y-3">
