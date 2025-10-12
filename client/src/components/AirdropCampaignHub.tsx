@@ -1005,8 +1005,8 @@ export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () =
         </motion.div>
       )}
 
-      {/* Connect Wallet CTA */}
-      {!isConnected && (
+      {/* Sign In CTA */}
+      {!isLoggedIn && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -1018,8 +1018,8 @@ export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () =
               <div className="flex items-center gap-4">
                 <AlertCircle className="h-6 w-6 text-yellow-400" />
                 <div>
-                  <p className="text-white font-semibold">Connect your wallet to claim airdrops</p>
-                  <p className="text-gray-300 text-sm">Sign in to participate in campaigns and earn rewards</p>
+                  <p className="text-white font-semibold">Create an account to claim free airdrops!</p>
+                  <p className="text-gray-300 text-sm">Join GXCOIN and start earning tokens today</p>
                 </div>
               </div>
             </CardContent>
