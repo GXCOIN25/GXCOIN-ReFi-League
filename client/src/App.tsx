@@ -658,15 +658,15 @@ function MainExperience() {
               </TabsContent>
 
               <TabsContent value="airdrops" className="mt-0">
-                <AirdropCampaignHub />
+                <AirdropCampaignHub onOpenLogin={() => setShowLoginModal(true)} />
               </TabsContent>
 
               <TabsContent value="analytics" className="mt-0">
-                <AnalyticsDashboard />
+                <AnalyticsDashboard onOpenLogin={() => setShowLoginModal(true)} />
               </TabsContent>
 
               <TabsContent value="battlepass" className="mt-0">
-                <BattlePassDashboard />
+                <BattlePassDashboard onOpenLogin={() => setShowLoginModal(true)} />
               </TabsContent>
             </div>
           </Tabs>

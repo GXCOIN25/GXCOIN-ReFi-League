@@ -47,7 +47,8 @@ import {
   BarChart3,
   Clock,
   ChevronDown,
-  Radio
+  Radio,
+  Lock
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUser } from '@/lib/stores/useUser';
@@ -62,7 +63,7 @@ import type {
 
 const API_BASE = '/api';
 
-const AnalyticsDashboard = () => {
+const AnalyticsDashboard = ({ onOpenLogin }: { onOpenLogin?: () => void }) => {
   const { isLoggedIn } = useUser();
   
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
@@ -316,7 +317,27 @@ const AnalyticsDashboard = () => {
   };
   
   if (!isLoggedIn) {
-    return null;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 p-4 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          <Card className="bg-gradient-to-br from-blue-900/40 to-purple-900/40 border-blue-500/30">
+            <CardContent className="p-12 text-center">
+              <Lock className="w-16 h-16 mx-auto mb-4 text-blue-400" />
+              <h2 className="text-2xl font-bold text-white mb-2">Login Required</h2>
+              <p className="text-gray-400 mb-6">
+                Please login to view analytics and track platform performance
+              </p>
+              <Button
+                onClick={() => onOpenLogin?.()}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
+                Login Now
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
   }
   
   return (

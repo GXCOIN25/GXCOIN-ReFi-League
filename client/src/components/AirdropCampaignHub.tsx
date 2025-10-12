@@ -338,7 +338,7 @@ const CampaignCard: React.FC<{
 };
 
 // Main Component
-export default function AirdropCampaignHub() {
+export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () => void }) {
   const { isConnected } = useWallet();
   const { isLoggedIn } = useUser();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -741,10 +741,12 @@ export default function AirdropCampaignHub() {
                   size="lg"
                   className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold"
                   onClick={() => {
-                    const firstCampaign = campaigns[0];
-                    if (firstCampaign) {
-                      document.getElementById(`campaign-${firstCampaign.id}`)?.scrollIntoView({ behavior: 'smooth' });
+                    if (!isLoggedIn) {
+                      onOpenLogin?.();
+                      return;
                     }
+                    // Scroll to campaigns section
+                    window.scrollTo({ top: 900, behavior: 'smooth' });
                   }}
                 >
                   Claim Now <ArrowRight className="ml-2 h-5 w-5" />
