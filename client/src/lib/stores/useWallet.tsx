@@ -14,6 +14,14 @@ interface TransactionStatus {
   gasUsed?: string;
 }
 
+export type WalletType = 'metamask' | 'coinbase' | 'walletconnect';
+
+export interface AvailableWallet {
+  type: WalletType;
+  name: string;
+  provider: any;
+}
+
 interface WalletState {
   isConnected: boolean;
   address: string | null;
@@ -24,13 +32,16 @@ interface WalletState {
   isConnecting: boolean;
   error: string | null;
   transactions: TransactionStatus[];
+  availableWallets: AvailableWallet[];
+  selectedWallet: WalletType | null;
   
   // Contract instances
   heroNFTContract: HeroNFTContract | null;
   tokenManager: TokenManager | null;
   
   // Actions
-  connectWallet: () => Promise<void>;
+  detectWallets: () => AvailableWallet[];
+  connectWallet: (walletType?: WalletType) => Promise<void>;
   disconnectWallet: () => void;
   getBalance: () => Promise<void>;
   getTokenBalances: () => Promise<void>;
@@ -55,24 +66,103 @@ export const useWallet = create<WalletState>((set, get) => ({
   isConnecting: false,
   error: null,
   transactions: [],
+  availableWallets: [],
+  selectedWallet: null,
   heroNFTContract: null,
   tokenManager: null,
 
-  connectWallet: async () => {
-    console.log('Attempting to connect wallet...');
+  detectWallets: () => {
+    const wallets: AvailableWallet[] = [];
+
+    // Check for MetaMask
+    if (window.ethereum?.isMetaMask) {
+      wallets.push({
+        type: 'metamask',
+        name: 'MetaMask',
+        provider: window.ethereum
+      });
+    }
+
+    // Check for Coinbase Wallet
+    if (window.ethereum?.isCoinbaseWallet || window.coinbaseWalletExtension) {
+      const coinbaseProvider = window.ethereum?.isCoinbaseWallet 
+        ? window.ethereum 
+        : window.coinbaseWalletExtension;
+      
+      wallets.push({
+        type: 'coinbase',
+        name: 'Coinbase Wallet',
+        provider: coinbaseProvider
+      });
+    }
+
+    // Handle multiple providers (when both wallets are installed)
+    if (window.ethereum?.providers) {
+      window.ethereum.providers.forEach((provider: any) => {
+        if (provider.isMetaMask && !wallets.find(w => w.type === 'metamask')) {
+          wallets.push({
+            type: 'metamask',
+            name: 'MetaMask',
+            provider
+          });
+        }
+        if (provider.isCoinbaseWallet && !wallets.find(w => w.type === 'coinbase')) {
+          wallets.push({
+            type: 'coinbase',
+            name: 'Coinbase Wallet',
+            provider
+          });
+        }
+      });
+    }
+
+    console.log('Detected wallets:', wallets);
+    set({ availableWallets: wallets });
+    return wallets;
+  },
+
+  connectWallet: async (walletType?: WalletType) => {
+    console.log('Attempting to connect wallet...', walletType);
     
-    if (!window.ethereum) {
-      const errorMsg = 'Please install MetaMask or another Web3 wallet';
-      console.error('No ethereum provider found:', errorMsg);
+    // First detect available wallets
+    const availableWallets = get().detectWallets();
+    
+    if (availableWallets.length === 0) {
+      const errorMsg = 'Please install MetaMask or Coinbase Wallet to continue';
+      console.error('No wallet provider found:', errorMsg);
       set({ error: errorMsg });
       return;
     }
 
-    console.log('Ethereum provider found:', window.ethereum);
-    set({ isConnecting: true, error: null });
+    // If wallet type not specified and multiple wallets available, set error to show selection UI
+    if (!walletType && availableWallets.length > 1) {
+      set({ error: 'multiple_wallets_available' });
+      return;
+    }
+
+    // Select wallet provider
+    let selectedProvider;
+    let selectedType: WalletType;
+
+    if (walletType) {
+      const wallet = availableWallets.find(w => w.type === walletType);
+      if (!wallet) {
+        set({ error: `${walletType} wallet not found` });
+        return;
+      }
+      selectedProvider = wallet.provider;
+      selectedType = walletType;
+    } else {
+      // Use the first available wallet
+      selectedProvider = availableWallets[0].provider;
+      selectedType = availableWallets[0].type;
+    }
+
+    console.log('Selected wallet:', selectedType, selectedProvider);
+    set({ isConnecting: true, error: null, selectedWallet: selectedType });
 
     try {
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.BrowserProvider(selectedProvider);
       console.log('Provider created:', provider);
       
       await provider.send('eth_requestAccounts', []);
