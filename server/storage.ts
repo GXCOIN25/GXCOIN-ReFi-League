@@ -111,7 +111,7 @@ export interface IStorage {
   }): Promise<User>;
   authenticateUser(username: string, password: string): Promise<User | null>;
   generateToken(user: User): string;
-  verifyToken(token: string): { userId: number } | null;
+  verifyToken(token: string): { userId: number; role: string } | null;
   
   // Contribution methods
   getUserContributions(userId: number): Promise<Contribution[]>;
@@ -326,20 +326,20 @@ export class PostgresStorage implements IStorage {
       throw new Error('❌ CRITICAL SECURITY ERROR: JWT_SECRET environment variable is required');
     }
     return jwt.sign(
-      { userId: user.id, username: user.username },
+      { userId: user.id, username: user.username, role: user.role || 'user' },
       secret,
       { expiresIn: '7d' }
     );
   }
 
-  verifyToken(token: string): { userId: number } | null {
+  verifyToken(token: string): { userId: number; role: string } | null {
     const secret = process.env.JWT_SECRET;
     if (!secret) {
       throw new Error('❌ CRITICAL SECURITY ERROR: JWT_SECRET environment variable is required');
     }
     try {
       const payload = jwt.verify(token, secret) as any;
-      return { userId: payload.userId };
+      return { userId: payload.userId, role: payload.role || 'user' };
     } catch {
       return null;
     }

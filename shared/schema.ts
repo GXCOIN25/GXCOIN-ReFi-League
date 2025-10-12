@@ -21,6 +21,8 @@ export const users = pgTable("users", {
   githubUserId: text("github_user_id"), // GitHub user ID for identity verification
   // Stripe fields
   stripeCustomerId: text("stripe_customer_id"),
+  // Role-based access control
+  role: text("role").default("user").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -78,6 +80,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   githubTokenExpiresAt: true,
   githubUserId: true,
   stripeCustomerId: true,
+  role: true,
 }).extend({
   password: z.string().optional().nullable(), // Allow null for SSO users
   walletAddress: z.string().optional().nullable(),
@@ -93,6 +96,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   githubTokenExpiresAt: z.date().optional().nullable(),
   githubUserId: z.string().optional().nullable(),
   stripeCustomerId: z.string().optional().nullable(),
+  role: z.enum(["user", "admin"]).optional().default("user"),
 });
 
 export const insertContributionSchema = createInsertSchema(contributions).pick({
@@ -420,6 +424,16 @@ export const battlePassPurchases = pgTable("battle_pass_purchases", {
   amount: integer("amount").notNull(),
   stripePaymentId: text("stripe_payment_id"),
   purchasedAt: timestamp("purchased_at").defaultNow()
+});
+
+export const battlePassClaims = pgTable("battle_pass_claims", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  seasonId: integer("season_id").references(() => battlePassSeasons.id),
+  level: integer("level").notNull(),
+  tier: text("tier").notNull(),
+  rewardJson: text("reward_json").notNull(),
+  claimedAt: timestamp("claimed_at").defaultNow()
 });
 
 // Guild System

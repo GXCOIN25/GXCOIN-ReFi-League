@@ -12,16 +12,23 @@ import Stripe from 'stripe';
 import { getUncachableOutlookClient } from './outlook';
 import { eq, and, lte, gte, desc, count, sql } from "drizzle-orm";
 import { analyticsService } from './services/analytics';
+import { battlePassService } from './services/battlePass';
 import { 
   analyticsEventInputSchema, 
   analyticsBatchEventInputSchema, 
   analyticsQueryParamsSchema,
-  AnalyticsEventInput 
+  AnalyticsEventInput,
+  XPSource,
+  BattlePassReward
 } from '@shared/types';
 import { z } from 'zod';
 
 interface AuthRequest extends Request {
   userId?: number;
+  user?: {
+    userId: number;
+    role: string;
+  };
 }
 
 const dateStringSchema = z.string().refine((val) => {
@@ -71,10 +78,27 @@ const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
     }
     
     req.userId = payload.userId;
+    req.user = {
+      userId: payload.userId,
+      role: payload.role
+    };
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Authentication failed' });
   }
+};
+
+// Admin check middleware - verifies user has admin privileges
+const requireAdmin = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin role required' });
+  }
+
+  next();
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -145,6 +169,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     message: { error: 'Too many analytics requests. Please slow down.' },
     standardHeaders: true,
     legacyHeaders: false,
+  });
+
+  // Battle Pass reward claiming rate limiting - 10 claims per minute per user
+  const rewardClaimRateLimit = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 10, // 10 claims per minute
+    message: { error: 'Too many reward claims. Please slow down.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req: AuthRequest) => `reward-claim-${req.userId}`, // Per user, not per IP
   });
   
   // Health check endpoint for production monitoring
@@ -2483,6 +2517,386 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.status(500).json({ 
         error: 'Failed to get realtime metrics',
+        message: error.message 
+      });
+    }
+  });
+
+  // ============ Battle Pass System Endpoints ============
+
+  // Admin Endpoints
+
+  // POST /api/admin/battle-pass/seasons - Create new season (Admin only)
+  app.post('/api/admin/battle-pass/seasons', authenticate, requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const { name, seasonNumber, startDate, endDate, freeTierRewards, premiumTierRewards } = req.body;
+
+      if (!name || !seasonNumber || !startDate || !endDate) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return res.status(400).json({ error: 'Invalid date format' });
+      }
+
+      if (start >= end) {
+        return res.status(400).json({ error: 'End date must be after start date' });
+      }
+
+      const season = await battlePassService.createSeason(
+        name,
+        seasonNumber,
+        start,
+        end,
+        freeTierRewards || [],
+        premiumTierRewards || []
+      );
+
+      res.json({
+        success: true,
+        data: season
+      });
+    } catch (error: any) {
+      console.error('Create season error:', error);
+      res.status(500).json({ 
+        error: 'Failed to create season',
+        message: error.message 
+      });
+    }
+  });
+
+  // PUT /api/admin/battle-pass/seasons/:id - Update season (Admin only)
+  app.put('/api/admin/battle-pass/seasons/:id', authenticate, requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const seasonId = parseInt(req.params.id);
+      
+      if (isNaN(seasonId)) {
+        return res.status(400).json({ error: 'Invalid season ID' });
+      }
+
+      const updates: any = {};
+
+      if (req.body.name !== undefined) {
+        updates.name = req.body.name;
+      }
+
+      if (req.body.startDate !== undefined) {
+        const start = new Date(req.body.startDate);
+        if (isNaN(start.getTime())) {
+          return res.status(400).json({ error: 'Invalid start date format' });
+        }
+        updates.startDate = start;
+      }
+
+      if (req.body.endDate !== undefined) {
+        const end = new Date(req.body.endDate);
+        if (isNaN(end.getTime())) {
+          return res.status(400).json({ error: 'Invalid end date format' });
+        }
+        updates.endDate = end;
+      }
+
+      if (req.body.freeTierRewards !== undefined) {
+        updates.freeTierRewards = req.body.freeTierRewards;
+      }
+
+      if (req.body.premiumTierRewards !== undefined) {
+        updates.premiumTierRewards = req.body.premiumTierRewards;
+      }
+
+      if (req.body.isActive !== undefined) {
+        updates.isActive = req.body.isActive;
+      }
+
+      const season = await battlePassService.updateSeason(seasonId, updates);
+
+      res.json({
+        success: true,
+        data: season
+      });
+    } catch (error: any) {
+      console.error('Update season error:', error);
+      
+      if (error.message === 'Season not found') {
+        return res.status(404).json({ error: 'Season not found' });
+      }
+
+      if (error.message.includes('End date must be after start date')) {
+        return res.status(400).json({ error: error.message });
+      }
+
+      res.status(500).json({ 
+        error: 'Failed to update season',
+        message: error.message 
+      });
+    }
+  });
+
+  // DELETE /api/admin/battle-pass/seasons/:id - Deactivate season (Admin only)
+  app.delete('/api/admin/battle-pass/seasons/:id', authenticate, requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const seasonId = parseInt(req.params.id);
+      
+      if (isNaN(seasonId)) {
+        return res.status(400).json({ error: 'Invalid season ID' });
+      }
+
+      await battlePassService.deactivateSeason(seasonId);
+
+      res.json({
+        success: true,
+        message: 'Season deactivated successfully'
+      });
+    } catch (error: any) {
+      console.error('Deactivate season error:', error);
+      
+      if (error.message === 'Season not found') {
+        return res.status(404).json({ error: 'Season not found' });
+      }
+
+      res.status(500).json({ 
+        error: 'Failed to deactivate season',
+        message: error.message 
+      });
+    }
+  });
+
+  // GET /api/admin/battle-pass/seasons - List all seasons (Admin only)
+  app.get('/api/admin/battle-pass/seasons', authenticate, requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const offset = parseInt(req.query.offset as string) || 0;
+
+      const seasons = await battlePassService.getAllSeasons(limit, offset);
+
+      res.json({
+        success: true,
+        data: seasons
+      });
+    } catch (error: any) {
+      console.error('Get seasons error:', error);
+      res.status(500).json({ 
+        error: 'Failed to get seasons',
+        message: error.message 
+      });
+    }
+  });
+
+  // User Endpoints
+
+  // GET /api/battle-pass/active - Get active season (Public)
+  app.get('/api/battle-pass/active', async (req: Request, res: Response) => {
+    try {
+      const season = await battlePassService.getActiveSeason();
+
+      if (!season) {
+        return res.status(404).json({ error: 'No active season' });
+      }
+
+      res.json({
+        success: true,
+        data: season
+      });
+    } catch (error: any) {
+      console.error('Get active season error:', error);
+      res.status(500).json({ 
+        error: 'Failed to get active season',
+        message: error.message 
+      });
+    }
+  });
+
+  // GET /api/battle-pass/progress - Get user progress (Auth required)
+  app.get('/api/battle-pass/progress', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+      if (!req.userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const seasonId = req.query.seasonId ? parseInt(req.query.seasonId as string) : undefined;
+
+      const progress = await battlePassService.getUserProgress(req.userId, seasonId);
+
+      if (!progress) {
+        return res.status(404).json({ error: 'No active season or progress found' });
+      }
+
+      res.json({
+        success: true,
+        data: progress
+      });
+    } catch (error: any) {
+      console.error('Get user progress error:', error);
+      res.status(500).json({ 
+        error: 'Failed to get user progress',
+        message: error.message 
+      });
+    }
+  });
+
+  // POST /api/admin/battle-pass/xp - Award XP manually (Admin only)
+  app.post('/api/admin/battle-pass/xp', authenticate, requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const { userId, xpAmount, reason } = req.body;
+
+      if (!userId || typeof userId !== 'number') {
+        return res.status(400).json({ error: 'Valid user ID is required' });
+      }
+
+      if (!xpAmount || typeof xpAmount !== 'number' || xpAmount <= 0) {
+        return res.status(400).json({ error: 'Invalid XP amount (must be positive number)' });
+      }
+
+      if (!reason || typeof reason !== 'string' || reason.trim().length === 0) {
+        return res.status(400).json({ error: 'Reason for XP grant is required' });
+      }
+
+      const progress = await battlePassService.addXPAdmin(userId, xpAmount, reason);
+
+      res.json({
+        success: true,
+        data: progress,
+        message: `Admin granted ${xpAmount} XP to user ${userId}`,
+        reason
+      });
+    } catch (error: any) {
+      console.error('Battle Pass admin XP grant error:', error);
+      res.status(error.message === 'No active season' ? 404 : 400).json({ 
+        error: error.message || 'Failed to grant XP',
+        message: error.message 
+      });
+    }
+  });
+
+  // POST /api/battle-pass/purchase - Purchase premium (Auth required)
+  app.post('/api/battle-pass/purchase', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+      if (!req.userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const { seasonId, stripePaymentId } = req.body;
+
+      if (!seasonId || !stripePaymentId) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      const progress = await battlePassService.purchasePremium(req.userId, seasonId, stripePaymentId);
+
+      res.json({
+        success: true,
+        data: progress
+      });
+    } catch (error: any) {
+      console.error('Purchase premium error:', error);
+      
+      if (error.message === 'Season not found') {
+        return res.status(404).json({ error: 'Season not found' });
+      }
+
+      if (error.message === 'Season is not active') {
+        return res.status(400).json({ error: 'Season is not active' });
+      }
+
+      if (error.message === 'Premium already purchased for this season') {
+        return res.status(409).json({ error: 'Premium already purchased for this season' });
+      }
+
+      res.status(500).json({ 
+        error: 'Failed to purchase premium',
+        message: error.message 
+      });
+    }
+  });
+
+  // POST /api/battle-pass/rewards/:level/claim - Claim reward (Auth required, rate limited)
+  app.post('/api/battle-pass/rewards/:level/claim', authenticate, rewardClaimRateLimit, async (req: AuthRequest, res: Response) => {
+    try {
+      if (!req.userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const level = parseInt(req.params.level);
+      const { tier } = req.body;
+
+      if (isNaN(level) || level < 1) {
+        return res.status(400).json({ error: 'Invalid level' });
+      }
+
+      if (!tier || !['free', 'premium'].includes(tier)) {
+        return res.status(400).json({ error: 'Invalid tier. Must be "free" or "premium"' });
+      }
+
+      const result = await battlePassService.claimReward(req.userId, level, tier);
+
+      res.json({
+        success: true,
+        data: result
+      });
+    } catch (error: any) {
+      console.error('Claim reward error:', error);
+      
+      if (error.message === 'No active season or progress found') {
+        return res.status(404).json({ error: 'No active season or progress found' });
+      }
+
+      if (error.message === 'Level not yet reached') {
+        return res.status(400).json({ error: 'Level not yet reached' });
+      }
+
+      if (error.message === 'Premium tier not purchased') {
+        return res.status(403).json({ error: 'Premium tier not purchased' });
+      }
+
+      if (error.message === 'No reward at this level') {
+        return res.status(404).json({ error: 'No reward at this level' });
+      }
+
+      if (error.message === 'Reward already claimed') {
+        return res.status(409).json({ error: 'Reward already claimed' });
+      }
+
+      res.status(500).json({ 
+        error: 'Failed to claim reward',
+        message: error.message 
+      });
+    }
+  });
+
+  // GET /api/battle-pass/rewards/unclaimed - Get unclaimed rewards (Auth required)
+  app.get('/api/battle-pass/rewards/unclaimed', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+      if (!req.userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const seasonId = req.query.seasonId ? parseInt(req.query.seasonId as string) : undefined;
+
+      if (seasonId === undefined) {
+        const activeSeason = await battlePassService.getActiveSeason();
+        if (!activeSeason) {
+          return res.status(404).json({ error: 'No active season' });
+        }
+        const rewards = await battlePassService.getUnclaimedRewards(req.userId, activeSeason.id);
+        return res.json({
+          success: true,
+          data: rewards
+        });
+      }
+
+      const rewards = await battlePassService.getUnclaimedRewards(req.userId, seasonId);
+
+      res.json({
+        success: true,
+        data: rewards
+      });
+    } catch (error: any) {
+      console.error('Get unclaimed rewards error:', error);
+      res.status(500).json({ 
+        error: 'Failed to get unclaimed rewards',
         message: error.message 
       });
     }
