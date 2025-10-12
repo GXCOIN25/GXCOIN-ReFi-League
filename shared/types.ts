@@ -132,3 +132,74 @@ export interface RealtimeMetrics {
   }[];
   timestamp: string;
 }
+
+// Battle Pass System Types
+
+export enum XPSource {
+  AIRDROP_CLAIM = "AIRDROP_CLAIM",
+  NFT_MINT = "NFT_MINT",
+  GUILD_ACTION = "GUILD_ACTION",
+  REFERRAL = "REFERRAL",
+  DAILY_LOGIN = "DAILY_LOGIN",
+}
+
+export const XP_AMOUNTS: Record<XPSource, number> = {
+  [XPSource.AIRDROP_CLAIM]: 50,
+  [XPSource.NFT_MINT]: 100,
+  [XPSource.GUILD_ACTION]: 75,
+  [XPSource.REFERRAL]: 25,
+  [XPSource.DAILY_LOGIN]: 10,
+};
+
+export interface BattlePassReward {
+  level: number;
+  reward: string;
+  type: "token" | "nft" | "bundle" | "cosmetic";
+}
+
+export interface BattlePassSeason {
+  id: number;
+  name: string;
+  seasonNumber: number;
+  startDate: Date;
+  endDate: Date;
+  freeTierRewardsJson: string | null;
+  premiumTierRewardsJson: string | null;
+  isActive: boolean;
+  createdAt: Date;
+}
+
+export interface BattlePassProgress {
+  id: number;
+  userId: number | null;
+  seasonId: number | null;
+  currentLevel: number | null;
+  currentXp: number | null;
+  isPremium: boolean | null;
+  premiumPurchasedAt: Date | null;
+  updatedAt: Date | null;
+}
+
+export interface BattlePassPurchase {
+  id: number;
+  userId: number;
+  seasonId: number;
+  amount: number;
+  stripePaymentId: string | null;
+  purchasedAt: Date;
+}
+
+export interface BattlePassSeasonWithRewards extends Omit<BattlePassSeason, 'freeTierRewardsJson' | 'premiumTierRewardsJson'> {
+  freeTierRewards: BattlePassReward[];
+  premiumTierRewards: BattlePassReward[];
+}
+
+export interface UserBattlePassProgress {
+  season: BattlePassSeasonWithRewards;
+  progress: BattlePassProgress;
+  unclaimedRewards: {
+    level: number;
+    tier: 'free' | 'premium';
+    reward: BattlePassReward;
+  }[];
+}
