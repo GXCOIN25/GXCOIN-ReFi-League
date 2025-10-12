@@ -42,7 +42,7 @@ interface ClaimedReward {
   tier: 'free' | 'premium';
 }
 
-export default function BattlePassDashboard() {
+export default function BattlePassDashboard({ onOpenLogin }: { onOpenLogin?: () => void }) {
   const { isLoggedIn } = useUser();
   
   const [season, setSeason] = useState<BattlePassSeasonWithRewards | null>(null);
@@ -285,10 +285,7 @@ export default function BattlePassDashboard() {
                 Please login to access the Battle Pass and track your progress
               </p>
               <Button
-                onClick={() => {
-                  const loginBtn = document.querySelector('[data-login-trigger]') as HTMLElement;
-                  if (loginBtn) loginBtn.click();
-                }}
+                onClick={() => onOpenLogin?.()}
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 Login Now
