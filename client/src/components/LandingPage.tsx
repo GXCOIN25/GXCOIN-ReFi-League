@@ -65,18 +65,44 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
   const [showEnrollmentForm, setShowEnrollmentForm] = useState(false);
   const { currentRank, impactMetrics, anchorPower, gxcoinStake, getAnchorMultiplier } = useContribution();
   const { isLoggedIn } = useUser();
-  const { isConnected } = useWallet();
+  const { isConnected, connectWallet, error: walletError } = useWallet();
 
   const handleGetStarted = () => {
     setOnboardingInitialTab('start');
     setShowOnboarding(true);
   };
 
-  const handleActivateAqua = () => {
+  const handleActivateAqua = async () => {
     if (!isConnected) {
-      setOnboardingInitialTab('metamask');
-      setShowOnboarding(true);
-    } else {
+      try {
+        await connectWallet();
+        if (!isLoggedIn) {
+          onOpenLogin?.();
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to connect wallet';
+        if (errorMessage.includes('install') || errorMessage.includes('No wallet')) {
+          toast.error('Wallet Not Detected', {
+            description: (
+              <div className="space-y-2">
+                <p>Wallet extensions don't work in embedded previews.</p>
+                <button
+                  onClick={() => window.open(window.location.href, '_blank')}
+                  className="w-full mt-2 py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium"
+                >
+                  Open in New Tab
+                </button>
+              </div>
+            ),
+            duration: 10000,
+          });
+        } else {
+          toast.error('Connection Failed', {
+            description: errorMessage,
+          });
+        }
+      }
+    } else if (!isLoggedIn) {
       onOpenLogin?.();
     }
   };
