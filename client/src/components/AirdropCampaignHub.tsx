@@ -338,7 +338,7 @@ const CampaignCard: React.FC<{
 };
 
 // Main Component
-export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () => void }) {
+export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onOpenLogin?: () => void; onSwitchToTab?: (tab: string) => void }) {
   const { isConnected } = useWallet();
   const { isLoggedIn } = useUser();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -446,8 +446,8 @@ export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () =
       setShowNextSteps(true);
       
       toast.success(`🎉 Success! You claimed ${data.amount} tokens!`, {
-        description: `Next: Generate your referral link to earn bonus tokens!`,
-        duration: 8000
+        description: `Next: Purchase dNFT Pass to enter the Arena and start battling! 🎮`,
+        duration: 10000
       });
 
       // Refresh campaign data
@@ -865,8 +865,27 @@ export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () =
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Step 1: Generate Referral Link */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {/* Step 1: Purchase dNFT for Arena Access - PRIMARY CTA */}
+                <Card className="bg-gradient-to-br from-pink-600/40 to-purple-600/40 border-pink-500 border-2 hover:border-pink-400 transition-all cursor-pointer shadow-lg shadow-pink-500/20" onClick={() => {
+                  setShowNextSteps(false);
+                  onSwitchToTab?.('nft');
+                }}>
+                  <CardContent className="pt-6">
+                    <div className="text-center space-y-3">
+                      <div className="mx-auto w-14 h-14 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full flex items-center justify-center animate-pulse">
+                        <Shield className="h-7 w-7 text-white" />
+                      </div>
+                      <h3 className="text-white font-bold text-lg">1. Enter the Arena 🎮</h3>
+                      <p className="text-gray-200 text-sm font-medium">Purchase dNFT Pass to unlock exclusive Arena battles!</p>
+                      <Button className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 font-bold">
+                        Get Arena Pass <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Step 2: Generate Referral Link */}
                 <Card className="bg-purple-900/30 border-purple-500/50 hover:border-purple-500 transition-all cursor-pointer" onClick={() => {
                   setShowNextSteps(false);
                   setTimeout(() => {
@@ -881,8 +900,8 @@ export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () =
                       <div className="mx-auto w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                         <Users className="h-6 w-6 text-white" />
                       </div>
-                      <h3 className="text-white font-bold">1. Share & Earn</h3>
-                      <p className="text-gray-300 text-sm">Generate your referral link to earn up to 30% bonus!</p>
+                      <h3 className="text-white font-bold">2. Share & Earn</h3>
+                      <p className="text-gray-300 text-sm">Generate referral link for up to 30% bonus!</p>
                       <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
                         Generate Link <ChevronRight className="ml-2 h-4 w-4" />
                       </Button>
@@ -890,7 +909,7 @@ export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () =
                   </CardContent>
                 </Card>
 
-                {/* Step 2: Claim More Campaigns */}
+                {/* Step 3: Claim More Campaigns */}
                 <Card className="bg-blue-900/30 border-blue-500/50 hover:border-blue-500 transition-all cursor-pointer" onClick={() => {
                   setShowNextSteps(false);
                   window.scrollTo({ top: 900, behavior: 'smooth' });
@@ -900,8 +919,8 @@ export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () =
                       <div className="mx-auto w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
                         <Gift className="h-6 w-6 text-white" />
                       </div>
-                      <h3 className="text-white font-bold">2. Claim More</h3>
-                      <p className="text-gray-300 text-sm">Explore other campaigns and claim more free tokens!</p>
+                      <h3 className="text-white font-bold">3. Claim More</h3>
+                      <p className="text-gray-300 text-sm">Explore other campaigns & claim more tokens!</p>
                       <Button className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
                         View Campaigns <ChevronRight className="ml-2 h-4 w-4" />
                       </Button>
@@ -909,18 +928,18 @@ export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () =
                   </CardContent>
                 </Card>
 
-                {/* Step 3: Upgrade to Battle Pass */}
+                {/* Step 4: Upgrade to Battle Pass */}
                 <Card className="bg-amber-900/30 border-amber-500/50 hover:border-amber-500 transition-all cursor-pointer" onClick={() => {
                   setShowNextSteps(false);
-                  window.location.href = '/?tab=battlepass';
+                  onSwitchToTab?.('battlepass');
                 }}>
                   <CardContent className="pt-6">
                     <div className="text-center space-y-3">
                       <div className="mx-auto w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full flex items-center justify-center">
                         <Crown className="h-6 w-6 text-white" />
                       </div>
-                      <h3 className="text-white font-bold">3. Go Premium</h3>
-                      <p className="text-gray-300 text-sm">Unlock exclusive rewards with Battle Pass for $29.99!</p>
+                      <h3 className="text-white font-bold">4. Go Premium</h3>
+                      <p className="text-gray-300 text-sm">Unlock exclusive rewards with Battle Pass!</p>
                       <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
                         Upgrade Now <ChevronRight className="ml-2 h-4 w-4" />
                       </Button>
