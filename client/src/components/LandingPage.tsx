@@ -33,7 +33,12 @@ import {
   CheckCircle,
   XCircle,
   Info,
-  Rocket
+  Rocket,
+  Gift,
+  Wallet,
+  Share2,
+  Timer,
+  DollarSign
 } from "lucide-react";
 import { getFeatureComparison, isDemoMode } from "@/config/nftConfig";
 
@@ -74,6 +79,11 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
     } else {
       onOpenLogin?.();
     }
+  };
+
+  const handleDirectPurchase = () => {
+    setOnboardingInitialTab('buy');
+    setShowOnboarding(true);
   };
 
   const handleOnboardingComplete = () => {
@@ -360,6 +370,350 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
           </div>
         </motion.section>
       )}
+
+      {/* Airdrops Benefits & Getting Started Section */}
+      <motion.section 
+        className="px-2 sm:px-4 pb-8 sm:pb-12"
+        initial={{ y: 30, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.9 }}
+      >
+        <div className="max-w-6xl mx-auto">
+          {/* Main Heading */}
+          <motion.div 
+            className="text-center mb-8 sm:mb-12"
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1.0 }}
+          >
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+              <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+                Claim Your Free Hero Tokens
+              </span>
+              <br />
+              <span className="text-2xl sm:text-3xl md:text-4xl text-green-400">
+                Airdrop Campaigns Live! 🎁
+              </span>
+            </h2>
+            <p className="text-gray-300 text-base sm:text-lg max-w-3xl mx-auto px-2">
+              Get started with zero investment! Claim free tokens from our hero campaigns, 
+              earn referral bonuses, and build your portfolio without spending a dime.
+            </p>
+          </motion.div>
+
+          {/* Hero Campaigns Showcase */}
+          <motion.div 
+            className="mb-8 sm:mb-10"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 1.1 }}
+          >
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 mb-6">
+              <Card className="bg-gradient-to-br from-blue-900/40 to-blue-700/30 border-blue-500/40">
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <Droplets className="h-8 w-8 sm:h-10 sm:w-10 mx-auto mb-2 text-blue-400" />
+                  <p className="text-white font-bold text-sm sm:text-base">AQUA</p>
+                  <p className="text-blue-300 text-xs">$WTR</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-orange-900/40 to-orange-700/30 border-orange-500/40">
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <Zap className="h-8 w-8 sm:h-10 sm:w-10 mx-auto mb-2 text-orange-400" />
+                  <p className="text-white font-bold text-sm sm:text-base">VOLTRA</p>
+                  <p className="text-orange-300 text-xs">$GPWR</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-orange-900/40 to-orange-600/30 border-orange-500/40">
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <Battery className="h-8 w-8 sm:h-10 sm:w-10 mx-auto mb-2 text-orange-400" />
+                  <p className="text-white font-bold text-sm sm:text-base">GRAPHENE</p>
+                  <p className="text-orange-300 text-xs">$BATT</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-green-900/40 to-emerald-700/30 border-green-500/40">
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <TrendingUp className="h-8 w-8 sm:h-10 sm:w-10 mx-auto mb-2 text-green-400" />
+                  <p className="text-white font-bold text-sm sm:text-base">CARBON</p>
+                  <p className="text-green-300 text-xs">$GCCT</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-yellow-900/40 to-yellow-700/30 border-yellow-500/40 col-span-2 sm:col-span-1">
+                <CardContent className="p-3 sm:p-4 text-center">
+                  <Crown className="h-8 w-8 sm:h-10 sm:w-10 mx-auto mb-2 text-yellow-400" />
+                  <p className="text-white font-bold text-sm sm:text-base">GXCOIN</p>
+                  <p className="text-yellow-300 text-xs">Anchor</p>
+                </CardContent>
+              </Card>
+            </div>
+          </motion.div>
+
+          {/* Key Benefits Grid */}
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 sm:mb-10"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1.2 }}
+          >
+            <Card className="bg-gradient-to-br from-purple-900/30 to-purple-700/20 border-purple-500/30">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-purple-500/20">
+                    <Gift className="h-5 w-5 sm:h-6 sm:w-6 text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold mb-1 text-sm sm:text-base">Free Token Distribution</h3>
+                    <p className="text-gray-400 text-xs sm:text-sm">Claim tokens worth real value</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-pink-900/30 to-pink-700/20 border-pink-500/30">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-pink-500/20">
+                    <Users className="h-5 w-5 sm:h-6 sm:w-6 text-pink-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold mb-1 text-sm sm:text-base">Viral Referral Rewards</h3>
+                    <p className="text-gray-400 text-xs sm:text-sm">Bronze (1-10), Silver (11-50), Gold (51+)</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-blue-900/30 to-blue-700/20 border-blue-500/30">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-blue-500/20">
+                    <Share2 className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold mb-1 text-sm sm:text-base">Social Sharing Bonuses</h3>
+                    <p className="text-gray-400 text-xs sm:text-sm">Twitter & Discord multipliers</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-orange-900/30 to-orange-700/20 border-orange-500/30">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-orange-500/20">
+                    <Timer className="h-5 w-5 sm:h-6 sm:w-6 text-orange-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold mb-1 text-sm sm:text-base">Limited Time Campaigns</h3>
+                    <p className="text-gray-400 text-xs sm:text-sm">Live countdown timers</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-green-900/30 to-green-700/20 border-green-500/30">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-green-500/20">
+                    <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold mb-1 text-sm sm:text-base">No Purchase Required</h3>
+                    <p className="text-gray-400 text-xs sm:text-sm">Just connect wallet to claim</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-yellow-900/30 to-yellow-700/20 border-yellow-500/30">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-yellow-500/20">
+                    <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-bold mb-1 text-sm sm:text-base">Build Portfolio Free</h3>
+                    <p className="text-gray-400 text-xs sm:text-sm">Zero cost to get started</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Stats Display */}
+          <motion.div 
+            className="flex flex-wrap justify-center gap-4 sm:gap-6 mb-10 sm:mb-12"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 1.3 }}
+          >
+            <Badge className="bg-purple-600/20 text-purple-300 border-purple-500/30 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3">
+              <Coins className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+              100K+ Tokens Available
+            </Badge>
+            <Badge className="bg-pink-600/20 text-pink-300 border-pink-500/30 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3">
+              <Crown className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+              5 Hero Campaigns
+            </Badge>
+            <Badge className="bg-green-600/20 text-green-300 border-green-500/30 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3">
+              <Trophy className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+              Earn Up to 10x Referral Bonus
+            </Badge>
+          </motion.div>
+
+          {/* Two Pathways - Wallet vs Stripe */}
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+            initial={{ y: 30, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1.4 }}
+          >
+            {/* Path A: Connect Wallet (Recommended for Airdrops) */}
+            <Card className="bg-gradient-to-br from-purple-900/50 via-pink-900/40 to-purple-800/50 border-purple-500/50 relative overflow-hidden">
+              <div className="absolute top-4 right-4">
+                <Badge className="bg-green-500/30 text-green-200 border-green-500/50 animate-pulse">
+                  RECOMMENDED
+                </Badge>
+              </div>
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10" />
+              
+              <CardHeader className="relative z-10">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-3 rounded-full bg-gradient-to-br from-purple-600 to-pink-600">
+                    <Wallet className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                  </div>
+                  <div>
+                    <Sparkles className="h-5 w-5 text-yellow-400 mb-1" />
+                  </div>
+                </div>
+                <CardTitle className="text-xl sm:text-2xl text-white mb-2">
+                  Get Free Tokens via Airdrops
+                </CardTitle>
+                <p className="text-purple-200 text-sm">
+                  Connect your wallet and claim free hero tokens - no purchase required!
+                </p>
+              </CardHeader>
+
+              <CardContent className="relative z-10 space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-white text-sm">Claim free hero tokens instantly</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-white text-sm">Earn referral bonuses (Bronze/Silver/Gold)</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-white text-sm">Participate in all airdrop campaigns</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-white text-sm">Build your portfolio at zero cost</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-white text-sm">Share on social for bonus rewards</p>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={handleActivateAqua}
+                  size="lg"
+                  className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 text-white font-bold text-base sm:text-lg py-6"
+                >
+                  <Wallet className="h-5 w-5 mr-2" />
+                  Connect Wallet & Claim Airdrops
+                </Button>
+
+                <p className="text-center text-purple-200/70 text-xs">
+                  💎 Most popular choice - Get started for FREE!
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Path B: Direct Purchase with Stripe */}
+            <Card className="bg-gradient-to-br from-green-900/40 via-emerald-900/30 to-green-800/40 border-green-500/40 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-emerald-500/10" />
+              
+              <CardHeader className="relative z-10">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-3 rounded-full bg-gradient-to-br from-green-600 to-emerald-600">
+                    <CreditCard className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+                  </div>
+                </div>
+                <CardTitle className="text-xl sm:text-2xl text-white mb-2">
+                  Buy NFTs Directly (No Wallet Needed)
+                </CardTitle>
+                <p className="text-green-200 text-sm">
+                  Skip the wallet setup - pay with your credit or debit card
+                </p>
+              </CardHeader>
+
+              <CardContent className="relative z-10 space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-white text-sm">Skip wallet setup - use credit/debit card</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-white text-sm">Instant purchase with Stripe</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-white text-sm">Secure payment processing</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-white text-sm">Email confirmation & receipt</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <p className="text-white text-sm">Get started in under 2 minutes</p>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={handleDirectPurchase}
+                  size="lg"
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold text-base sm:text-lg py-6"
+                >
+                  <CreditCard className="h-5 w-5 mr-2" />
+                  Buy with Card from $175+
+                </Button>
+
+                <p className="text-center text-green-200/70 text-xs">
+                  🚀 Fast & Simple - No crypto experience needed
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Educational Note */}
+          <motion.div 
+            className="mt-8 p-4 sm:p-6 bg-blue-500/10 border border-blue-500/30 rounded-lg"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1.5 }}
+          >
+            <div className="flex items-start gap-3">
+              <Info className="w-6 h-6 text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="text-blue-200 font-bold mb-2 text-base sm:text-lg">What are Airdrops?</h3>
+                <p className="text-blue-100/90 text-sm sm:text-base leading-relaxed">
+                  Airdrops are <strong>free token distributions</strong> - like getting free money! Companies distribute tokens to build community and reward early supporters. 
+                  By connecting your wallet, you can claim hero tokens worth real value, earn bonuses for referrals, and participate in campaigns - all <strong>completely free</strong>. 
+                  No purchase required, no hidden fees. Just connect, claim, and start building your crypto portfolio at zero cost!
+                </p>
+                <p className="text-blue-200/80 text-xs sm:text-sm mt-3 italic">
+                  💡 Don't want to deal with wallets and crypto? No problem! Use our Stripe option to buy NFTs directly with your credit card - simple and secure.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </motion.section>
 
       {/* GXCOIN Anchor Centerpiece */}
       <motion.section 
