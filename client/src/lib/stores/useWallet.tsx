@@ -377,16 +377,30 @@ export const useWallet = create<WalletState>((set, get) => ({
   },
 
   switchNetwork: async (chainId: number): Promise<void> => {
-    if (!window.ethereum) throw new Error('Ethereum provider not available');
+    const { selectedWallet, availableWallets } = get();
+    
+    // Get the provider for the selected wallet
+    let walletProvider;
+    if (selectedWallet) {
+      const wallet = availableWallets.find(w => w.type === selectedWallet);
+      walletProvider = wallet?.provider;
+    }
+    
+    // Fall back to window.ethereum if no specific wallet selected
+    if (!walletProvider && !window.ethereum) {
+      throw new Error('Ethereum provider not available');
+    }
+    
+    const provider = walletProvider || window.ethereum;
     
     try {
-      await window.ethereum.request({
+      await provider.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: `0x${chainId.toString(16)}` }]
       });
       
-      // Reconnect after network switch
-      await get().connectWallet();
+      // Reconnect after network switch, preserving the selected wallet
+      await get().connectWallet(selectedWallet || undefined);
     } catch (error: any) {
       if (error.code === 4902) {
         // Network not added to wallet, could add it here
@@ -397,9 +411,21 @@ export const useWallet = create<WalletState>((set, get) => ({
   },
 
   switchToTestnet: async (): Promise<void> => {
-    if (!window.ethereum) {
-      throw new Error('MetaMask not found');
+    const { selectedWallet, availableWallets } = get();
+    
+    // Get the provider for the selected wallet
+    let walletProvider;
+    if (selectedWallet) {
+      const wallet = availableWallets.find(w => w.type === selectedWallet);
+      walletProvider = wallet?.provider;
     }
+    
+    // Fall back to window.ethereum if no specific wallet selected
+    if (!walletProvider && !window.ethereum) {
+      throw new Error('Wallet not found');
+    }
+    
+    const provider = walletProvider || window.ethereum;
     
     // Try to switch to Sepolia first (most common testnet)
     try {
@@ -408,7 +434,7 @@ export const useWallet = create<WalletState>((set, get) => ({
       if (error.code === 4902) {
         // Network not added, try to add Sepolia
         try {
-          await window.ethereum.request({
+          await provider.request({
             method: 'wallet_addEthereumChain',
             params: [{
               chainId: '0xaa36a7', // 11155111 in hex
