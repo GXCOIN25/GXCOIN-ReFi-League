@@ -11,6 +11,13 @@ import { Octokit } from '@octokit/rest';
 import Stripe from 'stripe';
 import { getUncachableOutlookClient } from './outlook';
 import { eq, and, lte, gte, desc, count, sql } from "drizzle-orm";
+import { analyticsService } from './services/analytics';
+import { 
+  analyticsEventInputSchema, 
+  analyticsBatchEventInputSchema, 
+  analyticsQueryParamsSchema,
+  AnalyticsEventInput 
+} from '@shared/types';
 
 interface AuthRequest extends Request {
   userId?: number;
@@ -96,6 +103,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     windowMs: 15 * 60 * 1000, // 15 minutes
     delayAfter: 2, // Allow 2 requests at full speed
     delayMs: () => 500 // Add 500ms delay per request after
+  });
+
+  // Analytics rate limiting - 100 requests per minute per IP
+  const analyticsRateLimit = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 100, // 100 requests per minute per IP
+    message: { error: 'Too many analytics requests. Please slow down.' },
+    standardHeaders: true,
+    legacyHeaders: false,
   });
   
   // Health check endpoint for production monitoring
@@ -2123,6 +2139,125 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error('Error tracking referral:', error);
       res.status(500).json({ error: "Failed to track referral" });
+    }
+  });
+
+  // Analytics Ingestion Service Endpoints
+  
+  // POST /api/analytics/events - Ingest single event
+  app.post('/api/analytics/events', analyticsRateLimit, async (req: AuthRequest, res: Response) => {
+    try {
+      const eventInput = analyticsEventInputSchema.parse(req.body);
+      
+      const ipAddress = req.ip || req.socket.remoteAddress;
+      const userAgent = req.headers['user-agent'];
+      
+      await analyticsService.ingestEvent(eventInput, ipAddress, userAgent);
+      
+      res.status(202).json({ 
+        success: true, 
+        message: 'Event queued for processing' 
+      });
+    } catch (error: any) {
+      console.error('Analytics event ingestion error:', error);
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: 'Invalid event data', 
+          details: error.errors 
+        });
+      }
+      
+      res.status(500).json({ 
+        error: 'Failed to ingest analytics event',
+        message: error.message 
+      });
+    }
+  });
+
+  // POST /api/analytics/events/batch - Ingest multiple events
+  app.post('/api/analytics/events/batch', analyticsRateLimit, async (req: AuthRequest, res: Response) => {
+    try {
+      const batchInput = analyticsBatchEventInputSchema.parse(req.body);
+      
+      const ipAddress = req.ip || req.socket.remoteAddress;
+      const userAgent = req.headers['user-agent'];
+      
+      await analyticsService.ingestBatch(batchInput.events, ipAddress, userAgent);
+      
+      res.status(202).json({ 
+        success: true, 
+        message: `${batchInput.events.length} events queued for processing` 
+      });
+    } catch (error: any) {
+      console.error('Analytics batch ingestion error:', error);
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: 'Invalid batch data', 
+          details: error.errors 
+        });
+      }
+      
+      if (error.message.includes('exceed')) {
+        return res.status(400).json({ 
+          error: error.message 
+        });
+      }
+      
+      res.status(500).json({ 
+        error: 'Failed to ingest analytics batch',
+        message: error.message 
+      });
+    }
+  });
+
+  // GET /api/analytics/events - Query events with filters
+  app.get('/api/analytics/events', analyticsRateLimit, async (req: AuthRequest, res: Response) => {
+    try {
+      const queryParams = analyticsQueryParamsSchema.parse({
+        userId: req.query.userId ? parseInt(req.query.userId as string) : undefined,
+        eventType: req.query.eventType as string | undefined,
+        sessionId: req.query.sessionId as string | undefined,
+        startDate: req.query.startDate as string | undefined,
+        endDate: req.query.endDate as string | undefined,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
+        offset: req.query.offset ? parseInt(req.query.offset as string) : undefined,
+      });
+      
+      const events = await analyticsService.queryEvents(queryParams);
+      const totalCount = await analyticsService.getEventCount({
+        userId: queryParams.userId,
+        eventType: queryParams.eventType,
+        sessionId: queryParams.sessionId,
+        startDate: queryParams.startDate,
+        endDate: queryParams.endDate,
+      });
+      
+      res.json({
+        success: true,
+        events,
+        pagination: {
+          total: totalCount,
+          limit: queryParams.limit,
+          offset: queryParams.offset,
+          hasMore: (queryParams.offset || 0) + (queryParams.limit || 100) < totalCount,
+        },
+      });
+    } catch (error: any) {
+      console.error('Analytics query error:', error);
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: 'Invalid query parameters', 
+          details: error.errors 
+        });
+      }
+      
+      res.status(500).json({ 
+        error: 'Failed to query analytics events',
+        message: error.message 
+      });
     }
   });
 
