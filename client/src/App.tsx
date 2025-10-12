@@ -27,6 +27,8 @@ import LandingPage from "@/components/LandingPage";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import AirdropCampaignHub from "@/components/AirdropCampaignHub";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
+import BattlePassDashboard from "@/components/BattlePassDashboard";
+import { Toaster } from "@/components/ui/sonner";
 import { useWallet } from "@/lib/stores/useWallet";
 import { 
   Volume2, 
@@ -44,7 +46,8 @@ import {
   BookOpen,
   CreditCard,
   Gift,
-  BarChart3
+  BarChart3,
+  Award
 } from "lucide-react";
 import "@fontsource/inter";
 
@@ -374,6 +377,10 @@ function MainExperience() {
                   <BarChart3 className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="text-xs sm:text-sm md:text-base">Analytics</span>
                 </TabsTrigger>
+                <TabsTrigger value="battlepass" className="mobile-tab-trigger text-xs sm:text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap bg-gradient-to-r from-purple-600/20 to-yellow-600/20 hover:from-purple-600/30 hover:to-yellow-600/30" style={{ minWidth: '44px', minHeight: '44px' }}>
+                  <Award className="w-4 h-4 md:w-5 md:h-5" />
+                  <span className="text-xs sm:text-sm md:text-base">Battle Pass</span>
+                </TabsTrigger>
                 <TabsTrigger 
                   value="cryptoguide" 
                   className="mobile-tab-trigger text-xs sm:text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap bg-purple-600/20 hover:bg-purple-600/30" 
@@ -657,6 +664,10 @@ function MainExperience() {
               <TabsContent value="analytics" className="mt-0">
                 <AnalyticsDashboard />
               </TabsContent>
+
+              <TabsContent value="battlepass" className="mt-0">
+                <BattlePassDashboard />
+              </TabsContent>
             </div>
           </Tabs>
         </div>
@@ -730,6 +741,9 @@ function App() {
       
       {/* PWA Install Prompt - Available across all screens */}
       <PWAInstallPrompt />
+      
+      {/* Toast notifications */}
+      <Toaster />
     </div>
   );
 }
