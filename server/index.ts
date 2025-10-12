@@ -186,6 +186,11 @@ app.use((req, res, next) => {
     console.log('💰 Initializing token prices...');
     await storage.seedTokens();
     console.log('✅ Token prices initialized');
+    
+    // Initialize Battle Pass season
+    console.log('🎮 Initializing Battle Pass...');
+    await storage.seedBattlePass();
+    console.log('✅ Battle Pass initialized');
   } else {
     console.log('⚠️  Skipping patent registry initialization - database not available');
   }

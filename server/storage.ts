@@ -1,6 +1,6 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { users, contributions, nftBadges, missions, patents, economicRewards, userPatentAccess, environmentalBattles, userEconomicStats, githubOAuthStates, tokens, purchaseHistory,
+import { users, contributions, nftBadges, missions, patents, economicRewards, userPatentAccess, environmentalBattles, userEconomicStats, githubOAuthStates, tokens, purchaseHistory, battlePassSeasons,
          type User, type InsertUser, 
          type Contribution, type InsertContribution,
          type NftBadge, type InsertNftBadge,
@@ -185,6 +185,9 @@ export interface IStorage {
     balance: number;
     value: number;
   }>>;
+  
+  // Battle Pass methods
+  seedBattlePass(): Promise<void>;
   
   // Purchase History methods (Stripe)
   createPurchase(purchase: InsertPurchaseHistory): Promise<PurchaseHistory>;
@@ -958,6 +961,70 @@ export class PostgresStorage implements IStorage {
       balance,
       value: balance * (priceMap[symbol] || 0),
     }));
+  }
+
+  // Battle Pass methods
+  async seedBattlePass(): Promise<void> {
+    try {
+      // Check if a season already exists
+      const existingSeasons = await db.select().from(battlePassSeasons);
+      
+      if (existingSeasons.length > 0) {
+        console.log(`🎮 Found ${existingSeasons.length} existing Battle Pass season(s). Skipping seed.`);
+        return;
+      }
+
+      // Create Season 1 that runs for 90 days from now
+      const now = new Date();
+      const endDate = new Date(now);
+      endDate.setDate(endDate.getDate() + 90); // 90 days from now
+
+      // Define free tier rewards (every 5 levels)
+      const freeTierRewards = [
+        { level: 5, type: 'tokens' as const, amount: 100, description: '100 GXCOIN Tokens' },
+        { level: 10, type: 'badge' as const, amount: 1, description: 'Bronze Warrior Badge' },
+        { level: 15, type: 'tokens' as const, amount: 200, description: '200 GXCOIN Tokens' },
+        { level: 20, type: 'badge' as const, amount: 1, description: 'Silver Warrior Badge' },
+        { level: 25, type: 'tokens' as const, amount: 500, description: '500 GXCOIN Tokens' },
+        { level: 30, type: 'badge' as const, amount: 1, description: 'Gold Warrior Badge' },
+        { level: 35, type: 'tokens' as const, amount: 750, description: '750 GXCOIN Tokens' },
+        { level: 40, type: 'badge' as const, amount: 1, description: 'Platinum Warrior Badge' },
+        { level: 45, type: 'tokens' as const, amount: 1000, description: '1000 GXCOIN Tokens' },
+        { level: 50, type: 'nft' as const, amount: 1, description: 'Epic Hero NFT' }
+      ];
+
+      // Define premium tier rewards (every level)
+      const premiumTierRewards = [
+        { level: 1, type: 'tokens' as const, amount: 50, description: '50 Bonus GXCOIN' },
+        { level: 3, type: 'cosmetic' as const, amount: 1, description: 'Rare Emote' },
+        { level: 5, type: 'tokens' as const, amount: 150, description: '150 Bonus GXCOIN' },
+        { level: 7, type: 'cosmetic' as const, amount: 1, description: 'Epic Skin' },
+        { level: 10, type: 'nft' as const, amount: 1, description: 'Premium Hero NFT' },
+        { level: 15, type: 'tokens' as const, amount: 300, description: '300 Bonus GXCOIN' },
+        { level: 20, type: 'nft' as const, amount: 1, description: 'Legendary Hero NFT' },
+        { level: 25, type: 'tokens' as const, amount: 750, description: '750 Bonus GXCOIN' },
+        { level: 30, type: 'cosmetic' as const, amount: 1, description: 'Mythic Effect' },
+        { level: 35, type: 'tokens' as const, amount: 1000, description: '1000 Bonus GXCOIN' },
+        { level: 40, type: 'nft' as const, amount: 1, description: 'Ultra Rare Hero NFT' },
+        { level: 45, type: 'tokens' as const, amount: 1500, description: '1500 Bonus GXCOIN' },
+        { level: 50, type: 'nft' as const, amount: 1, description: 'Exclusive Founder Hero NFT' }
+      ];
+
+      await db.insert(battlePassSeasons).values({
+        name: 'Eco Warriors Season 1',
+        seasonNumber: 1,
+        startDate: now,
+        endDate: endDate,
+        freeTierRewardsJson: JSON.stringify(freeTierRewards),
+        premiumTierRewardsJson: JSON.stringify(premiumTierRewards),
+        isActive: true
+      });
+
+      console.log(`✅ Successfully created Battle Pass Season 1 (runs until ${endDate.toLocaleDateString()})!`);
+    } catch (error) {
+      console.error('❌ Error seeding Battle Pass:', error);
+      throw error;
+    }
   }
 
   // Purchase History methods (Stripe)
