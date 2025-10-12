@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage, db } from "./storage";
-import { insertUserSchema, insertContributionSchema, insertNftBadgeSchema, airdropCampaigns, airdropClaims, referrals, insertAirdropCampaignSchema, insertAirdropClaimSchema, insertReferralSchema } from "@shared/schema";
+import { insertUserSchema, insertContributionSchema, insertNftBadgeSchema, users, airdropCampaigns, airdropClaims, referrals, insertAirdropCampaignSchema, insertAirdropClaimSchema, insertReferralSchema } from "@shared/schema";
 import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import slowDown from "express-slow-down";
@@ -1955,11 +1955,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // POST /api/airdrops/claim - Claim airdrop tokens
   app.post("/api/airdrops/claim", authenticate, async (req: AuthRequest, res) => {
     try {
-      const { campaignId, walletAddress } = req.body;
+      const { campaignId } = req.body;
 
-      if (!campaignId || !walletAddress) {
-        return res.status(400).json({ error: "Campaign ID and wallet address are required" });
+      if (!campaignId) {
+        return res.status(400).json({ error: "Campaign ID is required" });
       }
+
+      // Get user's wallet address from their profile
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, req.userId!));
+
+      if (!user || !user.walletAddress) {
+        return res.status(400).json({ error: "User wallet address not found" });
+      }
+
+      const walletAddress = user.walletAddress;
 
       const [campaign] = await db
         .select()
