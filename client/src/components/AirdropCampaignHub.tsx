@@ -8,11 +8,14 @@ import { Separator } from "@/components/ui/separator";
 import { 
   Trophy, Gift, Users, Clock, Copy, Share2, 
   CheckCircle2, AlertCircle, Sparkles, Award,
-  TrendingUp, Zap, Crown, Star
+  TrendingUp, Zap, Crown, Star, Wallet, Target,
+  Coins, Rocket, Shield, DollarSign, UserPlus,
+  ArrowRight, ChevronRight
 } from "lucide-react";
 import Confetti from "react-confetti";
 import { toast } from "sonner";
 import { useWallet } from "@/lib/stores/useWallet";
+import { useUser } from "@/lib/stores/useUser";
 
 // Hero-specific color themes matching TokenBadge
 const HERO_THEMES = {
@@ -150,7 +153,8 @@ const CampaignCard: React.FC<{
   eligibility: EligibilityStatus | null;
   onClaim: (campaignId: number) => void;
   claiming: boolean;
-}> = ({ campaign, eligibility, onClaim, claiming }) => {
+  isLoggedIn: boolean;
+}> = ({ campaign, eligibility, onClaim, claiming, isLoggedIn }) => {
   const theme = HERO_THEMES[campaign.heroId as keyof typeof HERO_THEMES] || HERO_THEMES.gxcoin_anchor;
   const progressPercentage = (campaign.claimedAmount / campaign.totalAllocation) * 100;
   const remainingAllocation = campaign.totalAllocation - campaign.claimedAmount;
@@ -271,7 +275,12 @@ const CampaignCard: React.FC<{
 
           {/* Eligibility Status */}
           <div className="space-y-2">
-            {eligibility === null ? (
+            {!isLoggedIn ? (
+              <div className="flex items-center gap-2 text-yellow-400">
+                <AlertCircle className="h-5 w-5" />
+                <span className="text-sm">Login to check eligibility</span>
+              </div>
+            ) : eligibility === null ? (
               <div className="flex items-center gap-2 text-gray-400">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-400" />
                 <span className="text-sm">Checking eligibility...</span>
@@ -299,12 +308,14 @@ const CampaignCard: React.FC<{
             className="w-full font-semibold"
             style={{ 
               backgroundColor: theme.primary,
-              opacity: eligibility?.eligible && !eligibility?.alreadyClaimed ? 1 : 0.5
+              opacity: eligibility?.eligible && !eligibility?.alreadyClaimed && isLoggedIn ? 1 : 0.5
             }}
-            disabled={!eligibility?.eligible || eligibility?.alreadyClaimed || claiming || !campaign.isActive}
+            disabled={!isLoggedIn || !eligibility?.eligible || eligibility?.alreadyClaimed || claiming || !campaign.isActive}
             onClick={() => onClaim(campaign.id)}
           >
-            {claiming ? (
+            {!isLoggedIn ? (
+              'Login to Claim'
+            ) : claiming ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                 Claiming...
@@ -329,6 +340,7 @@ const CampaignCard: React.FC<{
 // Main Component
 export default function AirdropCampaignHub() {
   const { isConnected } = useWallet();
+  const { isLoggedIn } = useUser();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [eligibilityMap, setEligibilityMap] = useState<Map<number, EligibilityStatus>>(new Map());
   const [loading, setLoading] = useState(true);
@@ -343,14 +355,14 @@ export default function AirdropCampaignHub() {
     fetchCampaigns();
   }, []);
 
-  // Fetch eligibility for each campaign when user is connected
+  // Fetch eligibility for each campaign when user is logged in
   useEffect(() => {
-    if (isConnected && campaigns.length > 0) {
+    if (isLoggedIn && campaigns.length > 0) {
       campaigns.forEach(campaign => {
         checkEligibility(campaign.id);
       });
     }
-  }, [isConnected, campaigns.length]);
+  }, [isLoggedIn, campaigns.length]);
 
   // Fetch referral stats when connected
   useEffect(() => {
@@ -558,6 +570,191 @@ export default function AirdropCampaignHub() {
         </p>
       </motion.div>
 
+      {/* Epic Demo Section - How It Works */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="max-w-7xl mx-auto mb-16"
+      >
+        <Card className="bg-gradient-to-br from-purple-900/30 via-pink-900/20 to-purple-900/30 border-2 border-purple-500/30 backdrop-blur-sm overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+          <CardHeader className="relative">
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <Rocket className="h-8 w-8 text-purple-400" />
+              <CardTitle className="text-3xl font-bold text-transparent bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text">
+                How GXCOIN Airdrops Work
+              </CardTitle>
+            </div>
+            <CardDescription className="text-center text-gray-300 text-lg">
+              Get rewarded for taking environmental action - it's simple, profitable, and planet-saving!
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="relative">
+            {/* Step-by-Step Guide */}
+            <div className="grid md:grid-cols-4 gap-6 mb-8">
+              {[
+                {
+                  icon: <Wallet className="h-8 w-8" />,
+                  title: "1. Connect Wallet",
+                  desc: "Link your Web3 wallet to participate in campaigns",
+                  color: "from-blue-500 to-cyan-500"
+                },
+                {
+                  icon: <Target className="h-8 w-8" />,
+                  title: "2. Complete Actions",
+                  desc: "Contribute to environmental causes and earn eligibility",
+                  color: "from-green-500 to-emerald-500"
+                },
+                {
+                  icon: <Coins className="h-8 w-8" />,
+                  title: "3. Claim Tokens",
+                  desc: "Receive hero tokens directly to your wallet",
+                  color: "from-yellow-500 to-orange-500"
+                },
+                {
+                  icon: <UserPlus className="h-8 w-8" />,
+                  title: "4. Refer & Earn",
+                  desc: "Invite friends and unlock massive bonuses",
+                  color: "from-purple-500 to-pink-500"
+                }
+              ].map((step, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + index * 0.1 }}
+                  className="relative group"
+                >
+                  <Card className="h-full bg-black/40 border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+                    <CardContent className="pt-6 text-center">
+                      <div className={`inline-flex p-3 rounded-xl bg-gradient-to-br ${step.color} bg-opacity-20 mb-3`}>
+                        <div className="text-white">{step.icon}</div>
+                      </div>
+                      <h3 className="text-white font-bold mb-2">{step.title}</h3>
+                      <p className="text-gray-400 text-sm">{step.desc}</p>
+                      {index < 3 && (
+                        <ChevronRight className="hidden md:block absolute -right-4 top-1/2 -translate-y-1/2 h-8 w-8 text-purple-500" />
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            <Separator className="bg-purple-500/20 my-8" />
+
+            {/* Benefits & Features Grid */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Benefits Column */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <Trophy className="h-6 w-6 text-yellow-400" />
+                  <h3 className="text-xl font-bold text-white">Premium Benefits</h3>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { icon: <DollarSign className="h-5 w-5 text-green-400" />, text: "Free token airdrops worth up to $10,000" },
+                    { icon: <Shield className="h-5 w-5 text-blue-400" />, text: "Early access to exclusive hero NFT drops" },
+                    { icon: <TrendingUp className="h-5 w-5 text-purple-400" />, text: "Governance rights in GXCOIN DAO" },
+                    { icon: <Zap className="h-5 w-5 text-yellow-400" />, text: "Priority support & VIP community access" }
+                  ].map((benefit, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.6 + index * 0.1 }}
+                      className="flex items-start gap-3 p-3 bg-white/5 rounded-lg hover:bg-white/10 transition-all"
+                    >
+                      {benefit.icon}
+                      <span className="text-gray-300">{benefit.text}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Referral Commission Structure */}
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  <Users className="h-6 w-6 text-pink-400" />
+                  <h3 className="text-xl font-bold text-white">Referral Commissions</h3>
+                </div>
+                <div className="space-y-3">
+                  {[
+                    { tier: "Bronze", refs: "1-4 Referrals", bonus: "+5% Bonus Tokens", color: "from-orange-600 to-amber-600", icon: <Award className="h-5 w-5" /> },
+                    { tier: "Silver", refs: "5-9 Referrals", bonus: "+15% Bonus Tokens", color: "from-gray-400 to-gray-500", icon: <Star className="h-5 w-5" /> },
+                    { tier: "Gold", refs: "10+ Referrals", bonus: "+30% Bonus Tokens", color: "from-yellow-400 to-yellow-600", icon: <Crown className="h-5 w-5" /> }
+                  ].map((tier, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.6 + index * 0.1 }}
+                      className={`p-4 rounded-lg bg-gradient-to-r ${tier.color} bg-opacity-20 border border-white/10 hover:border-white/30 transition-all`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="text-white">{tier.icon}</div>
+                          <div>
+                            <div className="text-white font-bold">{tier.tier} Tier</div>
+                            <div className="text-gray-300 text-sm">{tier.refs}</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`text-transparent bg-gradient-to-r ${tier.color} bg-clip-text font-bold text-lg`}>
+                            {tier.bonus}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Special Bonuses Banner */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="mt-8 p-6 rounded-xl bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-purple-600/20 border-2 border-purple-500/50"
+            >
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full">
+                    <Sparkles className="h-8 w-8 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="text-white font-bold text-lg">🎁 Limited Time Bonus!</h4>
+                    <p className="text-gray-300">First 1,000 claimers get 2X tokens + exclusive NFT badge</p>
+                  </div>
+                </div>
+                <Button 
+                  size="lg"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold"
+                  onClick={() => {
+                    const firstCampaign = campaigns[0];
+                    if (firstCampaign) {
+                      document.getElementById(`campaign-${firstCampaign.id}`)?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                >
+                  Claim Now <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+            </motion.div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
       {/* Campaign Cards Grid */}
       <div className="max-w-7xl mx-auto space-y-12">
         {Object.entries(groupedCampaigns).map(([heroId, heroCampaigns]) => {
@@ -597,6 +794,7 @@ export default function AirdropCampaignHub() {
                     eligibility={eligibilityMap.get(campaign.id) || null}
                     onClaim={handleClaim}
                     claiming={claiming}
+                    isLoggedIn={isLoggedIn}
                   />
                 ))}
               </div>
