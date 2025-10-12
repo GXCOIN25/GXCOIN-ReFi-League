@@ -665,7 +665,10 @@ function MainExperience() {
               </TabsContent>
 
               <TabsContent value="airdrops" className="mt-0">
-                <AirdropCampaignHub onOpenLogin={() => setShowLoginModal(true)} />
+                <AirdropCampaignHub 
+                  onOpenLogin={() => setShowLoginModal(true)}
+                  onSwitchToTab={(tab) => setCurrentTab(tab)}
+                />
               </TabsContent>
 
               <TabsContent value="analytics" className="mt-0">
