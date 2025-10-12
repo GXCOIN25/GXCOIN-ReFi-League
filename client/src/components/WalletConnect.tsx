@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useWallet } from '../lib/stores/useWallet';
+import { useWallet, type WalletType } from '../lib/stores/useWallet';
 import { Wallet, Copy, ExternalLink, RefreshCw, AlertTriangle, CheckCircle, Globe, HelpCircle } from 'lucide-react';
 
 interface WalletConnectProps {
@@ -14,6 +14,7 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({ onOpenOnboarding }
     isConnecting,
     error,
     chainId,
+    availableWallets,
     connectWallet,
     disconnectWallet,
     switchToTestnet,
@@ -22,15 +23,15 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({ onOpenOnboarding }
     setError
   } = useWallet();
   
-  console.log('WalletConnect render:', { isConnected, address, balance, isConnecting, error, chainId });
+  console.log('WalletConnect render:', { isConnected, address, balance, isConnecting, error, chainId, availableWallets });
   
   const [copySuccess, setCopySuccess] = useState(false);
   const [showNetworkHelper, setShowNetworkHelper] = useState(false);
 
-  const handleConnect = async () => {
+  const handleConnect = async (walletType?: WalletType) => {
     setError(null);
     try {
-      await connectWallet();
+      await connectWallet(walletType);
     } catch (err) {
       console.error('Wallet connection error:', err);
       setError(err instanceof Error ? err.message : 'Failed to connect wallet');
@@ -214,6 +215,54 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({ onOpenOnboarding }
     );
   }
 
+  // Show wallet selection if multiple wallets detected
+  if (error === 'multiple_wallets_available' && availableWallets.length > 1) {
+    return (
+      <div className="bg-black/80 backdrop-blur-sm rounded-xl border border-purple-500/30 p-4 max-w-sm">
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Wallet className="w-8 h-8 text-white" />
+          </div>
+          <h3 className="text-white font-bold mb-2">Choose Your Wallet</h3>
+          <p className="text-gray-400 text-sm">Multiple wallets detected. Select one to connect:</p>
+        </div>
+
+        <div className="space-y-3">
+          {availableWallets.map((wallet) => (
+            <button
+              key={wallet.type}
+              onClick={() => handleConnect(wallet.type)}
+              disabled={isConnecting}
+              className="w-full py-4 px-4 bg-gradient-to-r from-purple-600/20 to-blue-600/20 hover:from-purple-600/40 hover:to-blue-600/40 border border-purple-500/30 hover:border-purple-500/60 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-200 flex items-center justify-between group"
+            >
+              <div className="flex items-center space-x-3">
+                {wallet.type === 'metamask' && (
+                  <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">
+                    <span className="text-2xl">🦊</span>
+                  </div>
+                )}
+                {wallet.type === 'coinbase' && (
+                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                    <span className="text-2xl">🔵</span>
+                  </div>
+                )}
+                <span className="font-bold">{wallet.name}</span>
+              </div>
+              <ExternalLink className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={() => setError(null)}
+          className="w-full mt-4 py-2 px-4 bg-gray-700/50 hover:bg-gray-700 text-gray-300 rounded-lg transition-all duration-200 text-sm"
+        >
+          Cancel
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-black/80 backdrop-blur-sm rounded-xl border border-purple-500/30 p-4 max-w-sm">
       <div className="text-center mb-6">
@@ -237,7 +286,7 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({ onOpenOnboarding }
         </div>
       </div>
       
-      {error && (
+      {error && error !== 'multiple_wallets_available' && (
         <div className="bg-red-500/20 border border-red-500/50 text-red-300 p-3 rounded-lg mb-4 text-sm">
           {error}
         </div>
@@ -245,7 +294,7 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({ onOpenOnboarding }
       
       <div className="space-y-3">
         <button
-          onClick={handleConnect}
+          onClick={() => handleConnect()}
           disabled={isConnecting}
           className="w-full py-3 px-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-200 font-bold"
         >
