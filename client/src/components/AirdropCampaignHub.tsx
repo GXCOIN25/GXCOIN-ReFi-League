@@ -349,6 +349,7 @@ export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () =
   const [referralStats, setReferralStats] = useState<ReferralStats | null>(null);
   const [referralLink, setReferralLink] = useState<string>('');
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [showNextSteps, setShowNextSteps] = useState(false);
 
   // Fetch campaigns on mount
   useEffect(() => {
@@ -441,13 +442,25 @@ export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () =
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 5000);
       
-      toast.success(`Successfully claimed ${data.amount} tokens!`, {
-        description: `Transaction: ${data.transactionHash || 'Pending'}`
+      // Show next steps guide
+      setShowNextSteps(true);
+      
+      toast.success(`🎉 Success! You claimed ${data.amount} tokens!`, {
+        description: `Next: Generate your referral link to earn bonus tokens!`,
+        duration: 8000
       });
 
       // Refresh campaign data
       await fetchCampaigns();
       await checkEligibility(campaignId);
+
+      // After first claim, scroll to next steps section
+      setTimeout(() => {
+        const nextStepsSection = document.getElementById('next-steps-section');
+        if (nextStepsSection) {
+          nextStepsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 1000);
     } catch (error) {
       console.error('Error claiming tokens:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to claim tokens');
@@ -818,15 +831,118 @@ export default function AirdropCampaignHub({ onOpenLogin }: { onOpenLogin?: () =
         )}
       </div>
 
-      {/* Referral Section */}
-      {isConnected && (
+      {/* Next Steps Guide - Shows after first claim */}
+      {showNextSteps && isLoggedIn && (
         <motion.div
+          id="next-steps-section"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-4xl mx-auto my-12"
+        >
+          <Card className="border-4 border-green-500/50 bg-gradient-to-br from-green-900/30 to-emerald-900/30 shadow-2xl">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full animate-pulse">
+                    <Sparkles className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-white text-2xl">🎉 Claim Successful! What's Next?</CardTitle>
+                    <CardDescription className="text-gray-300">
+                      Maximize your earnings with these next steps
+                    </CardDescription>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-gray-400 hover:text-white"
+                  onClick={() => setShowNextSteps(false)}
+                >
+                  ×
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Step 1: Generate Referral Link */}
+                <Card className="bg-purple-900/30 border-purple-500/50 hover:border-purple-500 transition-all cursor-pointer" onClick={() => {
+                  setShowNextSteps(false);
+                  setTimeout(() => {
+                    const referralSection = document.getElementById('referral-section');
+                    if (referralSection) {
+                      referralSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                  }, 100);
+                }}>
+                  <CardContent className="pt-6">
+                    <div className="text-center space-y-3">
+                      <div className="mx-auto w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                        <Users className="h-6 w-6 text-white" />
+                      </div>
+                      <h3 className="text-white font-bold">1. Share & Earn</h3>
+                      <p className="text-gray-300 text-sm">Generate your referral link to earn up to 30% bonus!</p>
+                      <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600">
+                        Generate Link <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Step 2: Claim More Campaigns */}
+                <Card className="bg-blue-900/30 border-blue-500/50 hover:border-blue-500 transition-all cursor-pointer" onClick={() => {
+                  setShowNextSteps(false);
+                  window.scrollTo({ top: 900, behavior: 'smooth' });
+                }}>
+                  <CardContent className="pt-6">
+                    <div className="text-center space-y-3">
+                      <div className="mx-auto w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
+                        <Gift className="h-6 w-6 text-white" />
+                      </div>
+                      <h3 className="text-white font-bold">2. Claim More</h3>
+                      <p className="text-gray-300 text-sm">Explore other campaigns and claim more free tokens!</p>
+                      <Button className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600">
+                        View Campaigns <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Step 3: Upgrade to Battle Pass */}
+                <Card className="bg-amber-900/30 border-amber-500/50 hover:border-amber-500 transition-all cursor-pointer" onClick={() => {
+                  setShowNextSteps(false);
+                  window.location.href = '/?tab=battlepass';
+                }}>
+                  <CardContent className="pt-6">
+                    <div className="text-center space-y-3">
+                      <div className="mx-auto w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full flex items-center justify-center">
+                        <Crown className="h-6 w-6 text-white" />
+                      </div>
+                      <h3 className="text-white font-bold">3. Go Premium</h3>
+                      <p className="text-gray-300 text-sm">Unlock exclusive rewards with Battle Pass for $29.99!</p>
+                      <Button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600">
+                        Upgrade Now <ChevronRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
+      {/* Referral Section */}
+      {isLoggedIn && (
+        <motion.div
+          id="referral-section"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className="max-w-4xl mx-auto mt-16"
         >
-          <Card className="border-2 border-purple-500/30 bg-gradient-to-br from-purple-900/20 to-pink-900/20">
+          <Card className="border-2 border-purple-500/30 bg-gradient-to-br from-purple-900/20 to-pink-900/20 transition-all duration-300">
             <CardHeader>
               <div className="flex items-center gap-3">
                 <Users className="h-6 w-6 text-purple-400" />
