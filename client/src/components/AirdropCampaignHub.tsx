@@ -10,7 +10,8 @@ import {
   CheckCircle2, AlertCircle, Sparkles, Award,
   TrendingUp, Zap, Crown, Star, Wallet, Target,
   Coins, Rocket, Shield, DollarSign, UserPlus,
-  ArrowRight, ChevronRight, Gamepad2, Swords
+  ArrowRight, ChevronRight, Gamepad2, Swords,
+  CreditCard, Percent, Timer, ShoppingBag
 } from "lucide-react";
 import { FaFacebook, FaLinkedin, FaInstagram, FaTiktok } from "react-icons/fa";
 import Confetti from "react-confetti";
@@ -351,6 +352,35 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
   const [referralLink, setReferralLink] = useState<string>('');
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [showNextSteps, setShowNextSteps] = useState(false);
+  
+  // Countdown timer for 30-day offer (set end date to 30 days from now)
+  const [timeLeft, setTimeLeft] = useState({ days: 30, hours: 0, minutes: 0, seconds: 0 });
+  
+  // Calculate countdown timer
+  useEffect(() => {
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + 30); // 30 days from now
+    
+    const timer = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = endDate.getTime() - now;
+      
+      if (distance < 0) {
+        clearInterval(timer);
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+      
+      setTimeLeft({
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((distance % (1000 * 60)) / 1000)
+      });
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, []);
 
   // Fetch campaigns on mount
   useEffect(() => {
@@ -795,6 +825,171 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   Claim Now <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </div>
+            </motion.div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Limited Time Engagement Offers */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+        className="max-w-7xl mx-auto mb-16"
+      >
+        <Card className="border-4 border-yellow-500/50 bg-gradient-to-br from-yellow-900/30 via-orange-900/20 to-red-900/30 shadow-2xl overflow-hidden">
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+          
+          {/* Countdown Header */}
+          <CardHeader className="relative pb-6">
+            <div className="text-center space-y-4">
+              <motion.div
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="inline-block"
+              >
+                <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-lg px-6 py-2 border-none">
+                  🔥 LIMITED TIME OFFERS
+                </Badge>
+              </motion.div>
+              
+              <h2 className="text-4xl font-bold text-transparent bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text">
+                Exclusive Airdrop Member Benefits
+              </h2>
+              
+              {/* Countdown Timer */}
+              <div className="flex items-center justify-center gap-2 text-sm text-yellow-300">
+                <Timer className="h-5 w-5 animate-pulse" />
+                <span className="font-semibold">Offer Ends In:</span>
+              </div>
+              <div className="flex justify-center gap-4">
+                {[
+                  { value: timeLeft.days, label: 'Days' },
+                  { value: timeLeft.hours, label: 'Hours' },
+                  { value: timeLeft.minutes, label: 'Mins' },
+                  { value: timeLeft.seconds, label: 'Secs' }
+                ].map((unit, index) => (
+                  <div key={index} className="bg-black/40 rounded-lg p-3 min-w-[70px]">
+                    <div className="text-3xl font-bold text-white">{String(unit.value).padStart(2, '0')}</div>
+                    <div className="text-xs text-gray-400 uppercase">{unit.label}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardHeader>
+
+          <CardContent className="relative">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Offer 1: Visa Card */}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="bg-gradient-to-br from-blue-900/50 to-blue-800/30 rounded-xl p-6 border-2 border-blue-500/50 hover:border-blue-400 transition-all cursor-pointer"
+                onClick={() => {
+                  toast.info('Visa Card application coming soon!');
+                }}
+              >
+                <div className="text-center space-y-3">
+                  <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                    <CreditCard className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-white font-bold text-lg">GXCOIN Visa Card</h3>
+                  <p className="text-gray-300 text-sm">Apply now and get exclusive rewards on eco-friendly purchases</p>
+                  <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/50">Early Access</Badge>
+                </div>
+              </motion.div>
+
+              {/* Offer 2: Arena Missions */}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="bg-gradient-to-br from-purple-900/50 to-purple-800/30 rounded-xl p-6 border-2 border-purple-500/50 hover:border-purple-400 transition-all cursor-pointer"
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    onOpenLogin?.();
+                    return;
+                  }
+                  onSwitchToTab?.('arena');
+                }}
+              >
+                <div className="text-center space-y-3">
+                  <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
+                    <Gamepad2 className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-white font-bold text-lg">Arena Missions</h3>
+                  <p className="text-gray-300 text-sm">Complete missions, earn XP, and unlock exclusive dNFT rewards</p>
+                  <Badge className="bg-purple-500/20 text-purple-300 border-purple-500/50">Play Now</Badge>
+                </div>
+              </motion.div>
+
+              {/* Offer 3: Limited Edition Platinum Series */}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="bg-gradient-to-br from-gray-800/50 to-gray-700/30 rounded-xl p-6 border-2 border-gray-400/50 hover:border-gray-300 transition-all cursor-pointer"
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    onOpenLogin?.();
+                    return;
+                  }
+                  onSwitchToTab?.('nft');
+                }}
+              >
+                <div className="text-center space-y-3">
+                  <div className="mx-auto w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center">
+                    <Crown className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-white font-bold text-lg">Platinum Series</h3>
+                  <p className="text-gray-300 text-sm">Limited edition NFTs with exclusive discounts for airdrop members</p>
+                  <Badge className="bg-yellow-500/20 text-yellow-300 border-yellow-500/50">VIP Access</Badge>
+                </div>
+              </motion.div>
+
+              {/* Offer 4: 10% Off dNFTs */}
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="bg-gradient-to-br from-green-900/50 to-emerald-800/30 rounded-xl p-6 border-2 border-green-500/50 hover:border-green-400 transition-all cursor-pointer"
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    onOpenLogin?.();
+                    return;
+                  }
+                  onSwitchToTab?.('nft');
+                }}
+              >
+                <div className="text-center space-y-3">
+                  <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                    <Percent className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-white font-bold text-lg">10% OFF dNFTs</h3>
+                  <p className="text-gray-300 text-sm">Save on all dNFT purchases - exclusive discount for airdrop participants</p>
+                  <Badge className="bg-green-500/20 text-green-300 border-green-500/50">Save Now</Badge>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Bottom CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="mt-8 text-center"
+            >
+              <p className="text-yellow-200 text-lg font-semibold mb-4">
+                🎯 Claim your first airdrop to unlock ALL these exclusive benefits!
+              </p>
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 hover:from-yellow-600 hover:via-orange-600 hover:to-red-600 text-white font-bold text-lg px-10"
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    onOpenLogin?.();
+                    return;
+                  }
+                  window.scrollTo({ top: 1200, behavior: 'smooth' });
+                }}
+              >
+                <ShoppingBag className="mr-2 h-5 w-5" />
+                Claim Airdrop & Get Benefits
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
             </motion.div>
           </CardContent>
         </Card>
