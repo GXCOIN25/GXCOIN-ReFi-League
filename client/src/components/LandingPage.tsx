@@ -73,12 +73,20 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
   };
 
   const handleActivateAqua = async () => {
+    // Check if user is logged in first
+    if (!isLoggedIn) {
+      toast.info('Create Account First', {
+        description: 'You need to create an account before claiming airdrops!',
+        duration: 3000,
+      });
+      onOpenLogin?.();
+      return;
+    }
+    
+    // If logged in but not connected, try to connect wallet
     if (!isConnected) {
       try {
         await connectWallet();
-        if (!isLoggedIn) {
-          onOpenLogin?.();
-        }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to connect wallet';
         if (errorMessage.includes('install') || errorMessage.includes('No wallet')) {
@@ -102,8 +110,6 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
           });
         }
       }
-    } else if (!isLoggedIn) {
-      onOpenLogin?.();
     }
   };
 
@@ -648,8 +654,8 @@ export default function LandingPage({ onOpenLogin }: { onOpenLogin?: () => void 
                   size="lg"
                   className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 hover:from-purple-700 hover:via-pink-700 hover:to-purple-700 text-white font-bold text-base sm:text-lg py-6"
                 >
-                  <Wallet className="h-5 w-5 mr-2" />
-                  Connect Wallet & Claim Airdrops
+                  <Gift className="h-5 w-5 mr-2" />
+                  {isLoggedIn ? 'Connect Wallet & Claim Airdrops' : 'Create Account & Claim Free Tokens'}
                 </Button>
 
                 <p className="text-center text-purple-200/70 text-xs">
