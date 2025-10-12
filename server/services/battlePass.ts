@@ -329,6 +329,105 @@ export class BattlePassService {
     return updatedProgress;
   }
 
+  // Stripe purchase flow - records pending purchase for webhook confirmation
+  async purchasePremiumWithStripe(
+    userId: number, 
+    seasonId: number, 
+    stripeSessionId: string, 
+    amount: number
+  ): Promise<{ purchase: any; alreadyPremium: boolean }> {
+    const season = await this.getSeasonById(seasonId);
+    if (!season) {
+      throw new Error("Season not found");
+    }
+
+    if (!season.isActive) {
+      throw new Error("Season is not active");
+    }
+
+    let [progress] = await db
+      .select()
+      .from(battlePassProgress)
+      .where(
+        and(
+          eq(battlePassProgress.userId, userId),
+          eq(battlePassProgress.seasonId, seasonId)
+        )
+      )
+      .limit(1);
+
+    if (!progress) {
+      [progress] = await db.insert(battlePassProgress).values({
+        userId,
+        seasonId,
+        currentLevel: 1,
+        currentXp: 0,
+        isPremium: false,
+        premiumPurchasedAt: null,
+      }).returning();
+    }
+
+    // Check if already premium
+    if (progress.isPremium) {
+      return { purchase: null, alreadyPremium: true };
+    }
+
+    // Record pending purchase - will be confirmed by webhook
+    const [purchase] = await db.insert(battlePassPurchases).values({
+      userId,
+      seasonId,
+      amount: Math.round(amount * 100), // Store in cents
+      stripePaymentId: stripeSessionId, // Store session ID for now, will update with payment intent
+      purchasedAt: new Date(),
+    }).returning();
+
+    return { purchase, alreadyPremium: false };
+  }
+
+  // Complete premium purchase after webhook confirmation
+  async completePremiumPurchase(userId: number, seasonId: number, stripePaymentId: string): Promise<BattlePassProgress> {
+    let [progress] = await db
+      .select()
+      .from(battlePassProgress)
+      .where(
+        and(
+          eq(battlePassProgress.userId, userId),
+          eq(battlePassProgress.seasonId, seasonId)
+        )
+      )
+      .limit(1);
+
+    if (!progress) {
+      [progress] = await db.insert(battlePassProgress).values({
+        userId,
+        seasonId,
+        currentLevel: 1,
+        currentXp: 0,
+        isPremium: false,
+        premiumPurchasedAt: null,
+      }).returning();
+    }
+
+    if (progress.isPremium) {
+      console.log(`[Battle Pass] User ${userId} already has premium for season ${seasonId}`);
+      return progress;
+    }
+
+    const [updatedProgress] = await db
+      .update(battlePassProgress)
+      .set({
+        isPremium: true,
+        premiumPurchasedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(battlePassProgress.id, progress.id))
+      .returning();
+
+    console.log(`✅ Battle Pass Premium activated for user ${userId}, season ${seasonId}`);
+
+    return updatedProgress;
+  }
+
   async purchasePremium(userId: number, seasonId: number, stripePaymentId: string): Promise<BattlePassProgress> {
     const season = await this.getSeasonById(seasonId);
     if (!season) {

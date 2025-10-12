@@ -1278,61 +1278,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const session = event.data.object as Stripe.Checkout.Session;
           console.log('Checkout session completed:', session.id);
 
-          const purchase = await storage.getPurchaseBySessionId(session.id);
-          if (purchase) {
-            // Update purchase status
-            await storage.updatePurchaseStatus(
-              session.id,
-              'completed',
-              new Date(),
-              session.payment_intent as string
-            );
-
-            // Create NFT badge for dNFT purchases
-            if (purchase.type === 'dnft_purchase') {
-              const heroId = purchase.heroId || session.metadata?.heroId;
-              if (heroId) {
-                // Create NFT badge with atomic edition assignment
-                const seriesName = 'Platinum Limited Edition';
-                const totalEditions = 200000;
-                
-                const nftBadge = await storage.createNFTBadgeWithEdition(
-                  {
-                    userId: purchase.userId,
-                    heroId,
-                    level: 1,
-                    evolution: 'base',
-                    rarity: 'Platinum Limited Edition',
-                    attributes: {
-                      purchasedAt: new Date().toISOString(),
-                      paymentIntentId: session.payment_intent,
-                    },
-                    minted: false,
-                  },
-                  seriesName,
-                  totalEditions
+          // Check if this is a Battle Pass purchase
+          if (session.metadata?.type === 'battle_pass_premium') {
+            const userId = parseInt(session.metadata.userId);
+            const seasonId = parseInt(session.metadata.seasonId);
+            
+            if (!isNaN(userId) && !isNaN(seasonId)) {
+              try {
+                await battlePassService.completePremiumPurchase(
+                  userId,
+                  seasonId,
+                  session.payment_intent as string
                 );
-                
-                if (nftBadge === null) {
-                  // Series is SOLD OUT - return error to Stripe
-                  console.error(`🚨 PLATINUM SERIES SOLD OUT - Unable to fulfill purchase for user ${purchase.userId}`);
-                  console.error(`💰 Payment received but no NFT available - manual refund may be required`);
-                  console.error(`📧 Session ID: ${session.id}, Payment Intent: ${session.payment_intent}`);
-                  
-                  // Return error status to Stripe webhook
-                  return res.status(500).json({ 
-                    error: 'Platinum series sold out - unable to create NFT badge',
-                    sessionId: session.id,
-                    requiresRefund: true
-                  });
-                }
-                
-                console.log(`✅ Created Platinum NFT badge #${nftBadge.editionNumber}/${nftBadge.totalEditions} for user ${purchase.userId}, hero ${heroId}`);
+                console.log(`✅ Battle Pass Premium activated for user ${userId}, season ${seasonId}`);
+              } catch (error: any) {
+                console.error(`❌ Failed to activate Battle Pass Premium: ${error.message}`);
+                return res.status(500).json({ 
+                  error: 'Failed to activate Battle Pass Premium',
+                  sessionId: session.id,
+                  message: error.message
+                });
               }
-            } else if (purchase.type === 'crypto_onramp') {
-              // Handle crypto onramp completion
-              console.log(`✅ Crypto onramp completed for user ${purchase.userId}`);
-              // Additional logic for crypto delivery would go here
+            }
+          } else {
+            // Handle other purchase types
+            const purchase = await storage.getPurchaseBySessionId(session.id);
+            if (purchase) {
+              // Update purchase status
+              await storage.updatePurchaseStatus(
+                session.id,
+                'completed',
+                new Date(),
+                session.payment_intent as string
+              );
+
+              // Create NFT badge for dNFT purchases
+              if (purchase.type === 'dnft_purchase') {
+                const heroId = purchase.heroId || session.metadata?.heroId;
+                if (heroId) {
+                  // Create NFT badge with atomic edition assignment
+                  const seriesName = 'Platinum Limited Edition';
+                  const totalEditions = 200000;
+                  
+                  const nftBadge = await storage.createNFTBadgeWithEdition(
+                    {
+                      userId: purchase.userId,
+                      heroId,
+                      level: 1,
+                      evolution: 'base',
+                      rarity: 'Platinum Limited Edition',
+                      attributes: {
+                        purchasedAt: new Date().toISOString(),
+                        paymentIntentId: session.payment_intent,
+                      },
+                      minted: false,
+                    },
+                    seriesName,
+                    totalEditions
+                  );
+                  
+                  if (nftBadge === null) {
+                    // Series is SOLD OUT - return error to Stripe
+                    console.error(`🚨 PLATINUM SERIES SOLD OUT - Unable to fulfill purchase for user ${purchase.userId}`);
+                    console.error(`💰 Payment received but no NFT available - manual refund may be required`);
+                    console.error(`📧 Session ID: ${session.id}, Payment Intent: ${session.payment_intent}`);
+                    
+                    // Return error status to Stripe webhook
+                    return res.status(500).json({ 
+                      error: 'Platinum series sold out - unable to create NFT badge',
+                      sessionId: session.id,
+                      requiresRefund: true
+                    });
+                  }
+                  
+                  console.log(`✅ Created Platinum NFT badge #${nftBadge.editionNumber}/${nftBadge.totalEditions} for user ${purchase.userId}, hero ${heroId}`);
+                }
+              } else if (purchase.type === 'crypto_onramp') {
+                // Handle crypto onramp completion
+                console.log(`✅ Crypto onramp completed for user ${purchase.userId}`);
+                // Additional logic for crypto delivery would go here
+              }
             }
           }
           break;
@@ -2767,6 +2792,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(error.message === 'No active season' ? 404 : 400).json({ 
         error: error.message || 'Failed to grant XP',
         message: error.message 
+      });
+    }
+  });
+
+  // POST /api/battle-pass/purchase/stripe-checkout - Create Stripe checkout session for Battle Pass Premium
+  app.post('/api/battle-pass/purchase/stripe-checkout', authenticate, async (req: AuthRequest, res: Response) => {
+    try {
+      if (!stripe) {
+        return res.status(503).json({ error: "Stripe is not configured. Please contact support." });
+      }
+
+      if (!req.userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const { seasonId } = req.body;
+
+      // Get user details
+      const user = await storage.getUser(req.userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Get season (active season if not provided)
+      let targetSeason;
+      if (seasonId) {
+        targetSeason = await battlePassService.getSeasonById(seasonId);
+        if (!targetSeason) {
+          return res.status(404).json({ error: 'Season not found' });
+        }
+      } else {
+        targetSeason = await battlePassService.getActiveSeason();
+        if (!targetSeason) {
+          return res.status(404).json({ error: 'No active season available' });
+        }
+      }
+
+      if (!targetSeason.isActive) {
+        return res.status(400).json({ error: 'Season is not active' });
+      }
+
+      // Check if user already has premium for this season
+      const userProgress = await battlePassService.getUserProgress(req.userId, targetSeason.id);
+      if (userProgress?.progress.isPremium) {
+        return res.status(409).json({ error: 'You already have premium for this season' });
+      }
+
+      // Create or get Stripe customer
+      let customerId = user.stripeCustomerId;
+      if (!customerId) {
+        const customer = await stripe.customers.create({
+          email: user.email || undefined,
+          metadata: {
+            userId: user.id.toString(),
+            username: user.username,
+          },
+        });
+        customerId = customer.id;
+        await storage.updateUserStripeCustomerId(user.id, customerId);
+      }
+
+      // Battle Pass Premium price
+      const BATTLE_PASS_PRICE = 29.99;
+
+      // Create checkout session for Battle Pass Premium
+      const session = await stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: `GXCOIN Battle Pass - Premium - Season ${targetSeason.name}`,
+                description: `Unlock premium rewards for Battle Pass Season ${targetSeason.seasonNumber}`,
+              },
+              unit_amount: Math.round(BATTLE_PASS_PRICE * 100), // Convert to cents
+            },
+            quantity: 1,
+          },
+        ],
+        mode: 'payment',
+        success_url: `${process.env.APP_URL || 'http://localhost:5000'}/battle-pass/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${process.env.APP_URL || 'http://localhost:5000'}/battle-pass`,
+        metadata: {
+          userId: user.id.toString(),
+          seasonId: targetSeason.id.toString(),
+          type: 'battle_pass_premium',
+        },
+      });
+
+      // Record pending purchase
+      await battlePassService.purchasePremiumWithStripe(
+        user.id,
+        targetSeason.id,
+        session.id,
+        BATTLE_PASS_PRICE
+      );
+
+      console.log(`✅ Battle Pass checkout session created for user ${user.id}, season ${targetSeason.id}`);
+
+      res.json({
+        sessionId: session.id,
+        url: session.url,
+      });
+    } catch (error: any) {
+      console.error('Battle Pass checkout error:', error);
+      res.status(500).json({ 
+        error: error.message || "Failed to create checkout session" 
       });
     }
   });
