@@ -2085,9 +2085,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .where(eq(referrals.referrerId, req.userId!))
         .limit(1);
 
+      const protocol = req.protocol || 'https';
+      const host = req.get('host') || 'localhost:5000';
+      const baseUrl = process.env.APP_URL || `${protocol}://${host}`;
+      
+      console.log('🔗 Generating referral link:', {
+        protocol,
+        host,
+        baseUrl,
+        hasAppUrl: !!process.env.APP_URL
+      });
+
       if (existingReferral.length > 0) {
         const referralCode = existingReferral[0].referralCode;
-        const referralLink = `${process.env.APP_URL || 'http://localhost:5000'}/ref/${referralCode}`;
+        const referralLink = `${baseUrl}/ref/${referralCode}`;
+        
+        console.log('✅ Using existing referral:', { referralCode, referralLink });
         
         return res.json({
           referralCode,
@@ -2106,7 +2119,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bonusEarned: 0
       }).returning();
 
-      const referralLink = `${process.env.APP_URL || 'http://localhost:5000'}/ref/${referralCode}`;
+      const referralLink = `${baseUrl}/ref/${referralCode}`;
+      
+      console.log('✅ Generated new referral:', { referralCode, referralLink });
 
       res.json({
         referralCode: newReferral.referralCode,
@@ -2114,7 +2129,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Referral code generated successfully"
       });
     } catch (error: any) {
-      console.error('Error generating referral code:', error);
+      console.error('❌ Error generating referral code:', error);
       res.status(500).json({ error: "Failed to generate referral code" });
     }
   });
