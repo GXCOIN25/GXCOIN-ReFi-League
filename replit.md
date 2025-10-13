@@ -8,6 +8,24 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates
 
+### 🔗 Wallet Connection & Navigation Fixes (October 13, 2025)
+- **Fixed Coinbase/Wallet "Redirect to Login" Issue**:
+  * Problem: "Open in New Tab" button for wallet extensions redirected users to welcome screen instead of wallet page
+  * Solution: Added URL parameters (skipWelcome=true, tab=wallet) to preserve navigation context when opening in new browser tab
+  * App.tsx now reads URL parameters to skip welcome screen and open directly to requested tab
+  * URL cleanup after initialization for clean browser history
+- **Navigation Bar Scrolling Fix**:
+  * Removed `justify-center` constraint that prevented horizontal scrolling on mobile
+  * Added `!justify-start` override to TabsList for proper scroll behavior
+  * Mobile users can now swipe left/right to access all navigation tabs
+- **Production-Safe Navigation System**:
+  * Added multi-layer fallback navigation with custom event system
+  * Primary: onSwitchToTab callback, Fallback 1: Custom 'navigateToTab' event with listener in App.tsx
+  * Fallback 2: DOM manipulation, Fallback 3: User-friendly error message
+  * Ensures buttons (Visa Card, Arena, etc.) work in both preview and published environments
+- **Referral Link Generation**: Uses dynamic request domain (req.protocol + req.get('host')) instead of hardcoded localhost
+- **Improved Wallet Error Messages**: Clearer guidance for new users to install MetaMask or Coinbase Wallet
+
 ### 💳 Battle Pass Monetization System - Complete Implementation (October 12, 2025)
 - **Battle Pass Recurring Revenue System LIVE** - Full Stripe integration with $29.99 premium tier ($50K-$200K/month target)
 - **Critical Security Fixes Applied**:

@@ -165,8 +165,8 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
   );
 }
 
-function MainExperience() {
-  const [currentTab, setCurrentTab] = useState("home");
+function MainExperience({ initialTab = "home" }: { initialTab?: string }) {
+  const [currentTab, setCurrentTab] = useState(initialTab);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showNFTMinting, setShowNFTMinting] = useState<{ heroId: string; level: number } | null>(null);
   const [selectedHeroForPurchase, setSelectedHeroForPurchase] = useState<{ heroId: string; heroName: string; heroRarity: string; heroImage: string } | null>(null);
@@ -704,7 +704,13 @@ function MainExperience() {
 function App() {
   const { start } = useGame();
   const { initializeAuth, completeGitHubOAuth } = useUser();
-  const [showWelcome, setShowWelcome] = useState(true);
+  
+  // Check URL parameters for skipWelcome
+  const urlParams = new URLSearchParams(window.location.search);
+  const shouldSkipWelcome = urlParams.get('skipWelcome') === 'true';
+  const initialTab = urlParams.get('tab') || 'home';
+  
+  const [showWelcome, setShowWelcome] = useState(!shouldSkipWelcome);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -728,6 +734,12 @@ function App() {
         
         await initializeAuth();
         setIsLoading(false);
+        
+        // Clean up URL parameters after app initialization
+        if (shouldSkipWelcome && window.location.search) {
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState({}, '', cleanUrl);
+        }
       } catch (error) {
         console.error('App initialization failed:', error);
         setIsLoading(false);
@@ -735,7 +747,7 @@ function App() {
     };
 
     initializeApp();
-  }, [initializeAuth, completeGitHubOAuth]);
+  }, [initializeAuth, completeGitHubOAuth, shouldSkipWelcome]);
 
   const handleEnterExperience = () => {
     setShowWelcome(false);
@@ -760,7 +772,7 @@ function App() {
         {showWelcome ? (
           <WelcomeScreen key="welcome" onEnter={handleEnterExperience} />
         ) : (
-          <MainExperience key="main" />
+          <MainExperience key="main" initialTab={initialTab} />
         )}
       </AnimatePresence>
       

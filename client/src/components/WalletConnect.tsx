@@ -302,7 +302,13 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({ onOpenOnboarding }
               </div>
             </div>
             <button
-              onClick={() => window.open(window.location.href, '_blank')}
+              onClick={() => {
+                // Add a URL parameter to skip welcome screen and go straight to wallet
+                const url = new URL(window.location.href);
+                url.searchParams.set('skipWelcome', 'true');
+                url.searchParams.set('tab', 'wallet');
+                window.open(url.toString(), '_blank');
+              }}
               className="w-full py-2 px-4 bg-yellow-500/30 hover:bg-yellow-500/40 border border-yellow-500/50 text-yellow-100 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 font-medium"
             >
               <ExternalLink className="w-4 h-4" />
