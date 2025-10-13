@@ -344,6 +344,10 @@ function MainExperience({ initialTab = "home" }: { initialTab?: string }) {
         onComplete={handleOnboardingComplete}
       />
 
+      {/* Main Content Tabs */}
+      <div className="relative z-10 pt-20">
+        <div className="max-w-7xl mx-auto px-4">
+          <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
             <div className="mb-8 overflow-x-auto relative -mx-4 px-4">
               <TabsList className="mobile-tabs-list inline-flex mx-auto bg-black/80 backdrop-blur-md p-3 !justify-start overflow-x-visible scroll-smooth gap-2 border border-green-500/20 relative">
                 <TabsTrigger value="home" className="mobile-tab-trigger text-xs sm:text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
@@ -692,7 +696,7 @@ function MainExperience({ initialTab = "home" }: { initialTab?: string }) {
                 <BattlePassDashboard onOpenLogin={() => setShowLoginModal(true)} />
               </TabsContent>
             </div>
-          </Tabs>}
+          </Tabs>
         </div>
       </div>
     </div>
@@ -714,10 +718,17 @@ function App() {
     const localStorageSkipWelcome = localStorage.getItem('skipWelcomeScreen') === 'true';
     const localStorageOpenWallet = localStorage.getItem('openWalletOnLoad') === 'true';
     
+    const flagsTimestamp = localStorage.getItem('walletFlagsTimestamp');
+    const now = Date.now();
+    const age = flagsTimestamp ? now - parseInt(flagsTimestamp) : null;
+    
     console.log('🔍 localStorage debug:', {
       skipWelcomeScreen: localStorage.getItem('skipWelcomeScreen'),
       openWalletOnLoad: localStorage.getItem('openWalletOnLoad'),
-      allKeys: Object.keys(localStorage)
+      timestamp: flagsTimestamp,
+      ageMs: age,
+      allKeys: Object.keys(localStorage),
+      currentTime: now
     });
     
     const shouldSkip = urlSkipWelcome || localStorageSkipWelcome;
@@ -737,15 +748,21 @@ function App() {
   const [showWelcome, setShowWelcome] = useState(!shouldSkipWelcome);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Clear localStorage flags in useEffect (after state is initialized)
+  // Clear localStorage flags after a delay to allow new tabs to read them
   useEffect(() => {
-    const hasFlags = localStorage.getItem('skipWelcomeScreen') || localStorage.getItem('openWalletOnLoad');
-    if (hasFlags) {
-      localStorage.removeItem('skipWelcomeScreen');
-      localStorage.removeItem('openWalletOnLoad');
-      console.log('🧹 Cleared localStorage wallet flags');
+    // Only clear flags if they were actually used in this tab
+    if (shouldSkipWelcome || initialTab === 'wallet') {
+      // Delay cleanup to allow other tabs to read the flags
+      const timer = setTimeout(() => {
+        localStorage.removeItem('skipWelcomeScreen');
+        localStorage.removeItem('openWalletOnLoad');
+        localStorage.removeItem('walletFlagsTimestamp');
+        console.log('🧹 Cleared localStorage wallet flags after successful use');
+      }, 3000); // 3 second delay to be safe
+      
+      return () => clearTimeout(timer);
     }
-  }, []);
+  }, [shouldSkipWelcome, initialTab]);
 
   useEffect(() => {
     const initializeApp = async () => {

@@ -8,17 +8,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates
 
-### 🔗 Wallet Connection & Navigation Fixes (October 13, 2025)
-- **Fixed Coinbase/Wallet "Redirect to Login" Issue (CRITICAL PRODUCTION FIX)**:
-  * Problem: "Open in New Tab" button redirected users to home page instead of wallet page on published site
-  * Root cause: Deployment proxies/security policies strip URL parameters between window.open() and page load
-  * **Solution: localStorage-based cross-tab communication**
-    - WalletConnect sets localStorage flags (openWalletOnLoad, skipWelcomeScreen) before opening new tab
-    - App.tsx reads both URL params AND localStorage on initialization (using useMemo to capture before cleanup)
-    - Flags are cleared in useEffect after state initialization to prevent persistent state
-    - Maintains backward compatibility with URL parameter approach for development
-  * Added wallet extension loading delays (500ms + 1s retry) to handle async provider injection
-  * Enhanced wallet detection logging for debugging
+### 🔗 Wallet Connection & Navigation Fixes (October 13, 2025 - Latest)
+- **Fixed Coinbase/Wallet "Open in New Tab" Race Condition (PRODUCTION FIX v2)**:
+  * Problem: localStorage flags were being cleared by origin tab before new tab could read them
+  * Root cause: Both tabs run cleanup useEffect, creating a race condition
+  * **Enhanced Solution with Timing Protection**:
+    - Added timestamp tracking when flags are set (walletFlagsTimestamp)
+    - 100ms delay before opening new tab to ensure localStorage persistence
+    - Conditional cleanup: only tabs that USE the flags will clear them
+    - 3-second cleanup delay to allow new tab to load and read flags
+    - Comprehensive debug logging with flag age calculation
+    - Added ?source=wallet_tab URL param for tracking in logs
+  * Verification logging shows exact timing of flag set/read operations
+  * Maintains backward compatibility with URL parameter approach
 - **Navigation Bar Scrolling Fix (Latest)**:
   * Changed TabsList from `w-full max-w-7xl` to `inline-flex` for natural overflow
   * Parent container now uses `-mx-4 px-4` for edge-to-edge scrollable area
