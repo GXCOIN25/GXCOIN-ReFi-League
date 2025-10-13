@@ -916,8 +916,11 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="bg-gradient-to-br from-purple-900/50 to-purple-800/30 rounded-xl p-6 border-2 border-purple-500/50 hover:border-purple-400 transition-all cursor-pointer touch-manipulation"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   console.log('🎮 Arena Missions clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
+                  alert('Arena Missions button clicked!');
                   if (!isLoggedIn) {
                     console.log('🔒 Not logged in, opening login modal');
                     onOpenLogin?.();
