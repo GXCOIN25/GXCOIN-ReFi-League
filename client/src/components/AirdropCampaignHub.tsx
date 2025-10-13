@@ -838,7 +838,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
         className="max-w-7xl mx-auto mb-16"
       >
         <Card className="border-4 border-yellow-500/50 bg-gradient-to-br from-yellow-900/30 via-orange-900/20 to-red-900/30 shadow-2xl overflow-hidden">
-          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10 pointer-events-none" />
           
           {/* Countdown Header */}
           <CardHeader className="relative pb-6">
