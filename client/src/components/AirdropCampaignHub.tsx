@@ -1011,7 +1011,9 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
               <Button
                 size="lg"
                 className="bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 hover:from-yellow-600 hover:via-orange-600 hover:to-red-600 text-white font-bold text-lg px-10"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   console.log('🛍️ Claim Airdrop & Get Benefits clicked - isLoggedIn:', isLoggedIn);
                   if (!isLoggedIn) {
                     console.log('🔒 Not logged in, opening login modal');
@@ -1020,6 +1022,10 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   }
                   console.log('📜 Scrolling to campaigns section');
                   window.scrollTo({ top: 1200, behavior: 'smooth' });
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                 }}
               >
                 <ShoppingBag className="mr-2 h-5 w-5" />
