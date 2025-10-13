@@ -173,6 +173,21 @@ function MainExperience() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingTab, setOnboardingTab] = useState<'start' | 'metamask' | 'buy' | 'learn' | 'security'>('start');
   const { isLoggedIn, onboardingProgress } = useUser();
+
+  // Listen for fallback navigation events (for production safety)
+  useEffect(() => {
+    const handleNavigateToTab = (event: CustomEvent) => {
+      const { tab } = event.detail;
+      console.log('📍 Custom navigation event received:', tab);
+      setCurrentTab(tab);
+    };
+
+    window.addEventListener('navigateToTab', handleNavigateToTab as EventListener);
+    
+    return () => {
+      window.removeEventListener('navigateToTab', handleNavigateToTab as EventListener);
+    };
+  }, []);
   const { heroes, selectHero } = useHeroes();
   const { isConnected } = useWallet();
 

@@ -128,7 +128,7 @@ export const useWallet = create<WalletState>((set, get) => ({
     const availableWallets = get().detectWallets();
     
     if (availableWallets.length === 0) {
-      const errorMsg = 'Please install MetaMask or Coinbase Wallet to continue';
+      const errorMsg = 'To use Web3 features, please install MetaMask or Coinbase Wallet browser extension first. Visit metamask.io or coinbase.com/wallet to get started!';
       console.error('No wallet provider found:', errorMsg);
       set({ error: errorMsg });
       return;

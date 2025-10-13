@@ -75,18 +75,45 @@ export default function LandingPage({ onOpenLogin, onSwitchToTab }: LandingPageP
   const { isLoggedIn, register } = useUser();
   const { isConnected, connectWallet, error: walletError } = useWallet();
 
+  // Production-safe tab switching with fallback
+  const switchTab = (tabName: string) => {
+    console.log('🔄 Switching tab to:', tabName);
+    
+    if (onSwitchToTab) {
+      console.log('✅ Using onSwitchToTab callback');
+      onSwitchToTab(tabName);
+    } else {
+      console.warn('⚠️ onSwitchToTab not available, using fallback navigation');
+      // Fallback: Try to trigger tab change via custom event
+      window.dispatchEvent(new CustomEvent('navigateToTab', { detail: { tab: tabName } }));
+      // Also try direct DOM manipulation as last resort
+      const tabTrigger = document.querySelector(`[value="${tabName}"]`) as HTMLElement;
+      if (tabTrigger) {
+        console.log('✅ Fallback: Clicking tab trigger');
+        tabTrigger.click();
+      } else {
+        console.error('❌ No navigation method available for tab:', tabName);
+        toast.error('Navigation unavailable', {
+          description: 'Please use the tab menu above to navigate manually.'
+        });
+      }
+    }
+  };
+
   const handleGetStarted = () => {
     setOnboardingInitialTab('start');
     setShowOnboarding(true);
   };
 
   const handleEpicJourney = async () => {
+    console.log('🚀 Epic Journey clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
+    
     if (isLoggedIn) {
       // Already logged in, just go to airdrops
       toast.success('🎉 Welcome back, Hero!', {
         description: 'Taking you to your airdrops...',
       });
-      onSwitchToTab?.('airdrops');
+      switchTab('airdrops');
       return;
     }
 
@@ -118,7 +145,7 @@ export default function LandingPage({ onOpenLogin, onSwitchToTab }: LandingPageP
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       // Switch to airdrops tab
-      onSwitchToTab?.('airdrops');
+      switchTab('airdrops');
 
       // Show clear call-to-action with next steps
       setTimeout(() => {
@@ -131,7 +158,7 @@ export default function LandingPage({ onOpenLogin, onSwitchToTab }: LandingPageP
       }, 500);
 
     } catch (error) {
-      console.error('Epic journey failed:', error);
+      console.error('❌ Epic journey failed:', error);
       toast.error('Oops!', {
         description: 'Something went wrong. Please try again.',
       });
