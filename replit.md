@@ -9,11 +9,14 @@ Preferred communication style: Simple, everyday language.
 ## Recent Updates
 
 ### 🔗 Wallet Connection & Navigation Fixes (October 13, 2025)
-- **Fixed Coinbase/Wallet "Redirect to Login" Issue**:
-  * Problem: "Open in New Tab" button for wallet extensions redirected users to welcome screen instead of wallet page
-  * Solution: Added URL parameters (skipWelcome=true, tab=wallet) to preserve navigation context when opening in new browser tab
-  * App.tsx now reads URL parameters to skip welcome screen and open directly to requested tab
-  * URL cleanup after initialization for clean browser history
+- **Fixed Coinbase/Wallet "Redirect to Login" Issue (CRITICAL PRODUCTION FIX)**:
+  * Problem: "Open in New Tab" button redirected users to home page instead of wallet page on published site
+  * Root cause: Deployment proxies/security policies strip URL parameters between window.open() and page load
+  * **Solution: localStorage-based cross-tab communication**
+    - WalletConnect sets localStorage flags (openWalletOnLoad, skipWelcomeScreen) before opening new tab
+    - App.tsx reads both URL params AND localStorage on initialization (using useMemo to capture before cleanup)
+    - Flags are cleared in useEffect after state initialization to prevent persistent state
+    - Maintains backward compatibility with URL parameter approach for development
   * Added wallet extension loading delays (500ms + 1s retry) to handle async provider injection
   * Enhanced wallet detection logging for debugging
 - **Navigation Bar Scrolling Fix (Latest)**:
