@@ -307,7 +307,10 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({ onOpenOnboarding }
                 const url = new URL(window.location.href);
                 url.searchParams.set('skipWelcome', 'true');
                 url.searchParams.set('tab', 'wallet');
-                window.open(url.toString(), '_blank');
+                const finalUrl = url.toString();
+                console.log('🔗 Opening new tab with URL:', finalUrl);
+                console.log('📍 Current location:', window.location.href);
+                window.open(finalUrl, '_blank');
               }}
               className="w-full py-2 px-4 bg-yellow-500/30 hover:bg-yellow-500/40 border border-yellow-500/50 text-yellow-100 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 font-medium"
             >
