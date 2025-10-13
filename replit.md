@@ -14,10 +14,13 @@ Preferred communication style: Simple, everyday language.
   * Solution: Added URL parameters (skipWelcome=true, tab=wallet) to preserve navigation context when opening in new browser tab
   * App.tsx now reads URL parameters to skip welcome screen and open directly to requested tab
   * URL cleanup after initialization for clean browser history
-- **Navigation Bar Scrolling Fix**:
-  * Removed `justify-center` constraint that prevented horizontal scrolling on mobile
-  * Added `!justify-start` override to TabsList for proper scroll behavior
-  * Mobile users can now swipe left/right to access all navigation tabs
+  * Added wallet extension loading delays (500ms + 1s retry) to handle async provider injection
+  * Enhanced wallet detection logging for debugging
+- **Navigation Bar Scrolling Fix (Latest)**:
+  * Changed TabsList from `w-full max-w-7xl` to `inline-flex` for natural overflow
+  * Parent container now uses `-mx-4 px-4` for edge-to-edge scrollable area
+  * Moved overflow handling from TabsList to parent container
+  * Users can now swipe/scroll through all navigation tabs on mobile and desktop
 - **Production-Safe Navigation System**:
   * Added multi-layer fallback navigation with custom event system
   * Primary: onSwitchToTab callback, Fallback 1: Custom 'navigateToTab' event with listener in App.tsx
