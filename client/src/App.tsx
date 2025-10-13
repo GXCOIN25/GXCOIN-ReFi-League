@@ -166,6 +166,7 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
 }
 
 function MainExperience({ initialTab = "home" }: { initialTab?: string }) {
+  console.log('📱 MainExperience initialTab:', initialTab);
   const [currentTab, setCurrentTab] = useState(initialTab);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showNFTMinting, setShowNFTMinting] = useState<{ heroId: string; level: number } | null>(null);
@@ -709,6 +710,8 @@ function App() {
   const urlParams = new URLSearchParams(window.location.search);
   const shouldSkipWelcome = urlParams.get('skipWelcome') === 'true';
   const initialTab = urlParams.get('tab') || 'home';
+  
+  console.log('🔍 App initialization:', { shouldSkipWelcome, initialTab, url: window.location.href });
   
   const [showWelcome, setShowWelcome] = useState(!shouldSkipWelcome);
   const [isLoading, setIsLoading] = useState(true);
