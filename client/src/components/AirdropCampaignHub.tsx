@@ -524,6 +524,8 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
   };
 
   const generateReferralCode = async () => {
+    console.log('🔗 Generate Referral Link clicked - isLoggedIn:', isLoggedIn);
+    
     if (!isLoggedIn) {
       toast.error('Please create an account or login first');
       return;
@@ -531,6 +533,8 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
 
     try {
       const token = localStorage.getItem('gxcoin_token');
+      console.log('🔑 Token exists:', !!token);
+      
       const response = await fetch('/api/referrals/generate', {
         method: 'POST',
         headers: {
@@ -539,15 +543,20 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
         }
       });
 
+      console.log('📡 Response status:', response.status);
+
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('❌ Server error:', errorData);
         throw new Error('Failed to generate referral code');
       }
 
       const data = await response.json();
+      console.log('✅ Referral data received:', data);
       setReferralLink(data.referralLink);
       toast.success('Referral link generated!');
     } catch (error) {
-      console.error('Error generating referral code:', error);
+      console.error('❌ Error generating referral code:', error);
       toast.error('Failed to generate referral code');
     }
   };
