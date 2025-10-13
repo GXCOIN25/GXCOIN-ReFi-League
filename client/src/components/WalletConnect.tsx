@@ -303,14 +303,11 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({ onOpenOnboarding }
             </div>
             <button
               onClick={() => {
-                // Add a URL parameter to skip welcome screen and go straight to wallet
-                const url = new URL(window.location.href);
-                url.searchParams.set('skipWelcome', 'true');
-                url.searchParams.set('tab', 'wallet');
-                const finalUrl = url.toString();
-                console.log('🔗 Opening new tab with URL:', finalUrl);
-                console.log('📍 Current location:', window.location.href);
-                window.open(finalUrl, '_blank');
+                // Use localStorage to persist wallet intent across tabs (more reliable than URL params)
+                localStorage.setItem('openWalletOnLoad', 'true');
+                localStorage.setItem('skipWelcomeScreen', 'true');
+                console.log('💾 Saved wallet intent to localStorage');
+                window.open(window.location.origin, '_blank');
               }}
               className="w-full py-2 px-4 bg-yellow-500/30 hover:bg-yellow-500/40 border border-yellow-500/50 text-yellow-100 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 font-medium"
             >

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -706,15 +706,43 @@ function App() {
   const { start } = useGame();
   const { initializeAuth, completeGitHubOAuth } = useUser();
   
-  // Check URL parameters for skipWelcome
-  const urlParams = new URLSearchParams(window.location.search);
-  const shouldSkipWelcome = urlParams.get('skipWelcome') === 'true';
-  const initialTab = urlParams.get('tab') || 'home';
-  
-  console.log('🔍 App initialization:', { shouldSkipWelcome, initialTab, url: window.location.href });
+  // Check both URL parameters and localStorage for skipWelcome
+  // Use useMemo to capture values before cleanup
+  const { shouldSkipWelcome, initialTab } = useMemo(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlSkipWelcome = urlParams.get('skipWelcome') === 'true';
+    const urlTab = urlParams.get('tab') || '';
+    
+    // Check localStorage (more reliable for cross-tab navigation)
+    const localStorageSkipWelcome = localStorage.getItem('skipWelcomeScreen') === 'true';
+    const localStorageOpenWallet = localStorage.getItem('openWalletOnLoad') === 'true';
+    
+    const shouldSkip = urlSkipWelcome || localStorageSkipWelcome;
+    const tab = urlTab || (localStorageOpenWallet ? 'wallet' : 'home');
+    
+    console.log('🔍 App initialization:', { 
+      shouldSkip, 
+      tab, 
+      url: window.location.href,
+      localStorageSkipWelcome,
+      localStorageOpenWallet 
+    });
+    
+    return { shouldSkipWelcome: shouldSkip, initialTab: tab };
+  }, []);
   
   const [showWelcome, setShowWelcome] = useState(!shouldSkipWelcome);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Clear localStorage flags in useEffect (after state is initialized)
+  useEffect(() => {
+    const hasFlags = localStorage.getItem('skipWelcomeScreen') || localStorage.getItem('openWalletOnLoad');
+    if (hasFlags) {
+      localStorage.removeItem('skipWelcomeScreen');
+      localStorage.removeItem('openWalletOnLoad');
+      console.log('🧹 Cleared localStorage wallet flags');
+    }
+  }, []);
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -738,8 +766,8 @@ function App() {
         await initializeAuth();
         setIsLoading(false);
         
-        // Clean up URL parameters after app initialization
-        if (shouldSkipWelcome && window.location.search) {
+        // Clean up URL parameters after app initialization (only if they exist)
+        if (window.location.search) {
           const cleanUrl = window.location.pathname;
           window.history.replaceState({}, '', cleanUrl);
         }
@@ -750,7 +778,7 @@ function App() {
     };
 
     initializeApp();
-  }, [initializeAuth, completeGitHubOAuth, shouldSkipWelcome]);
+  }, [initializeAuth, completeGitHubOAuth]);
 
   const handleEnterExperience = () => {
     setShowWelcome(false);
