@@ -896,7 +896,9 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="bg-gradient-to-br from-blue-900/50 to-blue-800/30 rounded-xl p-6 border-2 border-blue-500/50 hover:border-blue-400 transition-all cursor-pointer touch-manipulation"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   console.log('🏦 Visa Card clicked - Opening enrollment form');
                   setShowVisaCardForm(true);
                 }}
@@ -920,7 +922,6 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   e.preventDefault();
                   e.stopPropagation();
                   console.log('🎮 Arena Missions clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
-                  alert('Arena Missions button clicked!');
                   if (!isLoggedIn) {
                     console.log('🔒 Not logged in, opening login modal');
                     onOpenLogin?.();
@@ -945,7 +946,9 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="bg-gradient-to-br from-gray-800/50 to-gray-700/30 rounded-xl p-6 border-2 border-gray-400/50 hover:border-gray-300 transition-all cursor-pointer touch-manipulation"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   console.log('👑 Platinum Series clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
                   if (!isLoggedIn) {
                     console.log('🔒 Not logged in, opening login modal');
@@ -971,7 +974,9 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="bg-gradient-to-br from-green-900/50 to-emerald-800/30 rounded-xl p-6 border-2 border-green-500/50 hover:border-green-400 transition-all cursor-pointer touch-manipulation"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   console.log('💰 10% OFF dNFTs clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
                   if (!isLoggedIn) {
                     console.log('🔒 Not logged in, opening login modal');
