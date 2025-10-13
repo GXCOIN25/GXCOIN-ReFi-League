@@ -28,6 +28,7 @@ import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import AirdropCampaignHub from "@/components/AirdropCampaignHub";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import BattlePassDashboard from "@/components/BattlePassDashboard";
+import { CacheClearingGuide } from "@/components/CacheClearingGuide";
 import { Toaster } from "@/components/ui/sonner";
 import { useWallet } from "@/lib/stores/useWallet";
 import { 
@@ -50,6 +51,9 @@ import {
   Award
 } from "lucide-react";
 import "@fontsource/inter";
+
+// Version tracking for cache detection
+const APP_VERSION = "2.0.1-mobile-fixes-20251013";
 
 function LoadingScreen() {
   return (
@@ -174,7 +178,23 @@ function MainExperience({ initialTab = "home" }: { initialTab?: string }) {
   const [selectedHeroForPurchase, setSelectedHeroForPurchase] = useState<{ heroId: string; heroName: string; heroRarity: string; heroImage: string } | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingTab, setOnboardingTab] = useState<'start' | 'metamask' | 'buy' | 'learn' | 'security'>('start');
+  const [showCacheGuide, setShowCacheGuide] = useState(false);
   const { isLoggedIn, onboardingProgress } = useUser();
+
+  // Version check and cache detection
+  useEffect(() => {
+    console.log('🔢 App version:', APP_VERSION);
+    
+    // Store version on first load
+    const storedVersion = localStorage.getItem('app_version');
+    if (!storedVersion) {
+      localStorage.setItem('app_version', APP_VERSION);
+    } else if (storedVersion !== APP_VERSION) {
+      console.log('⚠️ Version mismatch detected! Stored:', storedVersion, 'Current:', APP_VERSION);
+      // Auto-show cache guide if version changed
+      setShowCacheGuide(true);
+    }
+  }, []);
 
   // Listen for fallback navigation events (for production safety)
   useEffect(() => {
@@ -699,6 +719,35 @@ function MainExperience({ initialTab = "home" }: { initialTab?: string }) {
           </Tabs>
         </div>
       </div>
+
+      {/* Cache Clearing Guide - Floating Help Button */}
+      {showCacheGuide && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowCacheGuide(false)}
+        >
+          <motion.div
+            initial={{ y: 50 }}
+            animate={{ y: 0 }}
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-2xl w-full"
+          >
+            <CacheClearingGuide onClose={() => setShowCacheGuide(false)} />
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Floating Help Button for Cache Issues */}
+      <Button
+        onClick={() => setShowCacheGuide(true)}
+        className="fixed bottom-20 right-4 z-50 bg-yellow-500 hover:bg-yellow-600 text-black font-bold rounded-full shadow-2xl md:bottom-4"
+        size="lg"
+      >
+        ⚠️ Button Not Working?
+      </Button>
     </div>
   );
 }
