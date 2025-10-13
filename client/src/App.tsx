@@ -167,7 +167,8 @@ function WelcomeScreen({ onEnter }: { onEnter: () => void }) {
 
 function MainExperience({ initialTab = "home" }: { initialTab?: string }) {
   console.log('📱 MainExperience initialTab:', initialTab);
-  const [currentTab, setCurrentTab] = useState(initialTab);
+  // Ensure currentTab always has a valid value
+  const [currentTab, setCurrentTab] = useState(initialTab || "home");
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showNFTMinting, setShowNFTMinting] = useState<{ heroId: string; level: number } | null>(null);
   const [selectedHeroForPurchase, setSelectedHeroForPurchase] = useState<{ heroId: string; heroName: string; heroRarity: string; heroImage: string } | null>(null);
@@ -343,10 +344,6 @@ function MainExperience({ initialTab = "home" }: { initialTab?: string }) {
         onComplete={handleOnboardingComplete}
       />
 
-      {/* Main Content Tabs */}
-      <div className="relative z-10 pt-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
             <div className="mb-8 overflow-x-auto relative -mx-4 px-4">
               <TabsList className="mobile-tabs-list inline-flex mx-auto bg-black/80 backdrop-blur-md p-3 !justify-start overflow-x-visible scroll-smooth gap-2 border border-green-500/20 relative">
                 <TabsTrigger value="home" className="mobile-tab-trigger text-xs sm:text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
@@ -695,7 +692,7 @@ function MainExperience({ initialTab = "home" }: { initialTab?: string }) {
                 <BattlePassDashboard onOpenLogin={() => setShowLoginModal(true)} />
               </TabsContent>
             </div>
-          </Tabs>
+          </Tabs>}
         </div>
       </div>
     </div>
@@ -716,6 +713,12 @@ function App() {
     // Check localStorage (more reliable for cross-tab navigation)
     const localStorageSkipWelcome = localStorage.getItem('skipWelcomeScreen') === 'true';
     const localStorageOpenWallet = localStorage.getItem('openWalletOnLoad') === 'true';
+    
+    console.log('🔍 localStorage debug:', {
+      skipWelcomeScreen: localStorage.getItem('skipWelcomeScreen'),
+      openWalletOnLoad: localStorage.getItem('openWalletOnLoad'),
+      allKeys: Object.keys(localStorage)
+    });
     
     const shouldSkip = urlSkipWelcome || localStorageSkipWelcome;
     const tab = urlTab || (localStorageOpenWallet ? 'wallet' : 'home');
