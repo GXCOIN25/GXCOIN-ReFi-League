@@ -471,15 +471,22 @@ export const CryptoOnboardingHub: React.FC<CryptoOnboardingHubProps> = ({
                               whileTap={{ scale: 0.98 }}
                             >
                               <Button
-                                asChild
                                 size="lg"
                                 className="w-full bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 hover:from-yellow-600 hover:via-orange-600 hover:to-red-600 text-white font-bold text-lg py-6 shadow-2xl shadow-yellow-500/50"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  console.log('🎬 Opening Epic Tour in new tab...');
+                                  window.open('/success?demo=true', '_blank', 'noopener,noreferrer');
+                                }}
+                                onTouchEnd={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}
                               >
-                                <a href="/success?demo=true" target="_blank" rel="noopener noreferrer">
-                                  <PlayCircle className="w-6 h-6 mr-3" />
-                                  🚀 Take the Epic Tour (FREE) 🚀
-                                  <ExternalLink className="w-5 h-5 ml-3" />
-                                </a>
+                                <PlayCircle className="w-6 h-6 mr-3" />
+                                🚀 Take the Epic Tour (FREE) 🚀
+                                <ExternalLink className="w-5 h-5 ml-3" />
                               </Button>
                             </motion.div>
                             
