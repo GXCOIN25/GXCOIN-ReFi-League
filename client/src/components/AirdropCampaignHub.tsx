@@ -395,6 +395,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
 
   // Fetch campaigns on mount
   useEffect(() => {
+    console.log('🎬 [AIRDROPS] Component mounted, starting campaign fetch...');
     fetchCampaigns();
   }, []);
 
@@ -417,18 +418,33 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
   const fetchCampaigns = async () => {
     try {
       setLoading(true);
+      console.log('🚀 [AIRDROPS] Fetching campaigns from:', '/api/airdrops/campaigns');
+      console.log('🚀 [AIRDROPS] Current URL:', window.location.href);
+      
       const response = await fetch('/api/airdrops/campaigns');
+      console.log('📡 [AIRDROPS] Response status:', response.status);
       
       if (!response.ok) {
-        throw new Error('Failed to fetch campaigns');
+        const errorText = await response.text();
+        console.error('❌ [AIRDROPS] API Error:', response.status, errorText);
+        throw new Error(`Failed to fetch campaigns: ${response.status} ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('✅ [AIRDROPS] Campaigns loaded:', data.length, 'campaigns');
+      console.log('📦 [AIRDROPS] Campaign data:', data);
       setCampaigns(data);
     } catch (error) {
-      console.error('Error fetching campaigns:', error);
-      toast.error('Failed to load campaigns');
+      console.error('❌ [AIRDROPS] Error fetching campaigns:', error);
+      console.error('❌ [AIRDROPS] Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        type: error instanceof TypeError ? 'Network/CORS error' : 'Other error'
+      });
+      toast.error('Failed to load campaigns. Please refresh the page.');
+      // Set empty campaigns to prevent infinite loading
+      setCampaigns([]);
     } finally {
+      console.log('🏁 [AIRDROPS] Fetch complete, setting loading=false');
       setLoading(false);
     }
   };
@@ -635,6 +651,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-500 mx-auto" />
           <p className="text-white mt-4 text-lg">Loading campaigns...</p>
+          <p className="text-gray-400 mt-2 text-sm">Check browser console for debug info (F12)</p>
         </div>
       </div>
     );
