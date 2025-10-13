@@ -74,6 +74,15 @@ export const useWallet = create<WalletState>((set, get) => ({
   detectWallets: () => {
     const wallets: AvailableWallet[] = [];
 
+    console.log('🔍 Checking for wallet providers...', {
+      hasEthereum: !!window.ethereum,
+      isMetaMask: window.ethereum?.isMetaMask,
+      isCoinbaseWallet: window.ethereum?.isCoinbaseWallet,
+      hasCoinbaseExtension: !!window.coinbaseWalletExtension,
+      hasProviders: !!window.ethereum?.providers,
+      providersCount: window.ethereum?.providers?.length || 0
+    });
+
     // Check for MetaMask
     if (window.ethereum?.isMetaMask) {
       wallets.push({
@@ -116,7 +125,7 @@ export const useWallet = create<WalletState>((set, get) => ({
       });
     }
 
-    console.log('Detected wallets:', wallets);
+    console.log('✅ Detected wallets:', wallets.map(w => w.name));
     set({ availableWallets: wallets });
     return wallets;
   },
@@ -124,8 +133,21 @@ export const useWallet = create<WalletState>((set, get) => ({
   connectWallet: async (walletType?: WalletType) => {
     console.log('Attempting to connect wallet...', walletType);
     
-    // First detect available wallets
-    const availableWallets = get().detectWallets();
+    // Wait for wallet extensions to load (they inject asynchronously)
+    let availableWallets = get().detectWallets();
+    
+    // If no wallets found, wait and retry (wallet extensions may still be loading)
+    if (availableWallets.length === 0) {
+      console.log('No wallets detected yet, waiting for extension to load...');
+      await new Promise(resolve => setTimeout(resolve, 500));
+      availableWallets = get().detectWallets();
+      
+      // Try one more time if still not found
+      if (availableWallets.length === 0) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        availableWallets = get().detectWallets();
+      }
+    }
     
     if (availableWallets.length === 0) {
       const errorMsg = 'To use Web3 features, please install MetaMask or Coinbase Wallet browser extension first. Visit metamask.io or coinbase.com/wallet to get started!';
