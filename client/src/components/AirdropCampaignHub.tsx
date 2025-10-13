@@ -894,7 +894,8 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
               {/* Offer 1: Visa Card */}
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="bg-gradient-to-br from-blue-900/50 to-blue-800/30 rounded-xl p-6 border-2 border-blue-500/50 hover:border-blue-400 transition-all cursor-pointer"
+                whileTap={{ scale: 0.95 }}
+                className="bg-gradient-to-br from-blue-900/50 to-blue-800/30 rounded-xl p-6 border-2 border-blue-500/50 hover:border-blue-400 transition-all cursor-pointer touch-manipulation"
                 onClick={() => {
                   console.log('🏦 Visa Card clicked - Opening enrollment form');
                   setShowVisaCardForm(true);
@@ -913,7 +914,8 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
               {/* Offer 2: Arena Missions */}
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="bg-gradient-to-br from-purple-900/50 to-purple-800/30 rounded-xl p-6 border-2 border-purple-500/50 hover:border-purple-400 transition-all cursor-pointer"
+                whileTap={{ scale: 0.95 }}
+                className="bg-gradient-to-br from-purple-900/50 to-purple-800/30 rounded-xl p-6 border-2 border-purple-500/50 hover:border-purple-400 transition-all cursor-pointer touch-manipulation"
                 onClick={() => {
                   console.log('🎮 Arena Missions clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
                   if (!isLoggedIn) {
@@ -938,7 +940,8 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
               {/* Offer 3: Limited Edition Platinum Series */}
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="bg-gradient-to-br from-gray-800/50 to-gray-700/30 rounded-xl p-6 border-2 border-gray-400/50 hover:border-gray-300 transition-all cursor-pointer"
+                whileTap={{ scale: 0.95 }}
+                className="bg-gradient-to-br from-gray-800/50 to-gray-700/30 rounded-xl p-6 border-2 border-gray-400/50 hover:border-gray-300 transition-all cursor-pointer touch-manipulation"
                 onClick={() => {
                   console.log('👑 Platinum Series clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
                   if (!isLoggedIn) {
@@ -963,7 +966,8 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
               {/* Offer 4: 10% Off dNFTs */}
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="bg-gradient-to-br from-green-900/50 to-emerald-800/30 rounded-xl p-6 border-2 border-green-500/50 hover:border-green-400 transition-all cursor-pointer"
+                whileTap={{ scale: 0.95 }}
+                className="bg-gradient-to-br from-green-900/50 to-emerald-800/30 rounded-xl p-6 border-2 border-green-500/50 hover:border-green-400 transition-all cursor-pointer touch-manipulation"
                 onClick={() => {
                   console.log('💰 10% OFF dNFTs clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
                   if (!isLoggedIn) {
