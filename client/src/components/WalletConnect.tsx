@@ -306,8 +306,19 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({ onOpenOnboarding }
                 // Use localStorage to persist wallet intent across tabs (more reliable than URL params)
                 localStorage.setItem('openWalletOnLoad', 'true');
                 localStorage.setItem('skipWelcomeScreen', 'true');
-                console.log('💾 Saved wallet intent to localStorage');
-                window.open(window.location.origin, '_blank');
+                const timestamp = Date.now();
+                localStorage.setItem('walletFlagsTimestamp', timestamp.toString());
+                console.log('💾 Saved wallet intent to localStorage at', timestamp);
+                console.log('💾 Verification - flags set:', {
+                  openWalletOnLoad: localStorage.getItem('openWalletOnLoad'),
+                  skipWelcomeScreen: localStorage.getItem('skipWelcomeScreen'),
+                  timestamp: localStorage.getItem('walletFlagsTimestamp')
+                });
+                
+                // Small delay to ensure localStorage is persisted
+                setTimeout(() => {
+                  window.open(window.location.origin + '?source=wallet_tab', '_blank');
+                }, 100);
               }}
               className="w-full py-2 px-4 bg-yellow-500/30 hover:bg-yellow-500/40 border border-yellow-500/50 text-yellow-100 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 font-medium"
             >
