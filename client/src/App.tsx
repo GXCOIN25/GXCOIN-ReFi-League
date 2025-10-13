@@ -347,8 +347,8 @@ function MainExperience({ initialTab = "home" }: { initialTab?: string }) {
       <div className="relative z-10 pt-20">
         <div className="max-w-7xl mx-auto px-4">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-            <div className="mb-8 overflow-x-auto relative">
-              <TabsList className="mobile-tabs-list w-full max-w-7xl mx-auto bg-black/80 backdrop-blur-md p-3 flex !justify-start overflow-x-auto scroll-smooth gap-2 border border-green-500/20 relative">
+            <div className="mb-8 overflow-x-auto relative -mx-4 px-4">
+              <TabsList className="mobile-tabs-list inline-flex mx-auto bg-black/80 backdrop-blur-md p-3 !justify-start overflow-x-visible scroll-smooth gap-2 border border-green-500/20 relative">
                 <TabsTrigger value="home" className="mobile-tab-trigger text-xs sm:text-sm md:text-base lg:text-lg flex items-center gap-1.5 md:gap-2 cursor-pointer hover:bg-white/10 rounded flex-shrink-0 px-3 md:px-4 py-2 md:py-3 whitespace-nowrap" style={{ minWidth: '44px', minHeight: '44px' }}>
                   <Home className="w-4 h-4 md:w-5 md:h-5" />
                   <span className="text-xs sm:text-sm md:text-base">Home</span>
