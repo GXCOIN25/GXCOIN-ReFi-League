@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GXCOIN - Redirecting to Live Promotion</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    
+    .logo {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    
+    h1 {
+      color: #1a202c;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    
+    .subtitle {
+      color: #4a5568;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+    
+    .alert {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .alert-title {
+      color: #92400e;
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    
+    .alert-text {
+      color: #78350f;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    
+    .btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 18px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin: 10px;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+      background: #6b7280;
+    }
+    
+    .instructions {
+      background: #f3f4f6;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 30px;
+      text-align: left;
+    }
+    
+    .instructions h3 {
+      color: #1f2937;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+    
+    .instructions ol {
+      margin-left: 20px;
+      color: #4b5563;
+      line-height: 1.8;
+    }
+    
+    .instructions li {
+      margin-bottom: 8px;
+    }
+    
+    .timer {
+      font-size: 48px;
+      font-weight: bold;
+      color: #667eea;
+      margin: 20px 0;
+    }
+    
+    @media (max-width: 640px) {
+      .container {
+        padding: 30px 20px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .btn {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">🚀</div>
+    <h1>GXCOIN Live Promotion</h1>
+    <p class="subtitle">Access the Latest Version</p>
+    
+    <div class="alert">
+      <div class="alert-title">⚡ Technical Update in Progress</div>
+      <div class="alert-text">
+        We're experiencing a temporary hosting issue. Click below to access the fully working promotion site.
+      </div>
+    </div>
+    
+    <div class="timer" id="countdown">5</div>
+    
+    <a href="https://0e0ed270-eebf-48f6-aeb7-3f28116e9d53-00-217wjbqdew0ol.janeway.replit.dev/" class="btn" id="mainBtn">
+      🎯 Access Live Promotion Now
+    </a>
+    
+    <a href="#" class="btn btn-secondary" onclick="showInstructions(); return false;">
+      📱 Button Not Working? Click Here
+    </a>
+    
+    <div class="instructions" id="instructions" style="display: none;">
+      <h3>Quick Fix for Mobile:</h3>
+      <ol>
+        <li>Tap the browser menu (⋮ or ⋯)</li>
+        <li>Find "Settings" or "History"</li>
+        <li>Tap "Clear browsing data"</li>
+        <li>Select "Cached images and files"</li>
+        <li>Tap "Clear data"</li>
+        <li>Try the button above again</li>
+      </ol>
+    </div>
+  </div>
+  
+  <script>
+    // Auto-redirect after 5 seconds
+    let countdown = 5;
+    const timerEl = document.getElementById('countdown');
+    const mainBtn = document.getElementById('mainBtn');
+    
+    const timer = setInterval(() => {
+      countdown--;
+      timerEl.textContent = countdown;
+      
+      if (countdown <= 0) {
+        clearInterval(timer);
+        window.location.href = mainBtn.href;
+      }
+    }, 1000);
+    
+    function showInstructions() {
+      document.getElementById('instructions').style.display = 'block';
+    }
+    
+    // Track if user clicks manual button
+    mainBtn.addEventListener('click', () => {
+      clearInterval(timer);
+    });
+  </script>
+</body>
+</html>
