@@ -1,16 +1,12 @@
 // GXCOIN PWA Service Worker  
-// Version 3.0.0 - NEVER CACHE JAVASCRIPT (Deployment Fix)
+// Version 4.0.0 - NEVER CACHE HTML (Fixed Deployment Forever!)
 
-const CACHE_NAME = 'gxcoin-pwa-v3.0.0-no-js-cache';
-const OFFLINE_CACHE = 'gxcoin-offline-v3.0.0';
+const CACHE_NAME = 'gxcoin-pwa-v4.0.0-no-html-cache';
+const OFFLINE_CACHE = 'gxcoin-offline-v4.0.0';
 
 // Essential files to cache for offline functionality
+// REMOVED: index.html and /src/* files - these MUST be fetched fresh to get latest bundle
 const CORE_CACHE_FILES = [
-  '/',
-  '/index.html',
-  '/src/main.tsx',
-  '/src/index.css',
-  '/src/App.tsx',
   '/manifest.json',
   // GXCOIN logo assets
   '/icons/gxcoin-logo.png',
@@ -74,7 +70,7 @@ const API_CACHE_PATTERNS = [
 
 // Install event - cache core files
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing GXCOIN PWA Service Worker v3.0.0 (NEVER CACHE JS)');
+  console.log('[SW] Installing GXCOIN PWA Service Worker v4.0.0 (HTML ALWAYS FRESH)');
   
   event.waitUntil(
     Promise.all([
@@ -204,21 +200,25 @@ async function networkFirst(request) {
   }
 }
 
-// Stale While Revalidate Strategy - for HTML pages
+// Network First Strategy for HTML - ALWAYS fetch fresh HTML to get latest bundle
 async function staleWhileRevalidate(request) {
-  const cachedResponse = await caches.match(request);
-  
-  const fetchPromise = fetch(request).then((networkResponse) => {
+  try {
+    // Always try network first for HTML to get latest bundle
+    const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      const cache = caches.open(CACHE_NAME);
-      cache.then(c => c.put(request, networkResponse.clone()));
+      const cache = await caches.open(CACHE_NAME);
+      cache.put(request, networkResponse.clone());
     }
     return networkResponse;
-  }).catch(() => {
-    console.log('[SW] Network failed for HTML page:', request.url);
-  });
-  
-  return cachedResponse || fetchPromise;
+  } catch (error) {
+    console.log('[SW] Network failed for HTML, using cache:', request.url);
+    // Only use cache as fallback when offline
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    throw error;
+  }
 }
 
 // Get offline fallback page
@@ -330,4 +330,4 @@ self.addEventListener('notificationclick', (event) => {
   }
 });
 
-console.log('[SW] GXCOIN PWA Service Worker v3.0.0 loaded (NEVER CACHE JS - Deployment Fix)');
+console.log('[SW] GXCOIN PWA Service Worker v4.0.0 loaded (HTML NETWORK-FIRST - Deployment Fix)');
