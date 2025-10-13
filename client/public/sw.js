@@ -1,8 +1,8 @@
 // GXCOIN PWA Service Worker  
-// Version 2.0.0 - FORCE REFRESH (Fixed overlay blocking)
+// Version 3.0.0 - NEVER CACHE JAVASCRIPT (Deployment Fix)
 
-const CACHE_NAME = 'gxcoin-pwa-v2.0.0-no-overlay';
-const OFFLINE_CACHE = 'gxcoin-offline-v2.0.0';
+const CACHE_NAME = 'gxcoin-pwa-v3.0.0-no-js-cache';
+const OFFLINE_CACHE = 'gxcoin-offline-v3.0.0';
 
 // Essential files to cache for offline functionality
 const CORE_CACHE_FILES = [
@@ -74,7 +74,7 @@ const API_CACHE_PATTERNS = [
 
 // Install event - cache core files
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing GXCOIN PWA Service Worker v2.0.0 (FORCE UPDATE)');
+  console.log('[SW] Installing GXCOIN PWA Service Worker v3.0.0 (NEVER CACHE JS)');
   
   event.waitUntil(
     Promise.all([
@@ -248,7 +248,8 @@ function isStaticAsset(pathname) {
          pathname.includes('/textures/') ||
          pathname.includes('/fonts/') ||
          pathname.includes('/geometries/') ||
-         pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|mp3|wav|ogg|woff|woff2|ttf|eot|css|js)$/);
+         pathname.match(/\.(png|jpg|jpeg|gif|svg|ico|mp3|wav|ogg|woff|woff2|ttf|eot)$/);
+  // REMOVED: .css and .js - these must ALWAYS fetch fresh to get updates
 }
 
 function isApiCall(pathname) {
@@ -329,4 +330,4 @@ self.addEventListener('notificationclick', (event) => {
   }
 });
 
-console.log('[SW] GXCOIN PWA Service Worker v2.0.0 loaded (Overlay Fix Applied)');
+console.log('[SW] GXCOIN PWA Service Worker v3.0.0 loaded (NEVER CACHE JS - Deployment Fix)');
