@@ -885,6 +885,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 whileHover={{ scale: 1.05 }}
                 className="bg-gradient-to-br from-blue-900/50 to-blue-800/30 rounded-xl p-6 border-2 border-blue-500/50 hover:border-blue-400 transition-all cursor-pointer"
                 onClick={() => {
+                  console.log('🏦 Visa Card clicked');
                   toast.info('Visa Card application coming soon!');
                 }}
               >
@@ -903,10 +904,13 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 whileHover={{ scale: 1.05 }}
                 className="bg-gradient-to-br from-purple-900/50 to-purple-800/30 rounded-xl p-6 border-2 border-purple-500/50 hover:border-purple-400 transition-all cursor-pointer"
                 onClick={() => {
+                  console.log('🎮 Arena Missions clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
                   if (!isLoggedIn) {
+                    console.log('🔒 Not logged in, opening login modal');
                     onOpenLogin?.();
                     return;
                   }
+                  console.log('✅ Switching to game tab');
                   onSwitchToTab?.('game');
                 }}
               >
@@ -925,10 +929,13 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 whileHover={{ scale: 1.05 }}
                 className="bg-gradient-to-br from-gray-800/50 to-gray-700/30 rounded-xl p-6 border-2 border-gray-400/50 hover:border-gray-300 transition-all cursor-pointer"
                 onClick={() => {
+                  console.log('👑 Platinum Series clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
                   if (!isLoggedIn) {
+                    console.log('🔒 Not logged in, opening login modal');
                     onOpenLogin?.();
                     return;
                   }
+                  console.log('✅ Switching to nfts tab');
                   onSwitchToTab?.('nfts');
                 }}
               >
@@ -947,10 +954,13 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 whileHover={{ scale: 1.05 }}
                 className="bg-gradient-to-br from-green-900/50 to-emerald-800/30 rounded-xl p-6 border-2 border-green-500/50 hover:border-green-400 transition-all cursor-pointer"
                 onClick={() => {
+                  console.log('💰 10% OFF dNFTs clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
                   if (!isLoggedIn) {
+                    console.log('🔒 Not logged in, opening login modal');
                     onOpenLogin?.();
                     return;
                   }
+                  console.log('✅ Switching to nfts tab');
                   onSwitchToTab?.('nfts');
                 }}
               >
@@ -979,10 +989,13 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 size="lg"
                 className="bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 hover:from-yellow-600 hover:via-orange-600 hover:to-red-600 text-white font-bold text-lg px-10"
                 onClick={() => {
+                  console.log('🛍️ Claim Airdrop & Get Benefits clicked - isLoggedIn:', isLoggedIn);
                   if (!isLoggedIn) {
+                    console.log('🔒 Not logged in, opening login modal');
                     onOpenLogin?.();
                     return;
                   }
+                  console.log('📜 Scrolling to campaigns section');
                   window.scrollTo({ top: 1200, behavior: 'smooth' });
                 }}
               >
@@ -1112,11 +1125,14 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                       size="lg"
                       className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 hover:from-purple-600 hover:via-pink-600 hover:to-purple-700 text-white font-bold text-lg px-8 py-6 shadow-lg shadow-purple-500/50"
                       onClick={() => {
+                        console.log('⚔️ Enter The Arena clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
                         if (!isLoggedIn) {
                           toast.info('Please login to access The Arena!');
+                          console.log('🔒 Not logged in, opening login modal');
                           onOpenLogin?.();
                           return;
                         }
+                        console.log('✅ Switching to game tab');
                         onSwitchToTab?.('game');
                       }}
                     >
@@ -1129,10 +1145,13 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                       variant="outline"
                       className="border-2 border-purple-500 text-purple-400 hover:bg-purple-500/20 font-bold text-lg px-8 py-6"
                       onClick={() => {
+                        console.log('🛡️ View dNFT Collection clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
                         if (!isLoggedIn) {
+                          console.log('🔒 Not logged in, opening login modal');
                           onOpenLogin?.();
                           return;
                         }
+                        console.log('✅ Switching to nfts tab');
                         onSwitchToTab?.('nfts');
                       }}
                     >
