@@ -18,6 +18,7 @@ import Confetti from "react-confetti";
 import { toast } from "sonner";
 import { useWallet } from "@/lib/stores/useWallet";
 import { useUser } from "@/lib/stores/useUser";
+import BlackCardEnrollmentForm from "@/components/BlackCardEnrollmentForm";
 
 // Hero-specific color themes matching TokenBadge
 const HERO_THEMES = {
@@ -348,6 +349,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
   const [loading, setLoading] = useState(true);
   const [claiming, setClaiming] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showVisaCardForm, setShowVisaCardForm] = useState(false);
   const [referralStats, setReferralStats] = useState<ReferralStats | null>(null);
   const [referralLink, setReferralLink] = useState<string>('');
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -885,8 +887,8 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 whileHover={{ scale: 1.05 }}
                 className="bg-gradient-to-br from-blue-900/50 to-blue-800/30 rounded-xl p-6 border-2 border-blue-500/50 hover:border-blue-400 transition-all cursor-pointer"
                 onClick={() => {
-                  console.log('🏦 Visa Card clicked');
-                  toast.info('Visa Card application coming soon!');
+                  console.log('🏦 Visa Card clicked - Opening enrollment form');
+                  setShowVisaCardForm(true);
                 }}
               >
                 <div className="text-center space-y-3">
@@ -1539,6 +1541,17 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
           </Card>
         </motion.div>
       )}
+
+      {/* Visa Card Enrollment Form */}
+      <BlackCardEnrollmentForm
+        isOpen={showVisaCardForm}
+        onClose={() => setShowVisaCardForm(false)}
+        onSubmit={(data) => {
+          console.log('Visa Card Enrollment submitted:', data);
+          toast.success('Application submitted! We\'ll review and contact you soon.');
+          setShowVisaCardForm(false);
+        }}
+      />
     </div>
   );
 }
