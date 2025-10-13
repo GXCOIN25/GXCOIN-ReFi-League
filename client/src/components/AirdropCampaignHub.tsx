@@ -314,7 +314,16 @@ const CampaignCard: React.FC<{
               opacity: eligibility?.eligible && !eligibility?.alreadyClaimed && isLoggedIn ? 1 : 0.5
             }}
             disabled={!isLoggedIn || !eligibility?.eligible || eligibility?.alreadyClaimed || claiming || !campaign.isActive}
-            onClick={() => onClaim(campaign.id)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('🎁 Claim button clicked for campaign:', campaign.id);
+              onClaim(campaign.id);
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
           >
             {!isLoggedIn ? (
               'Login to Claim'
@@ -824,13 +833,20 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 <Button 
                   size="lg"
                   className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('💎 Limited Time Bonus - Claim Now clicked');
                     if (!isLoggedIn) {
                       onOpenLogin?.();
                       return;
                     }
                     // Scroll to campaigns section
                     window.scrollTo({ top: 900, behavior: 'smooth' });
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                   }}
                 >
                   Claim Now <ArrowRight className="ml-2 h-5 w-5" />
@@ -1153,7 +1169,9 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                     <Button
                       size="lg"
                       className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-600 hover:from-purple-600 hover:via-pink-600 hover:to-purple-700 text-white font-bold text-lg px-8 py-6 shadow-lg shadow-purple-500/50"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         console.log('⚔️ Enter The Arena clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
                         if (!isLoggedIn) {
                           toast.info('Please login to access The Arena!');
@@ -1164,6 +1182,10 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                         console.log('✅ Switching to game tab');
                         onSwitchToTab?.('game');
                       }}
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
                     >
                       <Swords className="mr-2 h-6 w-6" />
                       Enter The Arena
@@ -1173,7 +1195,9 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                       size="lg"
                       variant="outline"
                       className="border-2 border-purple-500 text-purple-400 hover:bg-purple-500/20 font-bold text-lg px-8 py-6"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         console.log('🛡️ View dNFT Collection clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
                         if (!isLoggedIn) {
                           console.log('🔒 Not logged in, opening login modal');
@@ -1182,6 +1206,10 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                         }
                         console.log('✅ Switching to nfts tab');
                         onSwitchToTab?.('nfts');
+                      }}
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                       }}
                     >
                       <Shield className="mr-2 h-5 w-5" />
@@ -1234,7 +1262,15 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   variant="ghost"
                   size="icon"
                   className="text-gray-400 hover:text-white"
-                  onClick={() => setShowNextSteps(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowNextSteps(false);
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
                 >
                   ×
                 </Button>
@@ -1243,10 +1279,20 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {/* Step 1: Purchase dNFT for Arena Access - PRIMARY CTA */}
-                <Card className="bg-gradient-to-br from-pink-600/40 to-purple-600/40 border-pink-500 border-2 hover:border-pink-400 transition-all cursor-pointer shadow-lg shadow-pink-500/20" onClick={() => {
-                  setShowNextSteps(false);
-                  onSwitchToTab?.('nfts');
-                }}>
+                <Card 
+                  className="bg-gradient-to-br from-pink-600/40 to-purple-600/40 border-pink-500 border-2 hover:border-pink-400 transition-all cursor-pointer shadow-lg shadow-pink-500/20" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🎮 Enter Arena card clicked');
+                    setShowNextSteps(false);
+                    onSwitchToTab?.('nfts');
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                >
                   <CardContent className="pt-6">
                     <div className="text-center space-y-3">
                       <div className="mx-auto w-14 h-14 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full flex items-center justify-center animate-pulse">
@@ -1262,15 +1308,25 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 </Card>
 
                 {/* Step 2: Generate Referral Link */}
-                <Card className="bg-purple-900/30 border-purple-500/50 hover:border-purple-500 transition-all cursor-pointer" onClick={() => {
-                  setShowNextSteps(false);
-                  setTimeout(() => {
-                    const referralSection = document.getElementById('referral-section');
-                    if (referralSection) {
-                      referralSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                  }, 100);
-                }}>
+                <Card 
+                  className="bg-purple-900/30 border-purple-500/50 hover:border-purple-500 transition-all cursor-pointer" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('👥 Share & Earn card clicked');
+                    setShowNextSteps(false);
+                    setTimeout(() => {
+                      const referralSection = document.getElementById('referral-section');
+                      if (referralSection) {
+                        referralSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }
+                    }, 100);
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                >
                   <CardContent className="pt-6">
                     <div className="text-center space-y-3">
                       <div className="mx-auto w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
@@ -1286,10 +1342,20 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 </Card>
 
                 {/* Step 3: Claim More Campaigns */}
-                <Card className="bg-blue-900/30 border-blue-500/50 hover:border-blue-500 transition-all cursor-pointer" onClick={() => {
-                  setShowNextSteps(false);
-                  window.scrollTo({ top: 900, behavior: 'smooth' });
-                }}>
+                <Card 
+                  className="bg-blue-900/30 border-blue-500/50 hover:border-blue-500 transition-all cursor-pointer" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🎁 Claim More card clicked');
+                    setShowNextSteps(false);
+                    window.scrollTo({ top: 900, behavior: 'smooth' });
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                >
                   <CardContent className="pt-6">
                     <div className="text-center space-y-3">
                       <div className="mx-auto w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
@@ -1305,10 +1371,20 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 </Card>
 
                 {/* Step 4: Upgrade to Battle Pass */}
-                <Card className="bg-amber-900/30 border-amber-500/50 hover:border-amber-500 transition-all cursor-pointer" onClick={() => {
-                  setShowNextSteps(false);
-                  onSwitchToTab?.('battlepass');
-                }}>
+                <Card 
+                  className="bg-amber-900/30 border-amber-500/50 hover:border-amber-500 transition-all cursor-pointer" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('👑 Go Premium card clicked');
+                    setShowNextSteps(false);
+                    onSwitchToTab?.('battlepass');
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                >
                   <CardContent className="pt-6">
                     <div className="text-center space-y-3">
                       <div className="mx-auto w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-full flex items-center justify-center">
@@ -1389,7 +1465,15 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
               <div className="space-y-4">
                 {!referralLink && !referralStats?.referralCode ? (
                   <Button 
-                    onClick={generateReferralCode}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      generateReferralCode();
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
                     className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                   >
                     <Gift className="h-4 w-4 mr-2" />
@@ -1402,7 +1486,15 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                         {referralLink || `${window.location.origin}/ref/${referralStats?.referralCode}`}
                       </div>
                       <Button 
-                        onClick={copyReferralLink}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          copyReferralLink();
+                        }}
+                        onTouchEnd={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
                         variant="outline"
                         className="border-purple-500 text-purple-400 hover:bg-purple-500/20"
                       >
@@ -1414,35 +1506,75 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                       <p className="text-gray-300 text-sm font-medium">Share on Social Media:</p>
                       <div className="grid grid-cols-2 gap-2">
                         <Button 
-                          onClick={shareOnTwitter}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            shareOnTwitter();
+                          }}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
                           className="bg-blue-500 hover:bg-blue-600"
                         >
                           <Share2 className="h-4 w-4 mr-2" />
                           Twitter
                         </Button>
                         <Button 
-                          onClick={shareOnFacebook}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            shareOnFacebook();
+                          }}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
                           className="bg-blue-600 hover:bg-blue-700"
                         >
                           <FaFacebook className="h-4 w-4 mr-2" />
                           Facebook
                         </Button>
                         <Button 
-                          onClick={shareOnLinkedIn}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            shareOnLinkedIn();
+                          }}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
                           className="bg-blue-700 hover:bg-blue-800"
                         >
                           <FaLinkedin className="h-4 w-4 mr-2" />
                           LinkedIn
                         </Button>
                         <Button 
-                          onClick={shareOnInstagram}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            shareOnInstagram();
+                          }}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
                           className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:from-purple-600 hover:via-pink-600 hover:to-orange-600"
                         >
                           <FaInstagram className="h-4 w-4 mr-2" />
                           Instagram
                         </Button>
                         <Button 
-                          onClick={shareOnTikTok}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            shareOnTikTok();
+                          }}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
                           className="bg-black hover:bg-gray-900 border border-cyan-400"
                         >
                           <FaTiktok className="h-4 w-4 mr-2" />
@@ -1451,9 +1583,15 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                         <Button 
                           variant="outline"
                           className="border-purple-500 text-purple-400 hover:bg-purple-500/20"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
                             const discordUrl = `https://discord.com`;
                             window.open(discordUrl, '_blank');
+                          }}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
                           }}
                         >
                           <Share2 className="h-4 w-4 mr-2" />
