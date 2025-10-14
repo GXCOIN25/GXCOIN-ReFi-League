@@ -546,6 +546,14 @@ Start your exclusive missions at: ${window.location.origin}
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="flex items-center justify-center"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log('💎 Claim NFT button clicked (demo mode)');
+                        }}
+                        onTouchEnd={(e) => {
+                          e.stopPropagation();
+                          console.log('💎 Claim NFT button touched (demo mode)');
+                        }}
                       >
                         💎 Claim Your Platinum Series AQUA dNFT (from $175+)
                       </a>
@@ -568,7 +576,20 @@ Start your exclusive missions at: ${window.location.origin}
 
                 {/* Primary CTA */}
                 <Button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🚀 Start Mission button clicked');
+                    setLocation('/');
+                    setTimeout(() => {
+                      const gameTab = document.querySelector('[data-value="game"]') as HTMLElement;
+                      if (gameTab) gameTab.click();
+                    }, 500);
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🚀 Start Mission button touched');
                     setLocation('/');
                     setTimeout(() => {
                       const gameTab = document.querySelector('[data-value="game"]') as HTMLElement;
@@ -584,7 +605,16 @@ Start your exclusive missions at: ${window.location.origin}
                 {/* Share Buttons */}
                 <div className="grid grid-cols-2 gap-3">
                   <Button
-                    onClick={handleDownloadCertificate}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDownloadCertificate();
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDownloadCertificate();
+                    }}
                     variant="outline"
                     className="border-amber-500/50 hover:bg-amber-500/20 text-white"
                   >
@@ -592,7 +622,16 @@ Start your exclusive missions at: ${window.location.origin}
                     Platinum Certificate
                   </Button>
                   <Button
-                    onClick={handleCopyLink}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleCopyLink();
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleCopyLink();
+                    }}
                     variant="outline"
                     className="border-slate-400/50 hover:bg-slate-500/20 text-white"
                   >
@@ -604,7 +643,16 @@ Start your exclusive missions at: ${window.location.origin}
                 {/* Social Share Buttons */}
                 <div className="grid grid-cols-3 gap-2">
                   <Button
-                    onClick={handleShareTwitter}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleShareTwitter();
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleShareTwitter();
+                    }}
                     variant="outline"
                     size="sm"
                     className="border-blue-400/50 hover:bg-blue-400/20 text-white"
@@ -613,7 +661,16 @@ Start your exclusive missions at: ${window.location.origin}
                     Twitter
                   </Button>
                   <Button
-                    onClick={handleShareFacebook}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleShareFacebook();
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleShareFacebook();
+                    }}
                     variant="outline"
                     size="sm"
                     className="border-blue-600/50 hover:bg-blue-600/20 text-white"
@@ -622,7 +679,16 @@ Start your exclusive missions at: ${window.location.origin}
                     Facebook
                   </Button>
                   <Button
-                    onClick={handleShareLinkedIn}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleShareLinkedIn();
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleShareLinkedIn();
+                    }}
                     variant="outline"
                     size="sm"
                     className="border-blue-700/50 hover:bg-blue-700/20 text-white"
@@ -644,7 +710,16 @@ Start your exclusive missions at: ${window.location.origin}
                       className="bg-gray-800 border-slate-600 text-white"
                     />
                     <Button
-                      onClick={handleSendEmail}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleSendEmail();
+                      }}
+                      onTouchEnd={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleSendEmail();
+                      }}
                       size="sm"
                       variant="outline"
                       className="border-amber-500/50 hover:bg-amber-500/20"
