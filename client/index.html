@@ -87,6 +87,13 @@
   </head>
   <body class="dark">
     <div id="root"></div>
+    <script>
+      // TEMPORARY REDIRECT: Forward to working preview URL until CDN cache is fixed
+      // Remove this script once gxcoinheroes.com is working again
+      if (window.location.hostname === 'gxcoinheroes.com' || window.location.hostname === 'www.gxcoinheroes.com') {
+        window.location.href = 'https://0e0ed270-eebf-48f6-aeb7-3f28116e9d53-00-217wjbqdew0ol.janeway.replit.dev' + window.location.pathname + window.location.search;
+      }
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
