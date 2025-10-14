@@ -1202,6 +1202,13 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                       onTouchEnd={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        console.log('⚔️ Enter The Arena touched');
+                        if (!isLoggedIn) {
+                          toast.info('Please login to access The Arena!');
+                          onOpenLogin?.();
+                          return;
+                        }
+                        onSwitchToTab?.('game');
                       }}
                     >
                       <Swords className="mr-2 h-6 w-6" />
@@ -1227,6 +1234,12 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                       onTouchEnd={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        console.log('🛡️ View dNFT Collection touched');
+                        if (!isLoggedIn) {
+                          onOpenLogin?.();
+                          return;
+                        }
+                        onSwitchToTab?.('nfts');
                       }}
                     >
                       <Shield className="mr-2 h-5 w-5" />
@@ -1287,6 +1300,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   onTouchEnd={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    setShowNextSteps(false);
                   }}
                 >
                   ×
@@ -1308,6 +1322,9 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   onTouchEnd={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    console.log('🎮 Enter Arena card touched');
+                    setShowNextSteps(false);
+                    onSwitchToTab?.('nfts');
                   }}
                 >
                   <CardContent className="pt-6">
@@ -1342,6 +1359,14 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   onTouchEnd={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    console.log('👥 Share & Earn card touched');
+                    setShowNextSteps(false);
+                    setTimeout(() => {
+                      const referralSection = document.getElementById('referral-section');
+                      if (referralSection) {
+                        referralSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }
+                    }, 100);
                   }}
                 >
                   <CardContent className="pt-6">
@@ -1371,6 +1396,9 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   onTouchEnd={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    console.log('🎁 Claim More card touched');
+                    setShowNextSteps(false);
+                    window.scrollTo({ top: 900, behavior: 'smooth' });
                   }}
                 >
                   <CardContent className="pt-6">
@@ -1400,6 +1428,9 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   onTouchEnd={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    console.log('👑 Go Premium card touched');
+                    setShowNextSteps(false);
+                    onSwitchToTab?.('battlepass');
                   }}
                 >
                   <CardContent className="pt-6">
@@ -1485,11 +1516,14 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
+                      console.log('🖱️ Generate Referral Link - onClick fired');
                       generateReferralCode();
                     }}
                     onTouchEnd={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
+                      console.log('👆 Generate Referral Link - onTouchEnd fired');
+                      generateReferralCode();
                     }}
                     className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                   >
