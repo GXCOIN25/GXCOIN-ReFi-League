@@ -8,7 +8,24 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates
 
-### 🔗 Wallet Connection & Navigation Fixes (October 13, 2025 - Latest)
+### 🚀 Automated Deployment & GitHub Sync (October 19, 2025 - Latest)
+- **Automated Deployment Script**: Created `scripts/deploy-and-sync.ts` for one-command deployment
+  * Automatically commits all code changes
+  * Pushes to GitHub repository (GXCOIN25/GXCOIN-ReFj-League)
+  * Verifies sync and provides deployment status
+  * Run before republishing: `npx tsx scripts/deploy-and-sync.ts`
+- **Smart Contract Deployment Infrastructure**:
+  * Hardhat configuration for Polygon and Sepolia networks
+  * Deployment scripts for AirdropDistributor, BattlePass, CosmeticsNFT
+  * Gas Relayer system for gasless user transactions (platform covers fees)
+  * All contracts use OpenZeppelin security standards
+- **GitHub Integration**: Full repository sync with automated commit messages
+- **Deployment Workflow**: 
+  1. Run deployment script to sync GitHub
+  2. Republish on Replit Publishing tab
+  3. Smart contracts can be deployed separately to blockchain
+
+### 🔗 Wallet Connection & Navigation Fixes (October 13, 2025)
 - **Fixed Coinbase/Wallet "Open in New Tab" Race Condition (PRODUCTION FIX v2)**:
   * Problem: localStorage flags were being cleared by origin tab before new tab could read them
   * Root cause: Both tabs run cleanup useEffect, creating a race condition
