@@ -935,6 +935,12 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   console.log('🏦 Visa Card clicked - Opening enrollment form');
                   setShowVisaCardForm(true);
                 }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('👆 Visa Card touched - Opening enrollment form');
+                  setShowVisaCardForm(true);
+                }}
               >
                 <div className="text-center space-y-3">
                   <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
@@ -955,6 +961,18 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   e.preventDefault();
                   e.stopPropagation();
                   console.log('🎮 Arena Missions clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
+                  if (!isLoggedIn) {
+                    console.log('🔒 Not logged in, opening login modal');
+                    onOpenLogin?.();
+                    return;
+                  }
+                  console.log('✅ Switching to game tab');
+                  onSwitchToTab?.('game');
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('👆 Arena Missions touched - isLoggedIn:', isLoggedIn);
                   if (!isLoggedIn) {
                     console.log('🔒 Not logged in, opening login modal');
                     onOpenLogin?.();
@@ -991,6 +1009,18 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   console.log('✅ Switching to nfts tab');
                   onSwitchToTab?.('nfts');
                 }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('👆 Platinum Series touched - isLoggedIn:', isLoggedIn);
+                  if (!isLoggedIn) {
+                    console.log('🔒 Not logged in, opening login modal');
+                    onOpenLogin?.();
+                    return;
+                  }
+                  console.log('✅ Switching to nfts tab');
+                  onSwitchToTab?.('nfts');
+                }}
               >
                 <div className="text-center space-y-3">
                   <div className="mx-auto w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-500 rounded-full flex items-center justify-center">
@@ -1002,7 +1032,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                 </div>
               </motion.div>
 
-              {/* Offer 4: 10% Off dNFTs */}
+              {/* Offer 4: 10% OFF dNFTs */}
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -1011,6 +1041,18 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   e.preventDefault();
                   e.stopPropagation();
                   console.log('💰 10% OFF dNFTs clicked - isLoggedIn:', isLoggedIn, 'onSwitchToTab:', typeof onSwitchToTab);
+                  if (!isLoggedIn) {
+                    console.log('🔒 Not logged in, opening login modal');
+                    onOpenLogin?.();
+                    return;
+                  }
+                  console.log('✅ Switching to nfts tab');
+                  onSwitchToTab?.('nfts');
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('👆 10% OFF dNFTs touched - isLoggedIn:', isLoggedIn);
                   if (!isLoggedIn) {
                     console.log('🔒 Not logged in, opening login modal');
                     onOpenLogin?.();
