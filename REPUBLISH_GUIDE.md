@@ -1,6 +1,14 @@
 # 🚀 GXCOIN Republishing Guide
 
-This guide explains how to republish your GXCOIN platform with automatic GitHub synchronization.
+This guide explains how to republish your GXCOIN platform with automatic GitHub synchronization and CDN cache-busting.
+
+## ⚠️ CRITICAL: CDN Cache Issue Fixed!
+
+**Problem:** Updates show in preview but NOT on live site (gxcoinheroes.com)
+**Root Cause:** Replit's CDN caches your app for 5-10 minutes
+**Solution:** Cache-busting headers now implemented + wait time after republish
+
+See `CACHE_FIX_GUIDE.md` for complete technical details.
 
 ## Quick Republish Workflow
 
@@ -25,9 +33,12 @@ npx tsx scripts/deploy-and-sync.ts
 4. ✅ Prepares app for republishing
 
 **Then:**
-- Go to **Publishing** tab in Replit
-- Click **"Republish"**
-- Done! Your app is live with latest changes
+1. Go to **Publishing** tab in Replit
+2. Click **"Republish"**
+3. ⏰ **Wait 5-10 minutes** for CDN to refresh
+4. 🔄 **Hard refresh** your browser: `Ctrl + Shift + R` (Windows) or `Cmd + Shift + R` (Mac)
+5. ✅ Test live site: https://gxcoinheroes.com
+6. Done! Your app is live with latest changes
 
 ---
 
