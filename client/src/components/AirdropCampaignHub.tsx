@@ -864,6 +864,13 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                   onTouchEnd={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    console.log('👆 Limited Time Bonus - Claim Now touched');
+                    if (!isLoggedIn) {
+                      onOpenLogin?.();
+                      return;
+                    }
+                    // Scroll to campaigns section
+                    window.scrollTo({ top: 900, behavior: 'smooth' });
                   }}
                 >
                   Claim Now <ArrowRight className="ml-2 h-5 w-5" />
@@ -1587,6 +1594,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                         onTouchEnd={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
+                          copyReferralLink();
                         }}
                         variant="outline"
                         className="border-purple-500 text-purple-400 hover:bg-purple-500/20"
