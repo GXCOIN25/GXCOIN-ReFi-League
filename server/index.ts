@@ -12,6 +12,21 @@ app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// CRITICAL: Cache control headers for CDN cache-busting
+app.use((req, res, next) => {
+  // Set aggressive cache-busting headers for HTML, API responses
+  if (req.path === '/' || req.path.endsWith('.html') || req.path.startsWith('/api')) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+  // Allow caching for static assets (JS, CSS, images) with short TTL
+  else if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/)) {
+    res.setHeader('Cache-Control', 'public, max-age=300'); // 5 minutes
+  }
+  next();
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;

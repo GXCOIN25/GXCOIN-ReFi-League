@@ -14,6 +14,16 @@ Preferred communication style: Simple, everyday language.
   * Pushes to GitHub repository (GXCOIN25/GXCOIN-ReFj-League)
   * Verifies sync and provides deployment status
   * Run before republishing: `npx tsx scripts/deploy-and-sync.ts`
+- **CDN Cache-Busting Fix (CRITICAL PRODUCTION FIX)**:
+  * Problem: Updates showed in preview but NOT live on gxcoinheroes.com
+  * Root cause: Replit's CDN caches static assets for 5-10 minutes
+  * Solution implemented: Cache-control headers at HTML and server level
+  * Added cache-busting meta tags to index.html (no-cache, must-revalidate)
+  * Added Express middleware for aggressive cache control on HTML/API
+  * Static assets (JS/CSS/images) cached for 5 minutes only
+  * **Workflow**: Republish → Wait 5-10 min → Hard refresh browser (Ctrl+Shift+R)
+  * Verification script: `./verify-cache-headers.sh`
+  * Complete guide: `CACHE_FIX_GUIDE.md`
 - **Smart Contract Deployment Infrastructure**:
   * Hardhat configuration for Polygon and Sepolia networks
   * Deployment scripts for AirdropDistributor, BattlePass, CosmeticsNFT
@@ -21,9 +31,11 @@ Preferred communication style: Simple, everyday language.
   * All contracts use OpenZeppelin security standards
 - **GitHub Integration**: Full repository sync with automated commit messages
 - **Deployment Workflow**: 
-  1. Run deployment script to sync GitHub
-  2. Republish on Replit Publishing tab
-  3. Smart contracts can be deployed separately to blockchain
+  1. Run `./deploy.sh` to sync GitHub
+  2. Click "Republish" in Replit Publishing tab
+  3. Wait 5-10 minutes for CDN refresh
+  4. Hard refresh browser to see updates live
+  5. Smart contracts can be deployed separately to blockchain
 
 ### 🔗 Wallet Connection & Navigation Fixes (October 13, 2025)
 - **Fixed Coinbase/Wallet "Open in New Tab" Race Condition (PRODUCTION FIX v2)**:
