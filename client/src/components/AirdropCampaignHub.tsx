@@ -794,6 +794,108 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
         </motion.div>
       )}
 
+      {/* LOGGED IN USER - ACTIVATE REFERRAL LINK PROMPT */}
+      {isLoggedIn && !referralLink && !referralStats?.referralCode && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: -10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="max-w-4xl mx-auto mb-12"
+        >
+          <Card className="border-4 border-purple-500/70 bg-gradient-to-r from-purple-600/40 via-pink-600/40 to-purple-600/40 shadow-2xl overflow-hidden relative">
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10 pointer-events-none" />
+            
+            <CardContent className="p-8 relative">
+              <div className="text-center space-y-6">
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.15, 1],
+                    rotate: [0, 10, -10, 0]
+                  }}
+                  transition={{ 
+                    duration: 2.5,
+                    repeat: Infinity,
+                    repeatDelay: 0.5
+                  }}
+                  className="inline-block text-7xl"
+                >
+                  🎯
+                </motion.div>
+                
+                <div>
+                  <Badge className="bg-yellow-500 text-black font-bold text-sm px-4 py-2 mb-4">
+                    ⚡ STEP 1: START HERE
+                  </Badge>
+                  <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                    🚀 Activate Your Referral Link!
+                  </h2>
+                  <p className="text-gray-200 text-lg md:text-xl font-medium mb-3">
+                    Generate your unique referral link to start earning bonus tokens!
+                  </p>
+                  <p className="text-purple-300 text-base font-semibold mb-2">
+                    ✨ Every friend you invite = MORE tokens for BOTH of you!
+                  </p>
+                  <p className="text-gray-300 text-sm">
+                    Scroll down to the <span className="text-purple-400 font-bold">"Viral Referral System"</span> section and click <span className="text-green-400 font-bold">"Generate Referral Link"</span>
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold text-lg px-8 py-6 rounded-xl shadow-2xl transform transition-all hover:scale-105 w-full sm:w-auto"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('🎯 Scroll to Referral Section clicked');
+                      // Scroll to referral section
+                      const referralSection = document.getElementById('referral-section');
+                      if (referralSection) {
+                        referralSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Highlight it briefly
+                        referralSection.style.transition = 'all 0.3s';
+                        referralSection.style.transform = 'scale(1.02)';
+                        referralSection.style.boxShadow = '0 0 30px rgba(168, 85, 247, 0.6)';
+                        setTimeout(() => {
+                          referralSection.style.transform = 'scale(1)';
+                          referralSection.style.boxShadow = '';
+                        }, 2000);
+                      }
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('👆 Scroll to Referral Section touched');
+                      const referralSection = document.getElementById('referral-section');
+                      if (referralSection) {
+                        referralSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        referralSection.style.transition = 'all 0.3s';
+                        referralSection.style.transform = 'scale(1.02)';
+                        referralSection.style.boxShadow = '0 0 30px rgba(168, 85, 247, 0.6)';
+                        setTimeout(() => {
+                          referralSection.style.transform = 'scale(1)';
+                          referralSection.style.boxShadow = '';
+                        }, 2000);
+                      }
+                    }}
+                  >
+                    <Zap className="mr-3 h-6 w-6" />
+                    Take Me There!
+                    <ArrowRight className="ml-3 h-6 w-6" />
+                  </Button>
+                </div>
+
+                <div className="bg-purple-900/30 rounded-lg p-4 border border-purple-500/30">
+                  <p className="text-white text-sm font-semibold">
+                    💡 <span className="text-purple-300">Pro Tip:</span> Share your link on social media to maximize your earnings!
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
       {/* Epic Demo Section - How It Works */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

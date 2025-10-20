@@ -28,7 +28,17 @@ Preferred communication style: Simple, everyday language.
     - Added onTouchEnd to "Claim Now" limited time bonus button
     - Added onTouchEnd to "Generate Referral Link" and Copy buttons
   * Complete console logging for debugging login flow issues
-- **Impact**: Users can now easily find and click login button to create accounts and claim airdrops
+- **Post-Login Onboarding Flow**:
+  * Problem: Users redirected to arena after login with no clear next steps
+  * **Solution: "Activate Your Referral Link" Call-to-Action**:
+    - Giant purple prompt appears ONLY for logged-in users without referral links
+    - Animated target emoji (🎯) with "STEP 1: START HERE" badge
+    - Clear instructions: "Generate your unique referral link to start earning bonus tokens"
+    - "Take Me There!" button scrolls to referral section with visual highlight effect
+    - Automatically disappears once user generates their referral link
+  * Ensures new users start with referral activation to maximize viral growth
+  * Smooth scroll animation with 2-second purple glow highlight on referral section
+- **Impact**: Complete frictionless onboarding from signup → referral activation → token earning
 
 ### 🚀 Automated Deployment & GitHub Sync (October 19, 2025)
 - **Automated Deployment Script**: Created `scripts/deploy-and-sync.ts` for one-command deployment
