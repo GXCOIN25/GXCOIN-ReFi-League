@@ -1831,6 +1831,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                           onTouchEnd={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            shareOnTwitter();
                           }}
                           className="bg-blue-500 hover:bg-blue-600"
                         >
@@ -1846,6 +1847,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                           onTouchEnd={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            shareOnFacebook();
                           }}
                           className="bg-blue-600 hover:bg-blue-700"
                         >
@@ -1861,6 +1863,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                           onTouchEnd={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            shareOnLinkedIn();
                           }}
                           className="bg-blue-700 hover:bg-blue-800"
                         >
@@ -1876,6 +1879,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                           onTouchEnd={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            shareOnInstagram();
                           }}
                           className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:from-purple-600 hover:via-pink-600 hover:to-orange-600"
                         >
@@ -1891,6 +1895,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                           onTouchEnd={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            shareOnTikTok();
                           }}
                           className="bg-black hover:bg-gray-900 border border-cyan-400"
                         >
