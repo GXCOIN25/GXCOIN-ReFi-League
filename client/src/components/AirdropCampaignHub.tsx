@@ -90,7 +90,7 @@ interface EligibilityStatus {
 interface ReferralStats {
   totalReferrals: number;
   tier: string;
-  totalBonus: number;
+  bonusEarned: number;
   referralCode: string | null;
 }
 
@@ -1775,7 +1775,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                       <div className="text-center">
                         <TrendingUp className="h-5 w-5 text-green-400 mx-auto mb-2" />
                         <span className="text-gray-400 text-sm">Bonuses Earned</span>
-                        <p className="text-2xl font-bold text-white">{referralStats.totalBonus.toLocaleString()}</p>
+                        <p className="text-2xl font-bold text-white">{referralStats.bonusEarned?.toLocaleString() || '0'}</p>
                       </div>
                     </CardContent>
                   </Card>
