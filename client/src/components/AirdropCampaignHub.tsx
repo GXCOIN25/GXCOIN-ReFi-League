@@ -680,6 +680,120 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
         </p>
       </motion.div>
 
+      {/* PROMINENT LOGIN BUTTON - ALWAYS VISIBLE WHEN NOT LOGGED IN */}
+      {!isLoggedIn && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="max-w-3xl mx-auto mb-12"
+        >
+          <Card className="border-4 border-green-500/70 bg-gradient-to-r from-green-600/30 via-emerald-600/30 to-green-600/30 shadow-2xl overflow-hidden">
+            <CardContent className="p-8">
+              <div className="text-center space-y-6">
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.1, 1],
+                    rotate: [0, 5, -5, 0]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatDelay: 1
+                  }}
+                  className="inline-block text-6xl"
+                >
+                  🎁
+                </motion.div>
+                
+                <div>
+                  <h2 className="text-3xl font-bold text-white mb-3">
+                    🚀 Start Your Journey!
+                  </h2>
+                  <p className="text-gray-200 text-lg font-medium mb-2">
+                    Create a free account to claim airdrops, earn bonuses, and unlock rewards!
+                  </p>
+                  <p className="text-green-300 text-sm font-semibold">
+                    ✅ No crypto wallet needed • ✅ Free to join • ✅ Instant access
+                  </p>
+                </div>
+
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold text-xl px-12 py-8 rounded-xl shadow-2xl transform transition-all hover:scale-105 w-full md:w-auto"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🎯 PROMINENT LOGIN BUTTON - onClick fired');
+                    
+                    // Method 1: Use the callback
+                    if (onOpenLogin) {
+                      console.log('✅ Using onOpenLogin callback');
+                      onOpenLogin();
+                    } else {
+                      console.log('⚠️ onOpenLogin not available, using fallback');
+                      
+                      // Method 2: Emit custom event
+                      const event = new CustomEvent('openLoginModal', { detail: { source: 'airdrop-login-button' } });
+                      window.dispatchEvent(event);
+                      console.log('📡 Custom event dispatched: openLoginModal');
+                      
+                      // Method 3: Try direct DOM manipulation as last resort
+                      setTimeout(() => {
+                        const loginButton = document.querySelector('[data-login-trigger]') as HTMLButtonElement;
+                        if (loginButton) {
+                          console.log('🔘 Found login trigger button, clicking it');
+                          loginButton.click();
+                        } else {
+                          console.error('❌ No login trigger found');
+                          toast.error('Unable to open login. Please refresh the page and try again.');
+                        }
+                      }, 100);
+                    }
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('👆 PROMINENT LOGIN BUTTON - onTouchEnd fired');
+                    
+                    // Same logic for mobile
+                    if (onOpenLogin) {
+                      console.log('✅ Using onOpenLogin callback (mobile)');
+                      onOpenLogin();
+                    } else {
+                      console.log('⚠️ onOpenLogin not available (mobile), using fallback');
+                      
+                      const event = new CustomEvent('openLoginModal', { detail: { source: 'airdrop-login-button-touch' } });
+                      window.dispatchEvent(event);
+                      console.log('📡 Custom event dispatched (mobile): openLoginModal');
+                      
+                      setTimeout(() => {
+                        const loginButton = document.querySelector('[data-login-trigger]') as HTMLButtonElement;
+                        if (loginButton) {
+                          console.log('🔘 Found login trigger button (mobile), clicking it');
+                          loginButton.click();
+                        } else {
+                          console.error('❌ No login trigger found (mobile)');
+                          toast.error('Unable to open login. Please refresh the page and try again.');
+                        }
+                      }, 100);
+                    }
+                  }}
+                >
+                  <UserPlus className="mr-3 h-7 w-7" />
+                  Create Account / Login
+                  <ArrowRight className="ml-3 h-7 w-7" />
+                </Button>
+
+                <p className="text-gray-400 text-sm">
+                  Already have an account? Click above to login instantly!
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
+
       {/* Epic Demo Section - How It Works */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

@@ -8,7 +8,29 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates
 
-### 🚀 Automated Deployment & GitHub Sync (October 19, 2025 - Latest)
+### 🔐 Prominent Login/Signup System (October 20, 2025 - Latest)
+- **CRITICAL FIX: Added Standalone Login Button to Airdrops Page**:
+  * Problem: Users had NO visible way to create accounts or login on published site
+  * Root cause: `onOpenLogin` callback not triggering reliably in production
+  * **Solution: Prominent "Create Account / Login" button**:
+    - Large, animated call-to-action at top of Airdrop Campaign Hub
+    - Only visible when user is NOT logged in (disappears after login)
+    - Green gradient design with animated gift icon for maximum visibility
+    - Clear messaging: "No crypto wallet needed • Free to join • Instant access"
+    - Full mobile touch support with onTouchEnd handlers
+  * **Triple-Fallback Login System**:
+    - Primary: Uses onOpenLogin callback prop
+    - Fallback 1: Dispatches custom 'openLoginModal' event (caught by App.tsx listener)
+    - Fallback 2: DOM manipulation to find and click login trigger
+    - Fallback 3: User-friendly error message with refresh instruction
+  * **Mobile Touch Enhancements**:
+    - Added onTouchEnd to all airdrop benefit cards (Visa Card, Arena, Platinum, 10% OFF)
+    - Added onTouchEnd to "Claim Now" limited time bonus button
+    - Added onTouchEnd to "Generate Referral Link" and Copy buttons
+  * Complete console logging for debugging login flow issues
+- **Impact**: Users can now easily find and click login button to create accounts and claim airdrops
+
+### 🚀 Automated Deployment & GitHub Sync (October 19, 2025)
 - **Automated Deployment Script**: Created `scripts/deploy-and-sync.ts` for one-command deployment
   * Automatically commits all code changes
   * Pushes to GitHub repository (GXCOIN25/GXCOIN-ReFj-League)

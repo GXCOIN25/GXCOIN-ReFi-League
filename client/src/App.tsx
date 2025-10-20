@@ -253,6 +253,23 @@ function MainExperience({ initialTab = "home" }: { initialTab?: string }) {
   //   }
   // }, [isLoggedIn]);
 
+  // Listen for custom login modal events (fallback mechanism)
+  useEffect(() => {
+    const handleOpenLoginModal = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      console.log('🔔 Custom openLoginModal event received:', customEvent.detail);
+      setShowLoginModal(true);
+    };
+
+    window.addEventListener('openLoginModal', handleOpenLoginModal);
+    console.log('👂 Registered openLoginModal event listener');
+
+    return () => {
+      window.removeEventListener('openLoginModal', handleOpenLoginModal);
+      console.log('🔇 Removed openLoginModal event listener');
+    };
+  }, []);
+
   return (
     <div className="min-h-[100dvh] bg-gradient-to-br from-gray-900 via-black to-blue-900 relative overflow-y-auto">
       {/* Background with Hero Visualization - Hidden on mobile when showing main content */}
