@@ -408,6 +408,14 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
     }
   }, [isLoggedIn, campaigns.length]);
 
+  // Fetch referral stats when user is logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      console.log('👤 User logged in, fetching referral stats...');
+      fetchReferralStats();
+    }
+  }, [isLoggedIn]);
+
   // Fetch referral stats when connected
   useEffect(() => {
     if (isConnected) {
