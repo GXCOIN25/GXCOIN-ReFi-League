@@ -157,7 +157,8 @@ const CampaignCard: React.FC<{
   onClaim: (campaignId: number) => void;
   claiming: boolean;
   isLoggedIn: boolean;
-}> = ({ campaign, eligibility, onClaim, claiming, isLoggedIn }) => {
+  onSwitchToTab?: (tab: string) => void;
+}> = ({ campaign, eligibility, onClaim, claiming, isLoggedIn, onSwitchToTab }) => {
   const theme = HERO_THEMES[campaign.heroId as keyof typeof HERO_THEMES] || HERO_THEMES.gxcoin_anchor;
   const progressPercentage = (campaign.claimedAmount / campaign.totalAllocation) * 100;
   const remainingAllocation = campaign.totalAllocation - campaign.claimedAmount;
@@ -343,6 +344,116 @@ const CampaignCard: React.FC<{
               'Not Eligible'
             )}
           </Button>
+
+          {/* EPIC BATTLE PASS LIMITED TIME OFFER */}
+          {isLoggedIn && eligibility?.alreadyClaimed && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative overflow-hidden rounded-lg border-2 border-orange-500 bg-gradient-to-br from-orange-500/20 via-yellow-500/10 to-orange-600/20 p-4 mt-3"
+            >
+              {/* Animated glow effect */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-400/20 to-transparent"
+                animate={{
+                  translateX: ['-100%', '100%']
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'linear'
+                }}
+              />
+              
+              <div className="relative z-10 space-y-3">
+                {/* LIMITED TIME badge */}
+                <div className="flex items-center justify-between">
+                  <motion.div
+                    animate={{ scale: [1, 1.05, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                    className="flex items-center gap-2"
+                  >
+                    <Badge className="bg-red-500 text-white border-red-600 font-bold">
+                      <Timer className="h-3 w-3 mr-1" />
+                      LIMITED TIME
+                    </Badge>
+                    <Badge className="bg-yellow-500 text-black border-yellow-600 font-bold">
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      BONUS REWARDS
+                    </Badge>
+                  </motion.div>
+                </div>
+
+                {/* Title */}
+                <div className="text-center">
+                  <h4 className="text-lg font-bold text-white flex items-center justify-center gap-2">
+                    <Trophy className="h-5 w-5 text-yellow-400" />
+                    Unlock Battle Pass Premium
+                    <Trophy className="h-5 w-5 text-yellow-400" />
+                  </h4>
+                  <p className="text-sm text-gray-300 mt-1">
+                    2x rewards on EVERY mission + exclusive perks
+                  </p>
+                </div>
+
+                {/* Features grid */}
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex items-center gap-1 text-green-400">
+                    <CheckCircle2 className="h-3 w-3" />
+                    <span>Double XP</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-green-400">
+                    <CheckCircle2 className="h-3 w-3" />
+                    <span>Exclusive NFTs</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-green-400">
+                    <CheckCircle2 className="h-3 w-3" />
+                    <span>Premium Rewards</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-green-400">
+                    <CheckCircle2 className="h-3 w-3" />
+                    <span>VIP Access</span>
+                  </div>
+                </div>
+
+                {/* CTA Button */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button
+                    className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-bold shadow-lg shadow-orange-500/50"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('🎮 Battle Pass CTA clicked from airdrops');
+                      if (onSwitchToTab) {
+                        onSwitchToTab('battlepass');
+                      } else {
+                        const event = new CustomEvent('navigateToTab', { detail: { tab: 'battlepass' } });
+                        window.dispatchEvent(event);
+                      }
+                    }}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('👆 Battle Pass CTA touch from airdrops');
+                      if (onSwitchToTab) {
+                        onSwitchToTab('battlepass');
+                      } else {
+                        const event = new CustomEvent('navigateToTab', { detail: { tab: 'battlepass' } });
+                        window.dispatchEvent(event);
+                      }
+                    }}
+                  >
+                    <Crown className="h-4 w-4 mr-2" />
+                    Upgrade for $29.99
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </motion.div>
+              </div>
+            </motion.div>
+          )}
         </CardContent>
       </Card>
     </motion.div>
@@ -1383,6 +1494,7 @@ export default function AirdropCampaignHub({ onOpenLogin, onSwitchToTab }: { onO
                     onClaim={handleClaim}
                     claiming={claiming}
                     isLoggedIn={isLoggedIn}
+                    onSwitchToTab={onSwitchToTab}
                   />
                 ))}
               </div>
