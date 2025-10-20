@@ -324,6 +324,8 @@ const CampaignCard: React.FC<{
             onTouchEnd={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              console.log('👆 Claim button touched for campaign:', campaign.id);
+              onClaim(campaign.id);
             }}
           >
             {!isLoggedIn ? (
